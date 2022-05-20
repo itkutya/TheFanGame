@@ -14,7 +14,7 @@ public:
 	window(const sf::VideoMode& size, const char* name);
 	virtual ~window();
 
-	operator bool() const;
+	operator const bool();
 
 	const void pollEvents();
 private:

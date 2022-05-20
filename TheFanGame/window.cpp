@@ -12,9 +12,10 @@ window::~window()
 
 }
 
-window::operator bool() const
+window::operator const bool()
 {
-	return m_window.isOpen();
+	this->pollEvents();
+	return this->m_window.isOpen();
 }
 
 const void window::pollEvents()
@@ -23,7 +24,7 @@ const void window::pollEvents()
 	{
 		if (this->m_event.type == sf::Event::Closed)
 			this->m_window.close();
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && this->m_window.hasFocus())
 			this->m_window.close();
 	}
 }

@@ -7,21 +7,17 @@ int main()
 {
 	window mainWindow(sf::VideoMode(500, 500), "TITLE!5!%!");
 
-	try
-	{
-		while (mainWindow)
-		{
-			mainWindow.pollEvents();
+	try {
+		while (mainWindow) {
 		}
 	}
-	catch (const std::exception& e)
-	{
+	catch (const std::exception& e) {
 		std::cout << "\033[1;4;31m" << e.what() << '\n' << "\033[0m";
+		return -1;
 	}
-	catch(...)
-	{
+	catch(...) {
 		std::cout << "\033[1;4;31m" << "Something went terribly wrong...\n" << "\033[0m";
+		return -2;
 	}
-
 	return 0;
 }
