@@ -9,11 +9,12 @@ int main()
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << e.what() << '\n';
+		std::cout << "\033[1;4;31m" << e.what() << '\n' << "\033[0m";
 	}
 	catch(...)
 	{
-		std::cout << "Somehing went wrong...\n";
+		std::cout << "\033[1;4;31m" << "Something went terribly wrong...\n" << "\033[0m";
 	}
+
 	return 0;
 }
