@@ -1,11 +1,18 @@
 #include <exception>
 #include <iostream>
 
+#include "window.h"
+
 int main()
 {
+	window mainWindow(sf::VideoMode(500, 500), "TITLE!5!%!");
+
 	try
 	{
-
+		while (mainWindow)
+		{
+			mainWindow.pollEvents();
+		}
 	}
 	catch (const std::exception& e)
 	{
