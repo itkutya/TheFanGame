@@ -6,9 +6,12 @@
 int main()
 {
 	window mainWindow(sf::VideoMode(500, 500), "TITLE!5!%!");
+	mainWindow.setFramerateLimit(60);
 
 	try {
 		while (mainWindow) {
+			mainWindow.update();
+			mainWindow.draw();
 		}
 	}
 	catch (const std::exception& e) {

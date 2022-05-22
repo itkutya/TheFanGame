@@ -8,6 +8,8 @@
 	#endif
 #endif
 
+#include <vector>
+
 class window
 {
 public:
@@ -16,12 +18,16 @@ public:
 
 	operator const bool();
 
-	const void pollEvents();
+	const void setFramerateLimit(const unsigned int& limit);
+	void addToDrawPool(const sf::Drawable* object);
+
+	const void draw();
+	void update();
 private:
 	sf::RenderWindow m_window;
-	const sf::VideoMode videoMode;
-	const char* title;
-
 	sf::Event m_event;
-};
 
+	std::vector<const sf::Drawable*> objects;
+	
+	const void pollEvents();
+};
