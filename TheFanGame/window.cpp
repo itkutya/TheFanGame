@@ -38,10 +38,4 @@ const void window::draw() {
 void window::update() {
 	float dt = this->deltaTime.getElapsedTime().asSeconds();
 	this->deltaTime.restart();
-
-	std::cout << 1 / dt << '\n';
 }
-
-const void window::setFramerateLimit(const unsigned int& limit) { this->m_window.setFramerateLimit(limit); }
-
-void window::addToDrawPool(const sf::Drawable* object) { this->objects.emplace_back(object); }

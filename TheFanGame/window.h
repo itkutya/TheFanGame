@@ -13,8 +13,7 @@ public:
 
 	operator const bool();
 
-	const void setFramerateLimit(const unsigned int& limit);
-	void addToDrawPool(const sf::Drawable* object);
+	inline const void setFramerateLimit(const unsigned int& limit) { this->m_window.setFramerateLimit(limit); };
 
 	const void draw();
 	void update();
@@ -25,7 +24,8 @@ private:
 
 	std::vector<const sf::Drawable*> objects;
 
-	entity quad = entity(sf::PrimitiveType::Quads, 4);
-	
 	const void pollEvents();
+	inline const void addToDrawPool(const sf::Drawable* object) { this->objects.emplace_back(object); };
+
+	entity quad = entity(sf::PrimitiveType::Quads, 4);
 };
