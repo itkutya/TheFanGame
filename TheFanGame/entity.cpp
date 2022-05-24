@@ -1,15 +1,16 @@
 #include "entity.h"
 
-entity::entity(const sf::PrimitiveType& type, const std::size_t& size, const sf::Texture& texture) {
+entity::entity(const sf::PrimitiveType& type, const std::size_t& size, const std::string& source) {
 	this->m_vertices.setPrimitiveType(type);
 	this->m_vertices.resize(size);
+
+	if (!this->m_texture.loadFromFile(source))
+		throw "Cannot load texture...\n";
 }
 
 entity::~entity() {}
 
-entity::operator const sf::Drawable*() {
-	return &this->m_vertices;
-}
+entity::operator const sf::Drawable*() { return this; }
 
 sf::Vertex& entity::operator[](const std::size_t index) {
 	if (index > this->m_vertices.getVertexCount())

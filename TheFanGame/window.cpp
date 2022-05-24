@@ -9,15 +9,19 @@ window::window(const sf::VideoMode& size, const char* name) {
 	quad[1].position = sf::Vector2f(90.f, 30.f);
 	quad[2].position = sf::Vector2f(90.f, 90.f);
 	quad[3].position = sf::Vector2f(30.f, 90.f);
+
+	quad[0].texCoords = sf::Vector2f(0, 0);
+	quad[1].texCoords = sf::Vector2f(64, 0);
+	quad[2].texCoords = sf::Vector2f(64, 64);
+	quad[3].texCoords = sf::Vector2f(0, 64);
 	this->addToDrawPool(quad);
 }
 
 window::~window() {}
 
-window::operator const bool() {
-	this->pollEvents();
-	return this->m_window.isOpen();
-}
+window::operator const bool() { return this->m_window.isOpen(); }
+
+const void window::setFramerateLimit(const unsigned int& limit) { this->m_window.setFramerateLimit(limit); }
 
 const void window::pollEvents() {
 	while (this->m_window.pollEvent(this->m_event)) {
@@ -29,13 +33,20 @@ const void window::pollEvents() {
 }
 
 const void window::draw() {
-	this->m_window.clear(sf::Color::Black);
+	this->m_window.clear(sf::Color::Blue);
 	for (auto& i : objects)
 		this->m_window.draw(*i);
 	this->m_window.display();
 }
 
-void window::update() {
-	float dt = this->deltaTime.getElapsedTime().asSeconds();
-	this->deltaTime.restart();
+const void window::update() {
+	float dt = this->deltaTime.restart().asSeconds();
+	//std::cout << 1 / dt << '\n';
+
+	if (anim.update(dt, 30.f))
+	{
+		std::cout << "Something\n";
+	}
 }
+
+const void window::addToDrawPool(const sf::Drawable* object) { this->objects.emplace_back(object); }

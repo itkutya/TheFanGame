@@ -9,6 +9,7 @@ int main()
 
 	try {
 		while (mainWindow) {
+			mainWindow.pollEvents();
 			mainWindow.update();
 			mainWindow.draw();
 		}

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "entity.h"
+#include "animation.h"
 
 class window
 {
@@ -13,19 +14,19 @@ public:
 
 	operator const bool();
 
-	inline const void setFramerateLimit(const unsigned int& limit) { this->m_window.setFramerateLimit(limit); };
+	const void setFramerateLimit(const unsigned int& limit);
 
+	const void pollEvents ();
 	const void draw();
-	void update();
+	const void update();
 private:
 	sf::RenderWindow m_window;
 	sf::Event m_event;
 	sf::Clock deltaTime;
 
 	std::vector<const sf::Drawable*> objects;
+	const void addToDrawPool(const sf::Drawable* object);
 
-	const void pollEvents();
-	inline const void addToDrawPool(const sf::Drawable* object) { this->objects.emplace_back(object); };
-
-	entity quad = entity(sf::PrimitiveType::Quads, 4);
+	entity quad = entity(sf::PrimitiveType::Quads, 4, "res/wolftextures.png");
+	animation anim;
 };

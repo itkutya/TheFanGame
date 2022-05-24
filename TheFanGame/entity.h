@@ -11,11 +11,11 @@
 class entity : public sf::Drawable, public sf::Transformable
 {
 public:
-	entity(const sf::PrimitiveType& type, const std::size_t& size, const sf::Texture& texture = sf::Texture());
+	entity(const sf::PrimitiveType& type, const std::size_t& size, const std::string& source);
 	virtual ~entity();
 
-	virtual operator const sf::Drawable*();
-	virtual sf::Vertex& operator[](const std::size_t index);
+	virtual operator const sf::Drawable* ();
+	virtual sf::Vertex& operator[] (const std::size_t index);
 private:
 	sf::VertexArray m_vertices;
 	sf::Texture m_texture;
