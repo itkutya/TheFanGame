@@ -5,6 +5,7 @@
 
 #include "entity.h"
 #include "animation.h"
+#include "gui.h"
 
 class window
 {
@@ -21,7 +22,6 @@ public:
 	const void update();
 private:
 	sf::RenderWindow m_window;
-	sf::Event m_event;
 	sf::Clock deltaTime;
 
 	std::vector<const sf::Drawable*> objects;
@@ -29,4 +29,8 @@ private:
 
 	entity quad = entity(sf::PrimitiveType::Quads, 4, "res/wolftextures.png");
 	animation anim;
+	bool e = false;
+	float r = 12.f;
+	sf::CircleShape c = sf::CircleShape(r);
+	gui MENU;
 };
