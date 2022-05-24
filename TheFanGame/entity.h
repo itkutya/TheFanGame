@@ -12,7 +12,7 @@ class entity : public sf::Drawable, public sf::Transformable
 {
 public:
 	entity(const sf::PrimitiveType& type, const std::size_t& size, const std::string& source);
-	virtual ~entity();
+	virtual ~entity() noexcept;
 
 	virtual operator const sf::Drawable* ();
 	virtual sf::Vertex& operator[] (const std::size_t index);

@@ -8,7 +8,7 @@ entity::entity(const sf::PrimitiveType& type, const std::size_t& size, const std
 		throw "Cannot load texture...\n";
 }
 
-entity::~entity() {}
+entity::~entity() noexcept {}
 
 entity::operator const sf::Drawable*() { return this; }
 

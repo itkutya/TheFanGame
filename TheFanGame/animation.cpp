@@ -1,17 +1,17 @@
 #include "animation.h"
 
-animation::animation() 
+animation::animation() noexcept
 {
 	this->timer.restart();
 }
 
-animation::~animation() {}
+animation::~animation() noexcept {}
 
-const bool animation::update(const float& dt, const float& speed)
+const bool animation::update(const sf::Time& speed) noexcept
 {
-	if (this->timer.getElapsedTime().asSeconds() > speed * dt)
+	if (this->timer.getElapsedTime().asMicroseconds() > speed.asMicroseconds())
 	{
-		std::cout << this->timer.getElapsedTime().asSeconds();
+		std::cout << this->timer.getElapsedTime().asMicroseconds() << '\n';
 		this->timer.restart();
 		return true;
 	}

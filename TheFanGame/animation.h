@@ -13,10 +13,10 @@
 class animation
 {
 public:
-	animation();
-	virtual ~animation();
+	animation() noexcept;
+	virtual ~animation() noexcept;
 
-	const bool update(const float& dt, const float& speed);
+	const bool update(const sf::Time& speed) noexcept;
 private:
 	sf::Clock timer;
 };

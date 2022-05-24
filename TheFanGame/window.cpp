@@ -1,6 +1,6 @@
 #include "window.h"
 
-window::window(const sf::VideoMode& size, const char* name) {
+window::window(const sf::VideoMode& size, const char* name) noexcept {
 	this->m_window.create(size, name);
 	this->m_event = sf::Event();
 	this->deltaTime.restart();
@@ -17,7 +17,7 @@ window::window(const sf::VideoMode& size, const char* name) {
 	this->addToDrawPool(quad);
 }
 
-window::~window() {}
+window::~window() noexcept {}
 
 window::operator const bool() { return this->m_window.isOpen(); }
 
@@ -40,13 +40,11 @@ const void window::draw() {
 }
 
 const void window::update() {
-	float dt = this->deltaTime.restart().asSeconds();
+	const float dt = this->deltaTime.restart().asSeconds();
 	//std::cout << 1 / dt << '\n';
 
-	if (anim.update(dt, 30.f))
-	{
+	if (anim.update(sf::seconds(3.f)))
 		std::cout << "Something\n";
-	}
 }
 
 const void window::addToDrawPool(const sf::Drawable* object) { this->objects.emplace_back(object); }

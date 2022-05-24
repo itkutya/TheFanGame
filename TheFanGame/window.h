@@ -9,10 +9,10 @@
 class window
 {
 public:
-	window(const sf::VideoMode& size, const char* name);
-	virtual ~window();
+	window(const sf::VideoMode& size, const char* name) noexcept;
+	virtual ~window() noexcept;
 
-	operator const bool();
+	explicit operator const bool();
 
 	const void setFramerateLimit(const unsigned int& limit);
 
