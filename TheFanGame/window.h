@@ -1,8 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-
 #include "entity.h"
 #include "animation.h"
 #include "gui.h"
@@ -13,24 +10,20 @@ public:
 	window(const sf::VideoMode& size, const char* name) noexcept;
 	virtual ~window() noexcept;
 
-	explicit operator const bool();
+	explicit operator const bool() noexcept;
 
-	const void setFramerateLimit(const unsigned int& limit);
+	const void setFramerateLimit(const unsigned int& limit) noexcept;
 
-	const void pollEvents ();
-	const void draw();
-	const void update();
+	const void pollEvents() noexcept;
+	const void draw() noexcept;
+	const void update() noexcept;
 private:
 	sf::RenderWindow m_window;
 	sf::Clock deltaTime;
+	
+	std::unique_ptr<stateSystem> m_states;
 
 	std::vector<const sf::Drawable*> objects;
-	const void addToDrawPool(const sf::Drawable* object);
+	const void addToDrawPool(const sf::Drawable* object) noexcept;
 
-	entity quad = entity(sf::PrimitiveType::Quads, 4, "res/wolftextures.png");
-	animation anim;
-	bool e = false;
-	float r = 12.f;
-	sf::CircleShape c = sf::CircleShape(r);
-	gui MENU;
 };

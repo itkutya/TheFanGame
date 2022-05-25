@@ -51,6 +51,9 @@
     <ClCompile Include="ImGUI\imgui-SFML.cpp">
       <Filter>ImGUI</Filter>
     </ClCompile>
+    <ClCompile Include="ImGUI\imgui_demo.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
