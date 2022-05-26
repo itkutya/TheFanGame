@@ -20,10 +20,7 @@ public:
 private:
 	sf::RenderWindow m_window;
 	sf::Clock deltaTime;
-	
-	std::unique_ptr<stateSystem> m_states;
 
 	std::vector<const sf::Drawable*> objects;
 	const void addToDrawPool(const sf::Drawable* object) noexcept;
-
 };

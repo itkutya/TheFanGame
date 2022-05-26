@@ -4,6 +4,7 @@
 #include "ImGUI/imgui-SFML.h"
 
 #include "stateSystem.h"
+#include "resourceManager.h"
 
 class gui : public state
 {
@@ -16,7 +17,5 @@ public:
 	virtual const void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 private:
-	sf::Texture avatar;
-	sf::Texture menuGirl;
 	float xp = 0.f;
 };

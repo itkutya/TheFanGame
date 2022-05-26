@@ -173,6 +173,7 @@
     <ClCompile Include="ImGUI\imgui_tables.cpp" />
     <ClCompile Include="ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="resourceManager.cpp" />
     <ClCompile Include="stateSystem.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
@@ -190,6 +191,7 @@
     <ClInclude Include="ImGUI\imstb_textedit.h" />
     <ClInclude Include="ImGUI\imstb_truetype.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="resourceManager.h" />
     <ClInclude Include="stateSystem.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>

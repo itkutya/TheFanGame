@@ -1,16 +1,13 @@
 #include "gui.h"
 
-gui::gui() noexcept {}
+gui::gui() noexcept { m_resources = std::make_shared<resourceManager>(); }
 
-gui::~gui() noexcept { ImGui::SFML::Shutdown(); }
+gui::~gui() noexcept { ImGui::SFML::Shutdown(); m_resources.reset(); }
 
 const void gui::init(sf::RenderWindow& window)
 {
 	this->xp = 0.f;
-	if (!this->avatar.loadFromFile("res/wolftextures.png"))
-		throw "Cannot load image...\n";
-	if (!this->menuGirl.loadFromFile("res/wolftextures.png"))
-		throw "Cannot load image...\n";
+	m_resources->addTexture(0, "res/wolftextures.png");
 	ImGui::SFML::Init(window);
 	ImGui::StyleColorsDark();
 }
@@ -24,9 +21,11 @@ const void gui::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 	ImGui::Text("FPS: %f", 1.f / dt.asSeconds());
 	ImGui::SetCursorPos(ImVec2(25.f, 45.f));
-	ImGui::Image(this->avatar, sf::Vector2f(50.f, 50.f));
+	ImGui::Image(m_resources->getTexture(0), sf::Vector2f(50.f, 50.f));
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("This is a test tip!");
 	ImGui::SetCursorPos(ImVec2(300.f, 115.f));
-	ImGui::Image(this->menuGirl, sf::Vector2f(200.f, 200.f));
+	ImGui::Image(m_resources->getTexture(0), sf::Vector2f(200.f, 200.f));
 	ImGui::SetCursorPos(ImVec2(100.f, 65.f));
 	ImGui::SliderFloat("Level: ", &this->xp, 0.f, 100.f, "%.3f", ImGuiSliderFlags_NoInput);
 	ImGui::SetCursorPos(ImVec2(50.f, 115.f));

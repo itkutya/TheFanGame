@@ -38,6 +38,6 @@ public:
 private:
     std::stack<std::unique_ptr<state>> m_stateStack;
     std::unique_ptr<state> m_newState;
-
-    bool m_replace;
 };
+
+static std::unique_ptr<stateSystem> m_states;
