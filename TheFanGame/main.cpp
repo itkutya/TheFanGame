@@ -3,12 +3,13 @@
 #include "window.h"
 
 int main()
-{	
-	window mainWindow(sf::VideoMode(500, 500), "TITLE!5!%!");
-	mainWindow.setFramerateLimit(60);
-
+{
 	try
 	{
+		m_states = std::make_unique<stateSystem>();
+		window mainWindow(sf::VideoMode(500, 500), "TITLE!5!%!", m_states);
+		mainWindow.setFramerateLimit(60);
+
 		while (mainWindow) 
 		{
 			mainWindow.pollEvents();

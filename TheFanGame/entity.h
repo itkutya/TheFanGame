@@ -8,18 +8,27 @@
 	#endif
 #endif
 
+#include "resourceManager.h"
+#include "animation.h"
+
+constexpr float PI = 3.141592653589793116f;
+
 class entity : public sf::Drawable, public sf::Transformable
 {
 public:
-	entity(const sf::PrimitiveType& type, const std::size_t& size, const std::string& source);
+	entity(const sf::PrimitiveType& type = sf::PrimitiveType::Quads, const std::size_t& size = 4, const std::string& source = "");
 	virtual ~entity() noexcept;
 
 	virtual operator const sf::Drawable* ();
 	virtual sf::Vertex& operator[] (const std::size_t index);
-private:
-	sf::VertexArray m_vertices;
-	sf::Texture m_texture;
 
+	sf::VertexArray m_vertices;
+	sf::Vector2f direction;
+	float uDiv = 1.f;
+	float vDiv = 1.f;
+	float vMove = 0.f;
+	sf::Texture m_texture;
+private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };
 
