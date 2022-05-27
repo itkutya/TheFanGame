@@ -33,11 +33,14 @@ public:
 
     const void add(sf::RenderWindow& window, std::unique_ptr<state> toAdd, const bool& replace = false) noexcept;
     const void popCurrent() noexcept;
+    const void ProcessStateChange(sf::RenderWindow& window) noexcept;
     const std::unique_ptr<state>& getCurrentState() const noexcept;
     const std::size_t getCurrentSize() const noexcept;
 private:
     std::stack<std::unique_ptr<state>> m_stateStack;
     std::unique_ptr<state> m_newState;
-};
 
-static std::unique_ptr<stateSystem> m_states;
+    bool m_add;
+    bool m_replace;
+    bool m_remove;
+};

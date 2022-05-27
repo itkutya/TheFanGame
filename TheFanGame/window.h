@@ -5,7 +5,7 @@
 class window
 {
 public:
-	window(const sf::VideoMode& size, const char* name, std::unique_ptr<stateSystem>& context) noexcept;
+	window(const sf::VideoMode& size, const char* name, context* context) noexcept;
 	virtual ~window() noexcept;
 
 	explicit operator const bool() noexcept;
@@ -15,11 +15,13 @@ public:
 	const void pollEvents() noexcept;
 	const void draw() noexcept;
 	const void update() noexcept;
+
+	sf::RenderWindow& getWindow() noexcept;
 private:
 	sf::RenderWindow m_window;
 	sf::Clock deltaTime;
 
-	std::unique_ptr<stateSystem> m_context;
+	context* m_context;
 
 	std::vector<const sf::Drawable*> objects;
 	const void addToDrawPool(const sf::Drawable* object) noexcept;

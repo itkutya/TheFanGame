@@ -29,5 +29,3 @@ private:
 	std::map<const int, std::unique_ptr<sf::Texture>> m_textures;
 	std::map<const int, std::unique_ptr<sf::Font>> m_fonts;
 };
-
-static std::shared_ptr<resourceManager> m_resources;

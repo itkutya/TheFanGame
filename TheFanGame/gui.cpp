@@ -1,21 +1,19 @@
 #include "gui.h"
 
-gui::gui(std::unique_ptr<stateSystem>& context) noexcept 
-{ 
-	m_resources = std::make_shared<resourceManager>(); 
-	this->m_context = context.get();
+gui::gui(context* context) noexcept
+{
+	this->m_context = context;
 }
 
-gui::~gui() noexcept { ImGui::SFML::Shutdown(); m_resources.reset(); }
+gui::~gui() noexcept { ImGui::SFML::Shutdown(); }
 
 const void gui::init(sf::RenderWindow& window)
 {
-	m_resources->addTexture(0, "res/wolftextures.png");
 	ImGui::SFML::Init(window);
 	ImGui::StyleColorsDark();
 
 	this->xp = 0.f;
-	this->sprite.setTexture(m_resources->getTexture(0));
+	this->sprite.setTexture(this->m_context->g_resources.getTexture(0));
 }
 
 const void gui::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
@@ -38,7 +36,7 @@ const void gui::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 	ImGui::SliderFloat("Level: ", &this->xp, 0.f, 100.f, "%.3f", ImGuiSliderFlags_NoInput);
 	ImGui::SetCursorPos(ImVec2(50.f, 115.f));
 	if (ImGui::Button("Play", ImVec2(200.f, 50.f)))
-		this->m_context->add(window, std::make_unique<game>());
+		this->m_context->g_states.add(window, std::make_unique<game>(this->m_context));
 	ImGui::SetCursorPos(ImVec2(50.f, 215.f));
 	if (ImGui::Button("Settings", ImVec2(200.f, 50.f)))
 		std::cout << "Settings\n";

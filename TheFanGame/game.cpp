@@ -1,20 +1,18 @@
 #include "game.h"
 
-game::game() noexcept
-{ 
-    m_resources = std::make_shared<resourceManager>();
-}
-
-game::~game() noexcept { m_resources.reset(); }
-
-const void game::init(sf::RenderWindow& window)
+game::game(context* context) noexcept
 {
-    //m_resources->addTexture(0, "res/wolftextures.png");
+    this->m_context = context;
 }
+
+game::~game() noexcept {}
+
+const void game::init(sf::RenderWindow& window) {}
 
 const void game::processEvent(const sf::Event& event) noexcept 
 {
-    //TODO:...
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        this->m_context->g_states.popCurrent();
 }
 
 const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept {}
