@@ -33,7 +33,7 @@ public:
 
     const void add(sf::RenderWindow& window, std::unique_ptr<state> toAdd, const bool& replace = false) noexcept;
     const void popCurrent() noexcept;
-    const void ProcessStateChange(sf::RenderWindow& window) noexcept;
+    const void processStateChange(sf::RenderWindow& window) noexcept;
     const std::unique_ptr<state>& getCurrentState() const noexcept;
     const std::size_t getCurrentSize() const noexcept;
 private:
