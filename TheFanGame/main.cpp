@@ -13,7 +13,7 @@ int main()
 
 		while (mainWindow) 
 		{
-			m_context.g_states.processStateChange(mainWindow.getWindow());
+			m_context.g_states.processStateChange(mainWindow);
 			mainWindow.pollEvents();
 			mainWindow.update();
 			mainWindow.draw();

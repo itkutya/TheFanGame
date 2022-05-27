@@ -9,14 +9,13 @@ public:
 	virtual ~window() noexcept;
 
 	explicit operator const bool() noexcept;
+	operator sf::RenderWindow&() noexcept;
 
 	const void setFramerateLimit(const unsigned int& limit) noexcept;
 
 	const void pollEvents() noexcept;
 	const void draw() noexcept;
 	const void update() noexcept;
-
-	sf::RenderWindow& getWindow() noexcept;
 private:
 	sf::RenderWindow m_window;
 	sf::Clock deltaTime;

@@ -43,9 +43,9 @@ const void window::update() noexcept
 		this->m_context->g_states.getCurrentState()->update(this->m_window, this->deltaTime.restart());
 }
 
-sf::RenderWindow& window::getWindow() noexcept { return this->m_window; }
-
 window::operator const bool() noexcept { return this->m_window.isOpen(); }
+
+window::operator sf::RenderWindow&() noexcept { return this->m_window; }
 
 const void window::setFramerateLimit(const unsigned int& limit) noexcept { this->m_window.setFramerateLimit(limit); }
 
