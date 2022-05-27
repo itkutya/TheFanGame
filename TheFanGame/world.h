@@ -2,9 +2,6 @@
 
 #include "entity.h"
 
-#define mapWidth 24
-#define mapHeight 24
-
 class world : public entity
 {
 public:
@@ -13,8 +10,11 @@ public:
 
 	const int getMapTile(const int& i, const int& y) const noexcept;
 private:
-	sf::Vector2i mapSize = {24, 24};
-	sf::Vector2i mapDimension = { 24, 24 };
+	#define mapWidth 24
+	#define mapHeight 24
+
+	sf::Vector2i mapSize = {4, 4};
+	sf::Vector2i mapDimension = {mapWidth, mapHeight};
 	const int worldMap[mapWidth * mapHeight] =
 	{
 	  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
