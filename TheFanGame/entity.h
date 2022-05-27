@@ -16,10 +16,9 @@ constexpr float PI = 3.141592653589793116f;
 class entity : public sf::Drawable, public sf::Transformable
 {
 public:
-	entity(const sf::PrimitiveType& type = sf::PrimitiveType::Quads, const std::size_t& size = 4, const std::string& source = "");
+	entity(const sf::PrimitiveType& type = sf::PrimitiveType::Quads, const std::size_t& size = 4);
 	virtual ~entity() noexcept;
 
-	virtual operator const sf::Drawable* ();
 	virtual sf::Vertex& operator[] (const std::size_t index);
 
 	sf::VertexArray m_vertices;

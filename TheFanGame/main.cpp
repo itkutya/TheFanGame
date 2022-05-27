@@ -8,7 +8,7 @@ int main()
 	{
 		context m_context;
 		m_context.g_resources.addTexture(0, "res/wolftextures.png");
-		window mainWindow(sf::VideoMode(500, 500), "TITLE!5!%!", &m_context);
+		window mainWindow(sf::VideoMode(600, 600), "TITLE!5!%!", &m_context);
 		mainWindow.setFramerateLimit(60);
 
 		while (mainWindow) 

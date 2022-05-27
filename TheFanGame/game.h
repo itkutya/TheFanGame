@@ -2,6 +2,7 @@
 
 #include "stateSystem.h"
 #include "player.h"
+#include "world.h"
 
 struct context
 {
@@ -21,5 +22,6 @@ public:
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 private:
 	context* m_context;
+	world miniMap;
 };
 

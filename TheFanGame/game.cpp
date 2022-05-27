@@ -17,4 +17,7 @@ const void game::processEvent(const sf::Event& event) noexcept
 
 const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept {}
 
-const void game::draw(sf::RenderWindow& window) noexcept {}
+const void game::draw(sf::RenderWindow& window) noexcept 
+{
+    window.draw(this->miniMap);
+}

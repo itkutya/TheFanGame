@@ -179,6 +179,7 @@
     <ClCompile Include="resourceManager.cpp" />
     <ClCompile Include="stateSystem.cpp" />
     <ClCompile Include="window.cpp" />
+    <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animation.h" />
@@ -200,6 +201,7 @@
     <ClInclude Include="resourceManager.h" />
     <ClInclude Include="stateSystem.h" />
     <ClInclude Include="window.h" />
+    <ClInclude Include="world.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\wolftextures.png" />
