@@ -1,7 +1,6 @@
 #pragma once
 
 #include "entity.h"
-#include "ray.h"
 
 class player : public entity
 {

@@ -13,7 +13,7 @@ private:
 	#define mapWidth 24
 	#define mapHeight 24
 
-	sf::Vector2i mapSize = {4, 4};
+	sf::Vector2i mapSize = {24, 24};
 	sf::Vector2i mapDimension = {mapWidth, mapHeight};
 	const int worldMap[mapWidth * mapHeight] =
 	{

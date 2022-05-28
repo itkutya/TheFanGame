@@ -1,8 +1,7 @@
 #pragma once
 
 #include "stateSystem.h"
-#include "player.h"
-#include "world.h"
+#include "ray.h"
 
 struct context
 {
@@ -23,5 +22,7 @@ public:
 private:
 	context* m_context;
 	world miniMap;
+	player miniPlayer;
+	ray playerRay;
 };
 
