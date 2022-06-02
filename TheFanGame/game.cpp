@@ -26,7 +26,9 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         this->miniPlayer.move(100.f * dt.asSeconds(), 0.f);
 
-    this->playerRay.castRay(&this->miniPlayer, &this->miniMap);
+    this->playerRay[0].position = this->miniPlayer.getPosition();
+    for (unsigned int i = 1; i < window.getSize().x + 1; ++i)
+        this->playerRay.castRay(&this->miniPlayer, &this->miniMap, window.getSize().x, i);
 }
 
 const void game::draw(sf::RenderWindow& window) noexcept 
