@@ -26,9 +26,13 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         this->miniPlayer.move(100.f * dt.asSeconds(), 0.f);
 
+    sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
+    sf::Vector2f mouseDir = (mousePos - this->miniPlayer.getPosition()) / std::hypotf(mousePos.x - this->miniPlayer.getPosition().x, 
+                                                                                    mousePos.y - this->miniPlayer.getPosition().y);
+
     this->playerRay[0].position = this->miniPlayer.getPosition();
     for (unsigned int i = 1; i < window.getSize().x + 1; ++i)
-        this->playerRay.castRay(&this->miniPlayer, &this->miniMap, window.getSize().x, i);
+        this->playerRay.castRay(&this->miniPlayer, &this->miniMap, window.getSize().x, i, mouseDir);
 }
 
 const void game::draw(sf::RenderWindow& window) noexcept 

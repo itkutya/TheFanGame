@@ -10,7 +10,7 @@ ray::~ray()
 {
 }
 
-const bool ray::castRay(player* player, world* world, const unsigned int& screenWidth, unsigned int& i)
+const bool ray::castRay(player* player, world* world, const unsigned int& screenWidth, unsigned int& i, sf::Vector2f& dir)
 {
     sf::Vector2f sideDist;
     sf::Vector2i step;
@@ -19,8 +19,8 @@ const bool ray::castRay(player* player, world* world, const unsigned int& screen
 
     float cameraX = 2 * (i - 1) / (float)screenWidth - 1;
     sf::Vector2f rayDir;
-    rayDir.x = player->direction.x + player->plane.x * cameraX;
-    rayDir.y = player->direction.y + player->plane.y * cameraX;
+    rayDir.x = dir.x + (-dir.y / 3.f) * cameraX;
+    rayDir.y = dir.y + (dir.x / 3.f) * cameraX;
 
     sf::Vector2i map;
     map.x = int(player->getPosition().x / 24.f);
