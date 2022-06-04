@@ -68,20 +68,16 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
             this->miniPlayer.setPosition(sf::Vector2f(this->miniPlayer.getPosition().x - this->miniPlayer.direction.x * moveSpeed,
                                                       this->miniPlayer.getPosition().y - this->miniPlayer.direction.y * moveSpeed));
         }
-        /*
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        {
-            float oldDirX = this->miniPlayer.direction.x;
-            this->miniPlayer.setPosition(sf::Vector2f(this->miniPlayer.getPosition().x - ((this->miniPlayer.direction.x * cos(PI / 2) - this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed),
-                                                      this->miniPlayer.getPosition().y - ((oldDirX * cos(PI / 2) + this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed)));
-        }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         {
-            float oldDirX = this->miniPlayer.direction.x;
-            this->miniPlayer.setPosition(sf::Vector2f(this->miniPlayer.getPosition().x + ((this->miniPlayer.direction.x * cos(PI / 2) - this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed),
-                                                      this->miniPlayer.getPosition().y + ((oldDirX * cos(PI / 2) + this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed)));
+            this->miniPlayer.setPosition(sf::Vector2f(this->miniPlayer.getPosition().x - ((this->miniPlayer.direction.x * cos(PI / 2) - this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed),
+                                                      this->miniPlayer.getPosition().y - ((this->miniPlayer.direction.x * sin(PI / 2) + this->miniPlayer.direction.y * cos(PI / 2)) * moveSpeed)));
         }
-        */
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        {
+            this->miniPlayer.setPosition(sf::Vector2f(this->miniPlayer.getPosition().x + ((this->miniPlayer.direction.x * cos(PI / 2) - this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed),
+                                                      this->miniPlayer.getPosition().y + ((this->miniPlayer.direction.x * sin(PI / 2) + this->miniPlayer.direction.y * cos(PI / 2)) * moveSpeed)));
+        }
     }
 
     this->playerRay[0].position = this->miniPlayer.getPosition();

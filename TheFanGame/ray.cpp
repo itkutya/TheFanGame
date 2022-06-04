@@ -97,6 +97,7 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
 
     this->drawSE = draw;
 
+    //add to game.cpp...
     if (this->side == 1) 
     { 
         this->m_vertices[i].color.r = sf::Uint8(this->m_vertices[i].color.r / 1.5f);
