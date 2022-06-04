@@ -68,6 +68,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
             this->miniPlayer.setPosition(sf::Vector2f(this->miniPlayer.getPosition().x - this->miniPlayer.direction.x * moveSpeed,
                                                       this->miniPlayer.getPosition().y - this->miniPlayer.direction.y * moveSpeed));
         }
+        /*
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         {
             float oldDirX = this->miniPlayer.direction.x;
@@ -80,6 +81,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
             this->miniPlayer.setPosition(sf::Vector2f(this->miniPlayer.getPosition().x + ((this->miniPlayer.direction.x * cos(PI / 2) - this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed),
                                                       this->miniPlayer.getPosition().y + ((oldDirX * cos(PI / 2) + this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed)));
         }
+        */
     }
 
     this->playerRay[0].position = this->miniPlayer.getPosition();
@@ -102,10 +104,10 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 const void game::draw(sf::RenderWindow& window) noexcept 
 {
+    window.draw(this->walls);
     window.draw(this->miniMap);
     window.draw(this->miniPlayer);
     window.draw(this->playerRay);
-    window.draw(this->walls);
 
     ImGui::SFML::Render(window);
 }
