@@ -89,6 +89,28 @@ const sf::Vector2i ray::castRay(player* player, world* world, const unsigned int
     draw.x = (int)(-lineHeight / 2 + screenHeight / 2 * player->angle);
     draw.y = (int)(lineHeight / 2 + screenHeight / 2 * player->angle);
 
+    if (this->side == 1) 
+    { 
+        this->m_vertices[i].color.r = sf::Uint8(this->m_vertices[i].color.r / 1.5f);
+        this->m_vertices[i].color.g = sf::Uint8(this->m_vertices[i].color.g / 1.5f);
+        this->m_vertices[i].color.b = sf::Uint8(this->m_vertices[i].color.b / 1.5f);
+    }
+
+    //float wallX;
+    //if (side == 0) wallX = player->getPosition().y + perpWallDist * rayDir.y;
+    //else           wallX = player->getPosition().x + perpWallDist * rayDir.x;
+    //wallX -= floor((wallX));
+
+    //int texX = int(wallX * double(texWidth));
+    //if (side == 0 && rayDir.x > 0) texX = texWidth - texX - 1;
+    //if (side == 1 && rayDir.y < 0) texX = texWidth - texX - 1;
+
+    //int mapNum = world->getMapTile(map.x, map.y);
+    //walls[0].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), 0.f);
+    //walls[1].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), (float)texHeight);
+
+    //ZBuffer[i] = perpWallDist;
+
     return draw;
 }
 
@@ -107,37 +129,3 @@ void ray::draw(sf::RenderTarget& target, sf::RenderStates states) const
     states.texture = &this->m_texture;
     target.draw(this->m_vertices, states);
 }
-
-/*
-        int lineHeight = (int)(screenHeight / perpWallDist);
-        int drawStart = (int)(-lineHeight / 2 + screenHeight / 2 * player->angle);
-        int drawEnd = (int)(lineHeight / 2 + screenHeight / 2 * angle);
-
-        color = sf::Color(255 - (int)(perpWallDist * 5 > 255 ? 255 : perpWallDist * 5),
-            255 - (int)(perpWallDist * 5 > 255 ? 255 : perpWallDist * 5),
-            255 - (int)(perpWallDist * 5 > 255 ? 255 : perpWallDist * 5), 255);
-
-        if (side == 1) { color.r = sf::Uint8(color.r / 1.5f); color.g = sf::Uint8(color.g / 1.5f); color.b = sf::Uint8(color.b / 1.5f); }
-
-        sf::Vertex* walls = &line[i * 2];
-        walls[0].position = sf::Vector2f((float)i + 1, (float)drawStart);
-        walls[1].position = sf::Vector2f((float)i + 1, (float)drawEnd);
-
-        walls[0].color = color;
-        walls[1].color = color;
-
-        float wallX;
-        if (side == 0) wallX = player->getPosition().y + perpWallDist * rayDir.y;
-        else           wallX = player->getPosition().x + perpWallDist * rayDirX;
-        wallX -= floor((wallX));
-
-        int texX = int(wallX * double(texWidth));
-        if (side == 0 && rayDirX > 0) texX = texWidth - texX - 1;
-        if (side == 1 && rayDir.y < 0) texX = texWidth - texX - 1;
-
-        int mapNum = worldMap[map.x][mapY];
-        walls[0].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), 0.f);
-        walls[1].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), (float)texHeight);
-
-        ZBuffer[i] = perpWallDist;
-*/
