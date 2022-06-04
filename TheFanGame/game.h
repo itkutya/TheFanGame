@@ -27,5 +27,7 @@ private:
 	world miniMap;
 	player miniPlayer;
 	ray playerRay;
+
+	sf::VertexArray walls;
 };
 

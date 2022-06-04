@@ -9,13 +9,15 @@ public:
     ray();
     virtual ~ray();
 
-    const sf::Vector2i castRay(player* player, world* world, const unsigned int& screenWidth, const unsigned int& screenHeight, unsigned int& i, sf::Vector2f& dir);
+    const void castRay(player* player, world* world, const unsigned int& screenWidth, const unsigned int& screenHeight, unsigned int& i, sf::Vector2f& dir);
     const bool isHit() const noexcept;
+    const sf::Vector2i getDraw() const noexcept;
 
     virtual sf::Vertex& operator[] (const std::size_t index);
 private:
     sf::Vector2f sideDist;
     sf::Vector2i step;
+    sf::Vector2i drawSE;
     bool side;
     bool hit;
     float perpWallDist;

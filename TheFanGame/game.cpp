@@ -11,6 +11,9 @@ const void game::init(sf::RenderWindow& window)
 { 
     this->miniPlayer.setSize(sf::IntRect(-this->miniMap.mapSize.x / 2, -this->miniMap.mapSize.y / 2,
                                           this->miniMap.mapSize.x / 2, this->miniMap.mapSize.y / 2));
+
+    this->walls.setPrimitiveType(sf::PrimitiveType::Lines);
+    this->walls.resize((window.getSize().x + 1) * 2);
 }
 
 const void game::processEvent(const sf::Event& event) noexcept 
@@ -44,7 +47,13 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
     this->playerRay[0].position = this->miniPlayer.getPosition();
     for (unsigned int i = 1; i < window.getSize().x + 1; ++i)
+    {
         this->playerRay.castRay(&this->miniPlayer, &this->miniMap, window.getSize().x, window.getSize().y, i, mouseDir);
+
+        sf::Vertex* line = &this->walls[i * 2];
+        line[0].position = sf::Vector2f((float)i, (float)this->playerRay.getDraw().x);
+        line[1].position = sf::Vector2f((float)i, (float)this->playerRay.getDraw().y);
+    }
 }
 
 const void game::draw(sf::RenderWindow& window) noexcept 
@@ -52,6 +61,7 @@ const void game::draw(sf::RenderWindow& window) noexcept
     window.draw(this->miniMap);
     window.draw(this->miniPlayer);
     window.draw(this->playerRay);
+    window.draw(this->walls);
 
     ImGui::SFML::Render(window);
 }

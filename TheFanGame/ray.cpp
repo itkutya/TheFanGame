@@ -14,10 +14,11 @@ ray::~ray()
 {
 }
 
-const sf::Vector2i ray::castRay(player* player, world* world, const unsigned int& screenWidth, const unsigned int& screenHeight, unsigned int& i, sf::Vector2f& dir)
+const void ray::castRay(player* player, world* world, const unsigned int& screenWidth, const unsigned int& screenHeight, unsigned int& i, sf::Vector2f& dir)
 {
     this->sideDist = sf::Vector2f();
     this->step = sf::Vector2i();
+    this->drawSE = sf::Vector2i();
     this->side = false;
     this->hit = false;
     this->perpWallDist = 0.f;
@@ -84,10 +85,15 @@ const sf::Vector2i ray::castRay(player* player, world* world, const unsigned int
     this->m_vertices[i].position = sf::Vector2f(player->getPosition().x + rayDir.x * fDistance * world->mapSize.x,
                                                 player->getPosition().y + rayDir.y * fDistance * world->mapSize.y);
 
+    if (side == 0) this->perpWallDist = (this->sideDist.x - deltaDist.x);
+    else           this->perpWallDist = (this->sideDist.y - deltaDist.y);
+
     int lineHeight = (int)(screenHeight / this->perpWallDist);
     sf::Vector2i draw;
-    draw.x = (int)(-lineHeight / 2 + screenHeight / 2 * player->angle);
-    draw.y = (int)(lineHeight / 2 + screenHeight / 2 * player->angle);
+    draw.x = (int)(-lineHeight / 2 + screenHeight / 2 /* * player->angle*/);
+    draw.y = (int)(lineHeight / 2 + screenHeight / 2 /* * player->angle*/);
+
+    this->drawSE = draw;
 
     if (this->side == 1) 
     { 
@@ -100,21 +106,19 @@ const sf::Vector2i ray::castRay(player* player, world* world, const unsigned int
     //if (side == 0) wallX = player->getPosition().y + perpWallDist * rayDir.y;
     //else           wallX = player->getPosition().x + perpWallDist * rayDir.x;
     //wallX -= floor((wallX));
-
     //int texX = int(wallX * double(texWidth));
     //if (side == 0 && rayDir.x > 0) texX = texWidth - texX - 1;
     //if (side == 1 && rayDir.y < 0) texX = texWidth - texX - 1;
-
     //int mapNum = world->getMapTile(map.x, map.y);
     //walls[0].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), 0.f);
     //walls[1].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), (float)texHeight);
 
     //ZBuffer[i] = perpWallDist;
-
-    return draw;
 }
 
 const bool ray::isHit() const noexcept { return this->hit; }
+
+const sf::Vector2i ray::getDraw() const noexcept { return this->drawSE; }
 
 sf::Vertex& ray::operator[](const std::size_t index)
 {
