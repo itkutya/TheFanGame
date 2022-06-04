@@ -7,7 +7,11 @@ game::game(context* context) noexcept
 
 game::~game() noexcept {}
 
-const void game::init(sf::RenderWindow& window) {}
+const void game::init(sf::RenderWindow& window) 
+{ 
+    this->miniPlayer.setSize(sf::IntRect(-this->miniMap.mapSize.x / 2, -this->miniMap.mapSize.y / 2,
+                                          this->miniMap.mapSize.x / 2, this->miniMap.mapSize.y / 2));
+}
 
 const void game::processEvent(const sf::Event& event) noexcept 
 {

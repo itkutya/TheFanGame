@@ -5,6 +5,8 @@ world::world() noexcept
 	this->m_vertices.setPrimitiveType(sf::PrimitiveType::Quads);
 	this->m_vertices.resize(this->mapWidth * this->mapHeight * 4);
 
+    this->mapSize = { 4, 4 };
+
     sf::Color mapColor;
     for (unsigned int i = 0; i < this->mapWidth; ++i)
         for (unsigned int j = 0; j < this->mapHeight; ++j)

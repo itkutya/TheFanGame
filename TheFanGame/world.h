@@ -12,7 +12,7 @@ public:
 
 	static const unsigned int mapWidth = 24;
 	static const unsigned int mapHeight = 24;
-	sf::Vector2i mapSize = {12, 12};
+	sf::Vector2i mapSize;
 private:
 	const int worldMap[mapWidth * mapHeight] =
 	{
