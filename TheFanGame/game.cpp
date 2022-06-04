@@ -11,6 +11,7 @@ const void game::init(sf::RenderWindow& window)
 { 
     this->miniPlayer.setSize(sf::IntRect(-this->miniMap.mapSize.x / 2, -this->miniMap.mapSize.y / 2,
                                           this->miniMap.mapSize.x / 2, this->miniMap.mapSize.y / 2));
+    this->miniPlayer.setPosition(sf::Vector2f(20.f, 20.f));
 
     this->walls.setPrimitiveType(sf::PrimitiveType::Lines);
     this->walls.resize((window.getSize().x + 1) * 2);
@@ -31,24 +32,60 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     ImGui::Begin("FPS Counter", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
     ImGui::Text("FPS: %f", 1.f / dt.asSeconds());
     ImGui::End();
+    
+    if (window.hasFocus())
+    {
+        sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        this->miniPlayer.move(0.f, -100.f * dt.asSeconds());
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        this->miniPlayer.move(0.f, 100.f * dt.asSeconds());
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        this->miniPlayer.move(-100.f * dt.asSeconds(), 0.f);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        this->miniPlayer.move(100.f * dt.asSeconds(), 0.f);
+        float sensitivity = dt.asSeconds() * 50.f;
+        float moveSpeed = dt.asSeconds() * 30.f;
 
-    sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
-    sf::Vector2f mouseDir = (mousePos - this->miniPlayer.getPosition()) / std::hypotf(mousePos.x - this->miniPlayer.getPosition().x, 
-                                                                                      mousePos.y - this->miniPlayer.getPosition().y);
+        float diff_X = (float)((mousePos.x - (window.getSize().x / 2)) / window.getSize().x);
+        float oldDirX = this->miniPlayer.direction.x;
+        this->miniPlayer.direction.x = this->miniPlayer.direction.x * cos(sensitivity * diff_X) - this->miniPlayer.direction.y * sin(sensitivity * diff_X);
+        this->miniPlayer.direction.y = oldDirX * sin(sensitivity * diff_X) + this->miniPlayer.direction.y * cos(sensitivity * diff_X);
+        float oldPlaneX = this->miniPlayer.plane.x;
+        this->miniPlayer.plane.x = this->miniPlayer.plane.x * cos(sensitivity * diff_X) - this->miniPlayer.plane.y * sin(sensitivity * diff_X);
+        this->miniPlayer.plane.y = oldPlaneX * sin(sensitivity * diff_X) + this->miniPlayer.plane.y * cos(sensitivity * diff_X);
+
+        float diff_Y = (float)((mousePos.y - (window.getSize().y / 2)) / window.getSize().y);
+        if (diff_Y > 0.f)
+            this->miniPlayer.angle += 1.f * sensitivity * diff_Y;
+        else if (diff_Y < 0.f)
+            this->miniPlayer.angle += 1.f * sensitivity * diff_Y;
+
+        this->miniPlayer.angle = std::clamp(this->miniPlayer.angle, 0.f, 2.f);
+
+        sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        {
+            this->miniPlayer.setPosition(sf::Vector2f(this->miniPlayer.getPosition().x + this->miniPlayer.direction.x * moveSpeed, 
+                                                      this->miniPlayer.getPosition().y + this->miniPlayer.direction.y * moveSpeed));
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        {
+            this->miniPlayer.setPosition(sf::Vector2f(this->miniPlayer.getPosition().x - this->miniPlayer.direction.x * moveSpeed,
+                                                      this->miniPlayer.getPosition().y - this->miniPlayer.direction.y * moveSpeed));
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        {
+            float oldDirX = this->miniPlayer.direction.x;
+            this->miniPlayer.setPosition(sf::Vector2f(this->miniPlayer.getPosition().x - ((this->miniPlayer.direction.x * cos(PI / 2) - this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed),
+                                                      this->miniPlayer.getPosition().y - ((oldDirX * cos(PI / 2) + this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed)));
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        {
+            float oldDirX = this->miniPlayer.direction.x;
+            this->miniPlayer.setPosition(sf::Vector2f(this->miniPlayer.getPosition().x + ((this->miniPlayer.direction.x * cos(PI / 2) - this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed),
+                                                      this->miniPlayer.getPosition().y + ((oldDirX * cos(PI / 2) + this->miniPlayer.direction.y * sin(PI / 2)) * moveSpeed)));
+        }
+    }
 
     this->playerRay[0].position = this->miniPlayer.getPosition();
     for (unsigned int i = 1; i < window.getSize().x + 1; ++i)
     {
-        this->playerRay.castRay(&this->miniPlayer, &this->miniMap, window.getSize().x, window.getSize().y, i, mouseDir);
+        this->playerRay.castRay(&this->miniPlayer, &this->miniMap, window.getSize().x, window.getSize().y, i, this->miniPlayer.direction);
 
         sf::Vertex* line = &this->walls[i * 2];
         line[0].position = sf::Vector2f((float)i, (float)this->playerRay.getDraw().x);
