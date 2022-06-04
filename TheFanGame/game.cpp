@@ -48,7 +48,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
         this->miniPlayer.plane.x = this->miniPlayer.plane.x * cos(sensitivity * diff_X) - this->miniPlayer.plane.y * sin(sensitivity * diff_X);
         this->miniPlayer.plane.y = oldPlaneX * sin(sensitivity * diff_X) + this->miniPlayer.plane.y * cos(sensitivity * diff_X);
 
-        float diff_Y = (float)((mousePos.y - (window.getSize().y / 2)) / window.getSize().y);
+        float diff_Y = (float)(((window.getSize().y / 2) - mousePos.y) / window.getSize().y);
         if (diff_Y > 0.f)
             this->miniPlayer.angle += 1.f * sensitivity * diff_Y;
         else if (diff_Y < 0.f)

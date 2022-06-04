@@ -92,8 +92,8 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
 
     int lineHeight = (int)(screenHeight / this->perpWallDist);
     sf::Vector2i draw;
-    draw.x = (int)(-lineHeight / 2 + screenHeight / 2 /* * player->angle*/);
-    draw.y = (int)(lineHeight / 2 + screenHeight / 2 /* * player->angle*/);
+    draw.x = (int)(-lineHeight / 2 + screenHeight / 2 * player->angle);
+    draw.y = (int)(lineHeight / 2 + screenHeight / 2 * player->angle);
 
     this->drawSE = draw;
 
