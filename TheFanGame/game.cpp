@@ -113,15 +113,16 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
         line[1].color = color;
 
         float wallX;
-        if (!this->playerRay.isSide()) wallX = this->miniPlayer.getPosition().y / this->miniMap.mapSize.x + this->playerRay.getDistance() * this->playerRay.getRayDir().y;
-        else                           wallX = this->miniPlayer.getPosition().x / this->miniMap.mapSize.y + this->playerRay.getDistance() * this->playerRay.getRayDir().x;
+        if (!this->playerRay.isSide()) wallX = this->miniPlayer.getPosition().y / this->miniMap.mapSize.y + this->playerRay.getDistance() * this->playerRay.getRayDir().y;
+        else                           wallX = this->miniPlayer.getPosition().x / this->miniMap.mapSize.x + this->playerRay.getDistance() * this->playerRay.getRayDir().x;
         wallX -= floor((wallX));
 
         int texX = int(wallX * texWidth);
         if (!this->playerRay.isSide() && this->playerRay.getRayDir().x > 0) texX = texWidth - texX - 1;
         if (this->playerRay.isSide() && this->playerRay.getRayDir().y < 0)  texX = texWidth - texX - 1;
 
-        int mapNum = 0;//world->getMapTile(map.x, map.y);
+        int mapNum = this->miniMap.getMapTile((int)this->miniPlayer.getPosition().x / this->miniMap.mapSize.x,
+                                              (int)this->miniPlayer.getPosition().y / this->miniMap.mapSize.y);
         line[0].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), 0.f);
         line[1].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), (float)texHeight);
 
