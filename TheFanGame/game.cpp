@@ -21,7 +21,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
     ImGui::SFML::Update(window, dt);
 
-    ImGui::Begin("FPS Counter");
+    ImGui::Begin("FPS Counter", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
     ImGui::Text("FPS: %f", 1.f / dt.asSeconds());
     ImGui::End();
 
