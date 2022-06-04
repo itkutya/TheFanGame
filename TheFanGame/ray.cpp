@@ -10,12 +10,12 @@ ray::~ray()
 {
 }
 
-const bool ray::castRay(player* player, world* world, const unsigned int& screenWidth, unsigned int& i, sf::Vector2f& dir)
+const float ray::castRay(player* player, world* world, const unsigned int& screenWidth, unsigned int& i, sf::Vector2f& dir)
 {
-    sf::Vector2f sideDist;
-    sf::Vector2i step;
-    bool side = false;
-    bool hit = false;
+    sideDist = sf::Vector2f();
+    step = sf::Vector2i();
+    side = false;
+    hit = false;
 
     float cameraX = 2 * (i - 1) / (float)screenWidth - 1;
     sf::Vector2f rayDir;
@@ -23,8 +23,8 @@ const bool ray::castRay(player* player, world* world, const unsigned int& screen
     rayDir.y = dir.y + (dir.x / 3.f) * cameraX;
 
     sf::Vector2i map;
-    map.x = int(player->getPosition().x / 24.f);
-    map.y = int(player->getPosition().y / 24.f);
+    map.x = int(player->getPosition().x / world->mapWidth);
+    map.y = int(player->getPosition().y / world->mapHeight);
 
     sf::Vector2f deltaDist;
     deltaDist.x = (rayDir.x == 0.f) ? 1e30f : std::abs(1.f / rayDir.x);
@@ -32,54 +32,56 @@ const bool ray::castRay(player* player, world* world, const unsigned int& screen
 
     if (rayDir.x < 0)
     {
-        step.x = -1;
-        sideDist.x = (player->getPosition().x / 24.f - map.x) * deltaDist.x;
+        this->step.x = -1;
+        this->sideDist.x = (player->getPosition().x / world->mapWidth - map.x) * deltaDist.x;
     }
     else
     {
-        step.x = 1;
-        sideDist.x = (map.x + 1.0f - player->getPosition().x / 24.f) * deltaDist.x;
+        this->step.x = 1;
+        this->sideDist.x = (map.x + 1.0f - player->getPosition().x / world->mapWidth) * deltaDist.x;
     }
     if (rayDir.y < 0)
     {
-        step.y = -1;
-        sideDist.y = (player->getPosition().y / 24.f - map.y) * deltaDist.y;
+        this->step.y = -1;
+        this->sideDist.y = (player->getPosition().y / world->mapHeight - map.y) * deltaDist.y;
     }
     else
     {
-        step.y = 1;
-        sideDist.y = (map.y + 1.0f - player->getPosition().y / 24.f) * deltaDist.y;
+        this->step.y = 1;
+        this->sideDist.y = (map.y + 1.0f - player->getPosition().y / world->mapHeight) * deltaDist.y;
     }
 
     float fDistance = 0.f;
-    while (!hit && fDistance < 10.f)
+    while (!this->hit && fDistance < 10.f)
     {
-        if (sideDist.x < sideDist.y)
+        if (this->sideDist.x < this->sideDist.y)
         {
-            fDistance = sideDist.x;
-            sideDist.x += deltaDist.x;
-            map.x += step.x;
-            side = false;
+            fDistance = this->sideDist.x;
+            this->sideDist.x += deltaDist.x;
+            map.x += this->step.x;
+            this->side = false;
         }
         else
         {
-            fDistance = sideDist.y;
-            sideDist.y += deltaDist.y;
-            map.y += step.y;
-            side = true;
+            fDistance = this->sideDist.y;
+            this->sideDist.y += deltaDist.y;
+            map.y += this->step.y;
+            this->side = true;
         }
-        if (map.x >= 0 && map.x <= 24 && map.y >= 0 && map.y <= 24)
+        if (map.x >= 0 && map.x <= world->mapWidth && map.y >= 0 && map.y <= world->mapHeight)
             if (world->getMapTile(map.x, map.y) > 0)
-                hit = true;
+                this->hit = true;
     }
 
     if (fDistance > 10.f)
         fDistance = 10.f;
 
-    m_vertices[i].position = sf::Vector2f(player->getPosition().x + rayDir.x * fDistance * 24.f,
-                                              player->getPosition().y + rayDir.y * fDistance * 24.f);
-    return hit;
+    this->m_vertices[i].position = sf::Vector2f(player->getPosition().x + rayDir.x * fDistance * world->mapWidth,
+                                                player->getPosition().y + rayDir.y * fDistance * world->mapHeight);
+    return fDistance;
 }
+
+const bool ray::isHit() const noexcept { return this->hit; }
 
 /*
         int lineHeight = (int)(screenHeight / perpWallDist);

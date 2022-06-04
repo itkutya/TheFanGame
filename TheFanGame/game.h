@@ -1,5 +1,8 @@
 #pragma once
 
+#include "ImGUI/imgui.h"
+#include "ImGUI/imgui-SFML.h"
+
 #include "stateSystem.h"
 #include "ray.h"
 
