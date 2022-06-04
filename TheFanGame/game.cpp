@@ -1,5 +1,8 @@
 #include "game.h"
 
+#define texWidth 64
+#define texHeight 64
+
 game::game(context* context) noexcept
 {
     this->m_context = context;
@@ -15,6 +18,8 @@ const void game::init(sf::RenderWindow& window)
 
     this->walls.setPrimitiveType(sf::PrimitiveType::Lines);
     this->walls.resize((window.getSize().x + 1) * 2);
+
+    this->state = &this->m_context->g_resources.getTexture(0);
 }
 
 const void game::processEvent(const sf::Event& event) noexcept 
@@ -23,6 +28,9 @@ const void game::processEvent(const sf::Event& event) noexcept
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         this->m_context->g_states.popCurrent();
+
+    if (event.type == sf::Event::Resized)
+        walls.resize((event.size.width + 1) * 2);
 }
 
 const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept 
@@ -103,12 +111,27 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
         line[0].color = color;
         line[1].color = color;
+
+        float wallX;
+        if (!this->playerRay.isSide()) wallX = this->miniPlayer.getPosition().y / this->miniMap.mapSize.x + this->playerRay.getDistance() * this->playerRay.getRayDir().y;
+        else                           wallX = this->miniPlayer.getPosition().x / this->miniMap.mapSize.y + this->playerRay.getDistance() * this->playerRay.getRayDir().x;
+        wallX -= floor((wallX));
+
+        int texX = int(wallX * texWidth);
+        if (!this->playerRay.isSide() && this->playerRay.getRayDir().x > 0) texX = texWidth - texX - 1;
+        if (this->playerRay.isSide() && this->playerRay.getRayDir().y < 0)  texX = texWidth - texX - 1;
+
+        int mapNum = 0;//world->getMapTile(map.x, map.y);
+        line[0].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), 0.f);
+        line[1].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), (float)texHeight);
+
+        //ZBuffer[i] = perpWallDist;
     }
 }
 
 const void game::draw(sf::RenderWindow& window) noexcept 
 {
-    window.draw(this->walls);
+    window.draw(this->walls, this->state);
     window.draw(this->miniMap);
     window.draw(this->miniPlayer);
     window.draw(this->playerRay);

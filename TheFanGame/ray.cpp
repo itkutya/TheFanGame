@@ -24,7 +24,7 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
     this->perpWallDist = 0.f;
 
     float cameraX = 2 * (i - 1) / (float)screenWidth - 1;
-    sf::Vector2f rayDir;
+    rayDir = sf::Vector2f();
     rayDir.x = dir.x + (-dir.y / 3.f) * cameraX;
     rayDir.y = dir.y + (dir.x / 3.f) * cameraX;
 
@@ -94,19 +94,6 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
     draw.y = (int)(lineHeight / 2 + screenHeight / 2 * player->angle);
 
     this->drawSE = draw;
-
-    //float wallX;
-    //if (side == 0) wallX = player->getPosition().y + perpWallDist * rayDir.y;
-    //else           wallX = player->getPosition().x + perpWallDist * rayDir.x;
-    //wallX -= floor((wallX));
-    //int texX = int(wallX * double(texWidth));
-    //if (side == 0 && rayDir.x > 0) texX = texWidth - texX - 1;
-    //if (side == 1 && rayDir.y < 0) texX = texWidth - texX - 1;
-    //int mapNum = world->getMapTile(map.x, map.y);
-    //walls[0].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), 0.f);
-    //walls[1].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), (float)texHeight);
-
-    //ZBuffer[i] = perpWallDist;
 }
 
 const bool& ray::isHit() const noexcept { return this->hit; }
@@ -114,6 +101,8 @@ const bool& ray::isHit() const noexcept { return this->hit; }
 const bool& ray::isSide() const noexcept { return this->side; }
 
 const sf::Vector2i& ray::getDraw() const noexcept { return this->drawSE; }
+
+const sf::Vector2f& ray::getRayDir() const noexcept { return this->rayDir; }
 
 const float& ray::getDistance() const noexcept { return this->perpWallDist; }
 

@@ -29,5 +29,6 @@ private:
 	ray playerRay;
 
 	sf::VertexArray walls;
+	sf::RenderStates state;
 };
 

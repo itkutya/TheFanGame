@@ -13,6 +13,7 @@ public:
     const bool& isHit() const noexcept;
     const bool& isSide() const noexcept;
     const sf::Vector2i& getDraw() const noexcept;
+    const sf::Vector2f& getRayDir() const noexcept;
     const float& getDistance() const noexcept;
 
     virtual sf::Vertex& operator[] (const std::size_t index);
@@ -20,6 +21,7 @@ private:
     sf::Vector2f sideDist;
     sf::Vector2i step;
     sf::Vector2i drawSE;
+    sf::Vector2f rayDir;
     bool side;
     bool hit;
     float perpWallDist;
