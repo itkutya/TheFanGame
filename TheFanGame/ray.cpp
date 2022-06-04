@@ -58,7 +58,7 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
     }
 
     float fDistance = 0.f;
-    while (!this->hit && fDistance < 10.f)
+    while (!this->hit  && fDistance < 1000.f)
     {
         if (this->sideDist.x < this->sideDist.y)
         {
@@ -79,8 +79,10 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
                 this->hit = true;
     }
 
+    /*
     if (fDistance > 10.f)
         fDistance = 10.f;
+    */
 
     this->m_vertices[i].position = sf::Vector2f(player->getPosition().x + rayDir.x * fDistance * world->mapSize.x,
                                                 player->getPosition().y + rayDir.y * fDistance * world->mapSize.y);
@@ -116,9 +118,11 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
     //ZBuffer[i] = perpWallDist;
 }
 
-const bool ray::isHit() const noexcept { return this->hit; }
+const bool& ray::isHit() const noexcept { return this->hit; }
 
-const sf::Vector2i ray::getDraw() const noexcept { return this->drawSE; }
+const sf::Vector2i& ray::getDraw() const noexcept { return this->drawSE; }
+
+const float& ray::getDistance() const noexcept { return this->perpWallDist; }
 
 sf::Vertex& ray::operator[](const std::size_t index)
 {

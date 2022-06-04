@@ -10,8 +10,9 @@ public:
     virtual ~ray();
 
     const void castRay(player* player, world* world, const unsigned int& screenWidth, const unsigned int& screenHeight, unsigned int& i, sf::Vector2f& dir);
-    const bool isHit() const noexcept;
-    const sf::Vector2i getDraw() const noexcept;
+    const bool& isHit() const noexcept;
+    const sf::Vector2i& getDraw() const noexcept;
+    const float& getDistance() const noexcept;
 
     virtual sf::Vertex& operator[] (const std::size_t index);
 private:
