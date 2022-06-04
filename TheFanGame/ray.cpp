@@ -79,16 +79,14 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
                 this->hit = true;
     }
 
-    /*
     if (fDistance > 10.f)
         fDistance = 10.f;
-    */
 
     this->m_vertices[i].position = sf::Vector2f(player->getPosition().x + rayDir.x * fDistance * world->mapSize.x,
                                                 player->getPosition().y + rayDir.y * fDistance * world->mapSize.y);
 
-    if (side == 0) this->perpWallDist = (this->sideDist.x - deltaDist.x);
-    else           this->perpWallDist = (this->sideDist.y - deltaDist.y);
+    if (!this->side) this->perpWallDist = (this->sideDist.x - deltaDist.x);
+    else             this->perpWallDist = (this->sideDist.y - deltaDist.y);
 
     int lineHeight = (int)(screenHeight / this->perpWallDist);
     sf::Vector2i draw;
@@ -96,14 +94,6 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
     draw.y = (int)(lineHeight / 2 + screenHeight / 2 * player->angle);
 
     this->drawSE = draw;
-
-    //add to game.cpp...
-    if (this->side == 1) 
-    { 
-        this->m_vertices[i].color.r = sf::Uint8(this->m_vertices[i].color.r / 1.5f);
-        this->m_vertices[i].color.g = sf::Uint8(this->m_vertices[i].color.g / 1.5f);
-        this->m_vertices[i].color.b = sf::Uint8(this->m_vertices[i].color.b / 1.5f);
-    }
 
     //float wallX;
     //if (side == 0) wallX = player->getPosition().y + perpWallDist * rayDir.y;
@@ -120,6 +110,8 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
 }
 
 const bool& ray::isHit() const noexcept { return this->hit; }
+
+const bool& ray::isSide() const noexcept { return this->side; }
 
 const sf::Vector2i& ray::getDraw() const noexcept { return this->drawSE; }
 

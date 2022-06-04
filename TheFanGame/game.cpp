@@ -89,9 +89,17 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
         line[0].position = sf::Vector2f((float)i, (float)this->playerRay.getDraw().x);
         line[1].position = sf::Vector2f((float)i, (float)this->playerRay.getDraw().y);
 
-        sf::Color color = sf::Color(255 - (int)(this->playerRay.getDistance() * 10 > 255 ? 255 : this->playerRay.getDistance() * 10),
-                                    255 - (int)(this->playerRay.getDistance() * 10 > 255 ? 255 : this->playerRay.getDistance() * 10),
-                                    255 - (int)(this->playerRay.getDistance() * 10 > 255 ? 255 : this->playerRay.getDistance() * 10), 255);
+        sf::Color color;
+        color = sf::Color(255 - (int)(this->playerRay.getDistance() * 10 > 255 ? 255 : this->playerRay.getDistance() * 10),
+                          255 - (int)(this->playerRay.getDistance() * 10 > 255 ? 255 : this->playerRay.getDistance() * 10),
+                          255 - (int)(this->playerRay.getDistance() * 10 > 255 ? 255 : this->playerRay.getDistance() * 10), 255);
+
+        if (this->playerRay.isSide())
+        {
+            color.r = sf::Uint8(color.r / 1.5f);
+            color.g = sf::Uint8(color.g / 1.5f);
+            color.b = sf::Uint8(color.b / 1.5f);
+        }
 
         line[0].color = color;
         line[1].color = color;
