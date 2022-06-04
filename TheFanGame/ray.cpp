@@ -23,8 +23,8 @@ const float ray::castRay(player* player, world* world, const unsigned int& scree
     rayDir.y = dir.y + (dir.x / 3.f) * cameraX;
 
     sf::Vector2i map;
-    map.x = int(player->getPosition().x / world->mapWidth);
-    map.y = int(player->getPosition().y / world->mapHeight);
+    map.x = int(player->getPosition().x / world->mapSize.x);
+    map.y = int(player->getPosition().y / world->mapSize.y);
 
     sf::Vector2f deltaDist;
     deltaDist.x = (rayDir.x == 0.f) ? 1e30f : std::abs(1.f / rayDir.x);
@@ -33,22 +33,22 @@ const float ray::castRay(player* player, world* world, const unsigned int& scree
     if (rayDir.x < 0)
     {
         this->step.x = -1;
-        this->sideDist.x = (player->getPosition().x / world->mapWidth - map.x) * deltaDist.x;
+        this->sideDist.x = (player->getPosition().x / world->mapSize.x - map.x) * deltaDist.x;
     }
     else
     {
         this->step.x = 1;
-        this->sideDist.x = (map.x + 1.0f - player->getPosition().x / world->mapWidth) * deltaDist.x;
+        this->sideDist.x = (map.x + 1.0f - player->getPosition().x / world->mapSize.x) * deltaDist.x;
     }
     if (rayDir.y < 0)
     {
         this->step.y = -1;
-        this->sideDist.y = (player->getPosition().y / world->mapHeight - map.y) * deltaDist.y;
+        this->sideDist.y = (player->getPosition().y / world->mapSize.y - map.y) * deltaDist.y;
     }
     else
     {
         this->step.y = 1;
-        this->sideDist.y = (map.y + 1.0f - player->getPosition().y / world->mapHeight) * deltaDist.y;
+        this->sideDist.y = (map.y + 1.0f - player->getPosition().y / world->mapSize.y) * deltaDist.y;
     }
 
     float fDistance = 0.f;
@@ -76,8 +76,8 @@ const float ray::castRay(player* player, world* world, const unsigned int& scree
     if (fDistance > 10.f)
         fDistance = 10.f;
 
-    this->m_vertices[i].position = sf::Vector2f(player->getPosition().x + rayDir.x * fDistance * world->mapWidth,
-                                                player->getPosition().y + rayDir.y * fDistance * world->mapHeight);
+    this->m_vertices[i].position = sf::Vector2f(player->getPosition().x + rayDir.x * fDistance * world->mapSize.x,
+                                                player->getPosition().y + rayDir.y * fDistance * world->mapSize.y);
     return fDistance;
 }
 

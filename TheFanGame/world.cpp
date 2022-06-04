@@ -37,4 +37,4 @@ world::world() noexcept
 
 world::~world() noexcept {}
 
-const int world::getMapTile(const int& x, const int& y) const noexcept { return this->worldMap[x + y * this->mapDimension.x]; }
+const int world::getMapTile(const int& x, const int& y) const noexcept { return this->worldMap[x + y * this->mapWidth]; }
