@@ -4,18 +4,23 @@ ray::ray()
 {
 	this->m_vertices.setPrimitiveType(sf::PrimitiveType::TriangleFan);
 	this->m_vertices.resize(601); //TODO: Window width problem fix later...
+
+    this->side = false;
+    this->hit = false;
+    this->perpWallDist = 0.f;
 }
 
 ray::~ray()
 {
 }
 
-const float ray::castRay(player* player, world* world, const unsigned int& screenWidth, unsigned int& i, sf::Vector2f& dir)
+const sf::Vector2i ray::castRay(player* player, world* world, const unsigned int& screenWidth, const unsigned int& screenHeight, unsigned int& i, sf::Vector2f& dir)
 {
-    sideDist = sf::Vector2f();
-    step = sf::Vector2i();
-    side = false;
-    hit = false;
+    this->sideDist = sf::Vector2f();
+    this->step = sf::Vector2i();
+    this->side = false;
+    this->hit = false;
+    this->perpWallDist = 0.f;
 
     float cameraX = 2 * (i - 1) / (float)screenWidth - 1;
     sf::Vector2f rayDir;
@@ -78,10 +83,30 @@ const float ray::castRay(player* player, world* world, const unsigned int& scree
 
     this->m_vertices[i].position = sf::Vector2f(player->getPosition().x + rayDir.x * fDistance * world->mapSize.x,
                                                 player->getPosition().y + rayDir.y * fDistance * world->mapSize.y);
-    return fDistance;
+
+    int lineHeight = (int)(screenHeight / this->perpWallDist);
+    sf::Vector2i draw;
+    draw.x = (int)(-lineHeight / 2 + screenHeight / 2 * player->angle);
+    draw.y = (int)(lineHeight / 2 + screenHeight / 2 * player->angle);
+
+    return draw;
 }
 
 const bool ray::isHit() const noexcept { return this->hit; }
+
+sf::Vertex& ray::operator[](const std::size_t index)
+{
+    if (index > this->m_vertices.getVertexCount())
+        throw "Out of bound...\n";
+    return this->m_vertices[index];
+}
+
+void ray::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+    states.transform *= getTransform();
+    states.texture = &this->m_texture;
+    target.draw(this->m_vertices, states);
+}
 
 /*
         int lineHeight = (int)(screenHeight / perpWallDist);

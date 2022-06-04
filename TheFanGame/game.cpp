@@ -44,7 +44,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
     this->playerRay[0].position = this->miniPlayer.getPosition();
     for (unsigned int i = 1; i < window.getSize().x + 1; ++i)
-        this->playerRay.castRay(&this->miniPlayer, &this->miniMap, window.getSize().x, i, mouseDir);
+        this->playerRay.castRay(&this->miniPlayer, &this->miniMap, window.getSize().x, window.getSize().y, i, mouseDir);
 }
 
 const void game::draw(sf::RenderWindow& window) noexcept 
