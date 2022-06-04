@@ -16,6 +16,8 @@ player::player(const sf::PrimitiveType& type, const std::size_t& size)
 	this->m_vertices[3].color = sf::Color::Cyan;
 
 	this->direction = { -1.f, 0.f };
+	this->plane = { 0.f, 0.3f };
+	this->angle = 0.f;
 }
 
 player::~player() {}

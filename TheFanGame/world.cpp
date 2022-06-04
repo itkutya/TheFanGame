@@ -38,3 +38,10 @@ world::world() noexcept
 world::~world() noexcept {}
 
 const int world::getMapTile(const int& x, const int& y) const noexcept { return this->worldMap[x + y * this->mapWidth]; }
+
+void world::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+    states.transform *= getTransform();
+    states.texture = &this->m_texture;
+    target.draw(this->m_vertices, states);
+}

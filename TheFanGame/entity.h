@@ -24,12 +24,14 @@ public:
 	virtual sf::Vertex& operator[] (const std::size_t index);
 
 	sf::VertexArray m_vertices;
-	sf::Vector2f direction = {-1.f, 0.f};
-	float uDiv = 1.f;
-	float vDiv = 1.f;
-	float vMove = 0.f;
-	sf::Texture m_texture;
+	sf::Vector2f direction;
+	sf::Vector2f plane;
+	float angle;
+	float uDiv;
+	float vDiv;
+	float vMove;
 private:
+	sf::Texture m_texture;
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };
 

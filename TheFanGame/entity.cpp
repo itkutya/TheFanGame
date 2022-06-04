@@ -3,6 +3,12 @@
 entity::entity(const sf::PrimitiveType& type, const std::size_t& size) {
 	this->m_vertices.setPrimitiveType(type);
 	this->m_vertices.resize(size);
+	this->direction = { -1.f, 0.f };
+	this->plane = { 0.f, 0.3f };
+	this->angle = 0.f;
+	this->uDiv = 1.f;
+	this->vDiv = 1.f;
+	this->vMove = 0.f;
 }
 
 entity::~entity() noexcept {}

@@ -2,7 +2,7 @@
 
 #include "entity.h"
 
-class world : public entity
+class world : public sf::Drawable, public sf::Transformable
 {
 public:
 	world() noexcept;
@@ -41,5 +41,9 @@ private:
 	  1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
 	  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 	};
+	sf::VertexArray m_vertices;
+	sf::Texture m_texture;
+
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };
 
