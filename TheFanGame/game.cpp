@@ -90,8 +90,8 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
         }
     }
 
-    this->view.setSize(window.getSize().x, window.getSize().y);
-    this->view.setCenter(window.getSize().x / 2, window.getSize().y / 2);
+    this->view.setSize((float)window.getSize().x, (float)window.getSize().y);
+    this->view.setCenter((float)window.getSize().x / 2.f, (float)window.getSize().y / 2.f);
     this->playerRay[0].position = this->miniPlayer.getPosition();
     for (unsigned int i = 1; i < window.getSize().x + 1; ++i)
     {
