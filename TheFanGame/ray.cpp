@@ -24,37 +24,37 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
     this->perpWallDist = 0.f;
 
     float cameraX = 2 * (i - 1) / (float)screenWidth - 1;
-    rayDir = sf::Vector2f();
-    rayDir.x = dir.x + (-dir.y / 3.f) * cameraX;
-    rayDir.y = dir.y + (dir.x / 3.f) * cameraX;
+    this->rayDir = sf::Vector2f();
+    this->rayDir.x = dir.x + (-dir.y / 3.f) * cameraX;
+    this->rayDir.y = dir.y + (dir.x / 3.f) * cameraX;
 
-    sf::Vector2i map;
-    map.x = int(player->getPosition().x / world->mapSize.x);
-    map.y = int(player->getPosition().y / world->mapSize.y);
+    this->map = sf::Vector2i();
+    this->map.x = int(player->getPosition().x / world->mapSize.x);
+    this->map.y = int(player->getPosition().y / world->mapSize.y);
 
     sf::Vector2f deltaDist;
-    deltaDist.x = (rayDir.x == 0.f) ? 1e30f : std::abs(1.f / rayDir.x);
-    deltaDist.y = (rayDir.y == 0.f) ? 1e30f : std::abs(1.f / rayDir.y);
+    deltaDist.x = (this->rayDir.x == 0.f) ? 1e30f : std::abs(1.f / this->rayDir.x);
+    deltaDist.y = (this->rayDir.y == 0.f) ? 1e30f : std::abs(1.f / this->rayDir.y);
 
-    if (rayDir.x < 0)
+    if (this->rayDir.x < 0)
     {
         this->step.x = -1;
-        this->sideDist.x = (player->getPosition().x / world->mapSize.x - map.x) * deltaDist.x;
+        this->sideDist.x = (player->getPosition().x / world->mapSize.x - this->map.x) * deltaDist.x;
     }
     else
     {
         this->step.x = 1;
-        this->sideDist.x = (map.x + 1.0f - player->getPosition().x / world->mapSize.x) * deltaDist.x;
+        this->sideDist.x = (this->map.x + 1.0f - player->getPosition().x / world->mapSize.x) * deltaDist.x;
     }
-    if (rayDir.y < 0)
+    if (this->rayDir.y < 0)
     {
         this->step.y = -1;
-        this->sideDist.y = (player->getPosition().y / world->mapSize.y - map.y) * deltaDist.y;
+        this->sideDist.y = (player->getPosition().y / world->mapSize.y - this->map.y) * deltaDist.y;
     }
     else
     {
         this->step.y = 1;
-        this->sideDist.y = (map.y + 1.0f - player->getPosition().y / world->mapSize.y) * deltaDist.y;
+        this->sideDist.y = (this->map.y + 1.0f - player->getPosition().y / world->mapSize.y) * deltaDist.y;
     }
 
     float fDistance = 0.f;
@@ -64,26 +64,26 @@ const void ray::castRay(player* player, world* world, const unsigned int& screen
         {
             fDistance = this->sideDist.x;
             this->sideDist.x += deltaDist.x;
-            map.x += this->step.x;
+            this->map.x += this->step.x;
             this->side = false;
         }
         else
         {
             fDistance = this->sideDist.y;
             this->sideDist.y += deltaDist.y;
-            map.y += this->step.y;
+            this->map.y += this->step.y;
             this->side = true;
         }
-        if (map.x >= 0 && map.x <= world->mapWidth && map.y >= 0 && map.y <= world->mapHeight)
-            if (world->getMapTile(map.x, map.y) > 0)
+        if (this->map.x >= 0 && this->map.x <= world->mapWidth && this->map.y >= 0 && this->map.y <= world->mapHeight)
+            if (world->getMapTile(this->map.x, this->map.y) > 0)
                 this->hit = true;
     }
 
     if (fDistance > 10.f)
         fDistance = 10.f;
 
-    this->m_vertices[i].position = sf::Vector2f(player->getPosition().x + rayDir.x * fDistance * world->mapSize.x,
-                                                player->getPosition().y + rayDir.y * fDistance * world->mapSize.y);
+    this->m_vertices[i].position = sf::Vector2f(player->getPosition().x + this->rayDir.x * fDistance * world->mapSize.x,
+                                                player->getPosition().y + this->rayDir.y * fDistance * world->mapSize.y);
 
     if (!this->side) this->perpWallDist = (this->sideDist.x - deltaDist.x);
     else             this->perpWallDist = (this->sideDist.y - deltaDist.y);
@@ -103,6 +103,8 @@ const bool& ray::isSide() const noexcept { return this->side; }
 const sf::Vector2i& ray::getDraw() const noexcept { return this->drawSE; }
 
 const sf::Vector2f& ray::getRayDir() const noexcept { return this->rayDir; }
+
+const sf::Vector2i& ray::getMapPos() const noexcept { return this->map; }
 
 const float& ray::getDistance() const noexcept { return this->perpWallDist; }
 

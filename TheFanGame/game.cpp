@@ -98,15 +98,15 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
         line[1].position = sf::Vector2f((float)i, (float)this->playerRay.getDraw().y);
 
         sf::Color color;
-        color = sf::Color(255 - (int)(this->playerRay.getDistance() * 10 > 255 ? 255 : this->playerRay.getDistance() * 10),
-                          255 - (int)(this->playerRay.getDistance() * 10 > 255 ? 255 : this->playerRay.getDistance() * 10),
-                          255 - (int)(this->playerRay.getDistance() * 10 > 255 ? 255 : this->playerRay.getDistance() * 10), 255);
+        color = sf::Color(255 - (int)(this->playerRay.getDistance() * 20 > 255 ? 255 : this->playerRay.getDistance() * 20),
+                          255 - (int)(this->playerRay.getDistance() * 20 > 255 ? 255 : this->playerRay.getDistance() * 20),
+                          255 - (int)(this->playerRay.getDistance() * 20 > 255 ? 255 : this->playerRay.getDistance() * 20), 255);
 
         if (this->playerRay.isSide())
         {
-            color.r = sf::Uint8(color.r / 1.5f);
-            color.g = sf::Uint8(color.g / 1.5f);
-            color.b = sf::Uint8(color.b / 1.5f);
+            color.r = sf::Uint8(color.r / 2.5f);
+            color.g = sf::Uint8(color.g / 2.5f);
+            color.b = sf::Uint8(color.b / 2.5f);
         }
 
         line[0].color = color;
@@ -121,8 +121,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
         if (!this->playerRay.isSide() && this->playerRay.getRayDir().x > 0) texX = texWidth - texX - 1;
         if (this->playerRay.isSide() && this->playerRay.getRayDir().y < 0)  texX = texWidth - texX - 1;
 
-        int mapNum = this->miniMap.getMapTile((int)this->miniPlayer.getPosition().x / this->miniMap.mapSize.x,
-                                              (int)this->miniPlayer.getPosition().y / this->miniMap.mapSize.y);
+        int mapNum = this->miniMap.getMapTile(this->playerRay.getMapPos().x, this->playerRay.getMapPos().y);
         line[0].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), 0.f);
         line[1].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), (float)texHeight);
 

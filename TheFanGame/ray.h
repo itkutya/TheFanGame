@@ -14,6 +14,7 @@ public:
     const bool& isSide() const noexcept;
     const sf::Vector2i& getDraw() const noexcept;
     const sf::Vector2f& getRayDir() const noexcept;
+    const sf::Vector2i& getMapPos() const noexcept;
     const float& getDistance() const noexcept;
 
     virtual sf::Vertex& operator[] (const std::size_t index);
@@ -22,6 +23,7 @@ private:
     sf::Vector2i step;
     sf::Vector2i drawSE;
     sf::Vector2f rayDir;
+    sf::Vector2i map;
     bool side;
     bool hit;
     float perpWallDist;

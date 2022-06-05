@@ -39,7 +39,13 @@ world::world() noexcept
 
 world::~world() noexcept {}
 
-const int world::getMapTile(const int& x, const int& y) const noexcept { return this->worldMap[x + y * this->mapWidth]; }
+const int world::getMapTile(const int& x, const int& y) const 
+{ 
+    if (x >= 0 && x <= this->mapWidth && y >= 0 && y <= this->mapHeight)
+        return this->worldMap[x + y * this->mapWidth];
+    else
+        return 0;
+}
 
 void world::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
