@@ -8,7 +8,7 @@ public:
 	world() noexcept;
 	virtual ~world() noexcept;
 
-	const int getMapTile(const int& x, const int& y) const;
+	const int getMapTile(const int& x, const int& y) const noexcept;
 
 	static const unsigned int mapWidth = 24;
 	static const unsigned int mapHeight = 24;

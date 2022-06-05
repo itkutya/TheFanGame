@@ -17,7 +17,7 @@ const void game::init(sf::RenderWindow& window)
     this->miniPlayer.setPosition(sf::Vector2f(20.f, 20.f));
 
     this->walls.setPrimitiveType(sf::PrimitiveType::Lines);
-    this->walls.resize((static_cast<size_t>(window.getSize().x) + 1) * 2);
+    this->walls.resize((static_cast<std::size_t>(window.getSize().x) + 1) * 2);
 
     this->state = &this->m_context->g_resources.getTexture(0);
 
@@ -32,7 +32,7 @@ const void game::processEvent(const sf::Event& event) noexcept
         this->m_context->g_states.popCurrent();
 
     if (event.type == sf::Event::Resized)
-        walls.resize((static_cast<size_t>(event.size.width) + 1) * 2);
+        walls.resize((static_cast<std::size_t>(event.size.width) + 1) * 2);
 }
 
 const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept 
@@ -45,25 +45,30 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     
     if (window.hasFocus() && !sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
     {
-        sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
         float sensitivity = dt.asSeconds() * 50.f;
         float moveSpeed = dt.asSeconds() * 30.f;
 
         float diff_X = (float)((mousePos.x - (window.getSize().x / 2.f)) / window.getSize().x);
-        float oldDirX = this->miniPlayer.direction.x;
-        this->miniPlayer.direction.x = this->miniPlayer.direction.x * cos(sensitivity * diff_X) - this->miniPlayer.direction.y * sin(sensitivity * diff_X);
-        this->miniPlayer.direction.y = oldDirX * sin(sensitivity * diff_X) + this->miniPlayer.direction.y * cos(sensitivity * diff_X);
-        float oldPlaneX = this->miniPlayer.plane.x;
-        this->miniPlayer.plane.x = this->miniPlayer.plane.x * cos(sensitivity * diff_X) - this->miniPlayer.plane.y * sin(sensitivity * diff_X);
-        this->miniPlayer.plane.y = oldPlaneX * sin(sensitivity * diff_X) + this->miniPlayer.plane.y * cos(sensitivity * diff_X);
+        if (std::abs(diff_X) > 0.0009f)
+        {
+            float oldDirX = this->miniPlayer.direction.x;
+            this->miniPlayer.direction.x = this->miniPlayer.direction.x * cos(sensitivity * diff_X) - this->miniPlayer.direction.y * sin(sensitivity * diff_X);
+            this->miniPlayer.direction.y = oldDirX * sin(sensitivity * diff_X) + this->miniPlayer.direction.y * cos(sensitivity * diff_X);
+            float oldPlaneX = this->miniPlayer.plane.x;
+            this->miniPlayer.plane.x = this->miniPlayer.plane.x * cos(sensitivity * diff_X) - this->miniPlayer.plane.y * sin(sensitivity * diff_X);
+            this->miniPlayer.plane.y = oldPlaneX * sin(sensitivity * diff_X) + this->miniPlayer.plane.y * cos(sensitivity * diff_X);
+        }
 
         float diff_Y = (float)(((window.getSize().y / 2.f) - mousePos.y) / window.getSize().y);
-        if (diff_Y > 0.f)
-            this->miniPlayer.angle += 1.f * sensitivity * diff_Y;
-        else if (diff_Y < 0.f)
-            this->miniPlayer.angle += 1.f * sensitivity * diff_Y;
-
+        if (std::abs(diff_Y) > 0.0009f)
+        {
+            if (diff_Y > 0.f)
+                this->miniPlayer.angle += 1.f * sensitivity * diff_Y;
+            else if (diff_Y < 0.f)
+                this->miniPlayer.angle += 1.f * sensitivity * diff_Y;
+        }
         this->miniPlayer.angle = std::clamp(this->miniPlayer.angle, 0.f, 2.f);
 
         sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
@@ -97,7 +102,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     {
         this->playerRay.castRay(&this->miniPlayer, &this->miniMap, window.getSize().x, window.getSize().y, i, this->miniPlayer.direction);
 
-        sf::Vertex* line = &this->walls[static_cast<size_t>(i) * 2];
+        sf::Vertex* line = &this->walls[static_cast<std::size_t>(i) * 2];
         line[0].position = sf::Vector2f((float)i, (float)this->playerRay.getDraw().x);
         line[1].position = sf::Vector2f((float)i, (float)this->playerRay.getDraw().y);
 

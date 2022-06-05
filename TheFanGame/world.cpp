@@ -3,7 +3,7 @@
 world::world() noexcept
 {
 	this->m_vertices.setPrimitiveType(sf::PrimitiveType::Quads);
-    this->m_vertices.resize(static_cast<size_t>(this->mapWidth * this->mapHeight) * 4);
+    this->m_vertices.resize(static_cast<std::size_t>(this->mapWidth * this->mapHeight) * 4);
 
     this->mapSize = { 4, 4 };
 
@@ -13,7 +13,7 @@ world::world() noexcept
         {
             if (this->getMapTile(i, j) > 0)
             {
-                sf::Vertex* quad = &this->m_vertices[(i + this->mapWidth * static_cast<size_t>(j)) * 4];
+                sf::Vertex* quad = &this->m_vertices[(i + this->mapWidth * static_cast<std::size_t>(j)) * 4];
 
                 quad[0].position = sf::Vector2f((float)(i * this->mapSize.x), (float)(j * this->mapSize.y));
                 quad[1].position = sf::Vector2f(((float)(i + 1) * this->mapSize.x), (float)(j * this->mapSize.y));
@@ -39,7 +39,7 @@ world::world() noexcept
 
 world::~world() noexcept {}
 
-const int world::getMapTile(const int& x, const int& y) const 
+const int world::getMapTile(const int& x, const int& y) const noexcept
 { 
     if (x >= 0 && x <= this->mapWidth && y >= 0 && y <= this->mapHeight)
         return this->worldMap[x + y * this->mapWidth];
