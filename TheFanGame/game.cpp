@@ -20,6 +20,8 @@ const void game::init(sf::RenderWindow& window)
     this->walls.resize((window.getSize().x + 1) * 2);
 
     this->state = &this->m_context->g_resources.getTexture(0);
+
+    this->playerRay.resize(window.getSize().x);
 }
 
 const void game::processEvent(const sf::Event& event) noexcept 
@@ -41,7 +43,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     ImGui::Text("FPS: %f", 1.f / dt.asSeconds());
     ImGui::End();
     
-    if (window.hasFocus())
+    if (window.hasFocus() && !sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
     {
         sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
 
@@ -88,6 +90,8 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
         }
     }
 
+    this->view.setSize(window.getSize().x, window.getSize().y);
+    this->view.setCenter(window.getSize().x / 2, window.getSize().y / 2);
     this->playerRay[0].position = this->miniPlayer.getPosition();
     for (unsigned int i = 1; i < window.getSize().x + 1; ++i)
     {
@@ -131,7 +135,10 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 const void game::draw(sf::RenderWindow& window) noexcept 
 {
+    window.setView(this->view);
     window.draw(this->walls, this->state);
+
+    window.setView(window.getDefaultView());
     window.draw(this->miniMap);
     window.draw(this->miniPlayer);
     window.draw(this->playerRay);

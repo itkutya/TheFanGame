@@ -3,7 +3,7 @@
 ray::ray()
 {
 	this->m_vertices.setPrimitiveType(sf::PrimitiveType::TriangleFan);
-	this->m_vertices.resize(601); //TODO: Window width problem fix later...
+	this->m_vertices.resize(601);
 
     this->side = false;
     this->hit = false;
@@ -16,6 +16,9 @@ ray::~ray()
 
 const void ray::castRay(player* player, world* world, const unsigned int& screenWidth, const unsigned int& screenHeight, unsigned int& i, sf::Vector2f& dir)
 {
+    if (this->m_vertices.getVertexCount() != screenWidth + 1)
+        this->m_vertices.resize(screenWidth + 1);
+
     this->sideDist = sf::Vector2f();
     this->step = sf::Vector2i();
     this->drawSE = sf::Vector2i();
@@ -107,6 +110,8 @@ const sf::Vector2f& ray::getRayDir() const noexcept { return this->rayDir; }
 const sf::Vector2i& ray::getMapPos() const noexcept { return this->map; }
 
 const float& ray::getDistance() const noexcept { return this->perpWallDist; }
+
+const void ray::resize(const unsigned int& screenWidth) noexcept { this->m_vertices.resize(screenWidth + 1); }
 
 sf::Vertex& ray::operator[](const std::size_t index)
 {

@@ -16,6 +16,7 @@ public:
     const sf::Vector2f& getRayDir() const noexcept;
     const sf::Vector2i& getMapPos() const noexcept;
     const float& getDistance() const noexcept;
+    const void resize(const unsigned int& screenWidth) noexcept;
 
     virtual sf::Vertex& operator[] (const std::size_t index);
 private:

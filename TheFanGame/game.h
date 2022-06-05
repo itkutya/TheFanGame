@@ -30,5 +30,6 @@ private:
 
 	sf::VertexArray walls;
 	sf::RenderStates state;
+	sf::View view;
 };
 
