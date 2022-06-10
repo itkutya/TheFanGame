@@ -21,12 +21,8 @@ const void game::init(sf::RenderWindow& window)
     this->m_walls.setPrimitiveType(sf::PrimitiveType::Lines);
     this->m_walls.resize((static_cast<std::size_t>(window.getSize().x) + 1) * 2);
 
-    for (std::size_t i = 0; i < 10; i++)
-    {
+    for (std::size_t i = 0; i < 10; ++i)
         this->m_entities.push_back(entity(sf::Vector2f((float)this->m_Map.mapSize.x, (float)this->m_Map.mapSize.y), sf::Vector2f((float)(std::rand() % 100), (float)(std::rand() % 100)), sf::Color::Green));
-    }
-    //this->m_entities.push_back(entity(sf::Vector2f((float)this->m_Map.mapSize.x, (float)this->m_Map.mapSize.y), sf::Vector2f(15.f, 15.f), sf::Color::Green));
-    //this->m_entities.push_back(entity(sf::Vector2f((float)this->m_Map.mapSize.x, (float)this->m_Map.mapSize.y), sf::Vector2f(50.f, 15.f), sf::Color::Green));
 
     this->m_sprites.setPrimitiveType(sf::PrimitiveType::Quads);
     this->m_sprites.resize(this->m_entities.size() * 4);
@@ -56,16 +52,15 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
         this->m_sprites.resize(this->m_entities.size() * 4);
 
     ImGui::SFML::Update(window, dt);
-
     ImGui::Begin("FPS Counter", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
     ImGui::Text("FPS: %f", 1.f / dt.asSeconds());
     ImGui::End();
 
+    float sensitivity = dt.asSeconds() * 30.f;
+    float moveSpeed = dt.asSeconds() * 10.f;
+
     if (window.hasFocus() && !sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
     {
-        float sensitivity = dt.asSeconds() * 30.f;
-        float moveSpeed = dt.asSeconds() * 10.f;
-
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
         float diffX = (float)(((window.getSize().x / 2.f) - mousePos.x) / window.getSize().x);
@@ -77,9 +72,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
         this->m_Player.m_plane.y = oldPlaneX * std::sin(sensitivity * diffX) + this->m_Player.m_plane.y * std::cos(sensitivity * diffX);
 
         float diffY = (float)(((window.getSize().y / 2.f) - mousePos.y) / window.getSize().y);
-        if (diffY > 0.f)
-            this->m_Player.m_angle += 1.f * sensitivity * diffY;
-        else if (diffY < 0.f)
+        if (diffY != 0.f)
             this->m_Player.m_angle += 1.f * sensitivity * diffY;
 
         this->m_Player.m_angle = std::clamp(this->m_Player.m_angle, 0.f, 2.f);
