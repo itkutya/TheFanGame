@@ -1,31 +1,25 @@
 #include "player.h"
 
-player::player(const sf::PrimitiveType& type, const std::size_t& size)
+player::player(const sf::Vector2f& size, const sf::Vector2f& pos, const sf::Color& color) noexcept
 {
-	this->m_vertices.setPrimitiveType(type);
-	this->m_vertices.resize(size);
+	this->m_vertices.setPrimitiveType(sf::PrimitiveType::Quads);
+	this->m_vertices.resize(4);
 
-	this->m_vertices[0].position = sf::Vector2f(-6, -6);
-	this->m_vertices[1].position = sf::Vector2f(6, -6);
-	this->m_vertices[2].position = sf::Vector2f(6, 6);
-	this->m_vertices[3].position = sf::Vector2f(-6, 6);
+	this->m_vertices[0].position = sf::Vector2f(-size.x, -size.y);
+	this->m_vertices[1].position = sf::Vector2f(size.x, -size.y);
+	this->m_vertices[2].position = sf::Vector2f(size.x, size.y);
+	this->m_vertices[3].position = sf::Vector2f(-size.x, size.y);
 
-	this->m_vertices[0].color = sf::Color::Cyan;
-	this->m_vertices[1].color = sf::Color::Cyan;
-	this->m_vertices[2].color = sf::Color::Cyan;
-	this->m_vertices[3].color = sf::Color::Cyan;
+	this->setPosition(pos);
 
-	this->direction = { -1.f, 0.f };
-	this->plane = { 0.f, 0.3f };
-	this->angle = 0.f;
+	this->m_vertices[0].color = color;
+	this->m_vertices[1].color = color;
+	this->m_vertices[2].color = color;
+	this->m_vertices[3].color = color;
+
+	this->m_direction = { -1.f, 0.f };
+	this->m_plane = { 0.f, 0.77f };
+	this->m_angle = 0.f;
 }
 
-player::~player() {}
-
-const void player::setSize(const sf::IntRect& size) noexcept
-{
-	this->m_vertices[0].position = sf::Vector2f((float)size.left, (float)size.top);
-	this->m_vertices[1].position = sf::Vector2f((float)size.width, (float)size.top);
-	this->m_vertices[2].position = sf::Vector2f((float)size.width, (float)size.height);
-	this->m_vertices[3].position = sf::Vector2f((float)size.left, (float)size.height);
-}
+player::~player() noexcept {}

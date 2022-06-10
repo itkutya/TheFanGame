@@ -9,29 +9,19 @@ public:
     ray();
     virtual ~ray();
 
-    const void castRay(player* player, world* world, const unsigned int& screenWidth, const unsigned int& screenHeight, unsigned int& i, sf::Vector2f& dir);
-    const bool& isHit() const noexcept;
-    const bool& isSide() const noexcept;
-    const sf::Vector2i& getDraw() const noexcept;
-    const sf::Vector2f& getRayDir() const noexcept;
-    const sf::Vector2i& getMapPos() const noexcept;
-    const float& getDistance() const noexcept;
-    const void resize(const unsigned int& screenWidth) noexcept;
+    const void castRay(player& player, world& world, const std::uint32_t& screenWidth, const std::uint32_t& screenHeight, std::uint32_t& i);
 
     virtual sf::Vertex& operator[] (const std::size_t index);
-private:
-    sf::Vector2f sideDist;
-    sf::Vector2i step;
-    sf::Vector2i drawSE;
-    sf::Vector2f rayDir;
-    sf::Vector2i map;
+
+    sf::Vector2f r_rayDir;
+    sf::Vector2i r_stepSize;
+    sf::Vector2i r_drawPos;
+    sf::Vector2i r_mapPos;
     bool side;
     bool hit;
     float perpWallDist;
-
-    sf::VertexArray m_vertices;
-    sf::Texture m_texture;
-
+    sf::VertexArray r_vertices;
+private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };
 

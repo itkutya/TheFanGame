@@ -8,13 +8,13 @@ public:
 	world() noexcept;
 	virtual ~world() noexcept;
 
-	const int getMapTile(const int& x, const int& y) const noexcept;
+	const std::uint8_t getMapTile(const int& x, const int& y) const noexcept;
 
-	static const unsigned int mapWidth = 24;
-	static const unsigned int mapHeight = 24;
+	static const std::uint32_t mapWidth = 24;
+	static const std::uint32_t mapHeight = 24;
 	sf::Vector2i mapSize;
 private:
-	const int worldMap[mapWidth * mapHeight] =
+	const std::uint8_t worldMap[mapWidth * mapHeight] =
 	{
 	  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 	  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -42,7 +42,6 @@ private:
 	  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 	};
 	sf::VertexArray m_vertices;
-	sf::Texture m_texture;
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };

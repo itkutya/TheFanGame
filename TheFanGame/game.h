@@ -22,14 +22,20 @@ public:
 	virtual const void processEvent(const sf::Event& event) noexcept override;
 	virtual const void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
+
+	const void sortSprites(std::vector<int>& order, std::vector<float>& dist, const std::size_t& amount) noexcept;
 private:
 	context* m_context;
-	world miniMap;
-	player miniPlayer;
-	ray playerRay;
+	world m_Map;
+	player m_Player;
+	ray m_Ray;
 
-	sf::VertexArray walls;
-	sf::RenderStates state;
-	sf::View view;
+	sf::View m_view;
+	sf::RenderStates m_state;
+
+	sf::VertexArray m_walls;
+	sf::VertexArray m_sprites;
+	std::vector<entity> m_entities;
+	std::vector<float> zBuffer;
 };
 

@@ -7,9 +7,8 @@ world::world() noexcept
 
     this->mapSize = { 4, 4 };
 
-    sf::Color mapColor;
-    for (unsigned int i = 0; i < this->mapWidth; ++i)
-        for (unsigned int j = 0; j < this->mapHeight; ++j)
+    for (std::uint8_t i = 0; i < this->mapWidth; ++i)
+        for (std::uint8_t j = 0; j < this->mapHeight; ++j)
         {
             if (this->getMapTile(i, j) > 0)
             {
@@ -20,6 +19,7 @@ world::world() noexcept
                 quad[2].position = sf::Vector2f((float)((i + 1) * this->mapSize.x), (float)((j + 1) * this->mapSize.y));
                 quad[3].position = sf::Vector2f((float)(i * this->mapSize.x), (float)((j + 1) * this->mapSize.y));
 
+                sf::Color mapColor;
                 switch (this->getMapTile(i, j))
                 {
                     case 1:  mapColor = sf::Color::Red;    break;
@@ -39,7 +39,7 @@ world::world() noexcept
 
 world::~world() noexcept {}
 
-const int world::getMapTile(const int& x, const int& y) const noexcept
+const std::uint8_t world::getMapTile(const int& x, const int& y) const noexcept
 { 
     if (x >= 0 && x <= this->mapWidth && y >= 0 && y <= this->mapHeight)
         return this->worldMap[x + y * this->mapWidth];
@@ -50,6 +50,5 @@ const int world::getMapTile(const int& x, const int& y) const noexcept
 void world::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
-    states.texture = &this->m_texture;
     target.draw(this->m_vertices, states);
 }
