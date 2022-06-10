@@ -21,8 +21,12 @@ const void game::init(sf::RenderWindow& window)
     this->m_walls.setPrimitiveType(sf::PrimitiveType::Lines);
     this->m_walls.resize((static_cast<std::size_t>(window.getSize().x) + 1) * 2);
 
-    this->m_entities.push_back(entity(sf::Vector2f((float)this->m_Map.mapSize.x, (float)this->m_Map.mapSize.y), sf::Vector2f(15.f, 15.f), sf::Color::Green));
-    this->m_entities.push_back(entity(sf::Vector2f((float)this->m_Map.mapSize.x, (float)this->m_Map.mapSize.y), sf::Vector2f(50.f, 15.f), sf::Color::Green));
+    for (std::size_t i = 0; i < 10; i++)
+    {
+        this->m_entities.push_back(entity(sf::Vector2f((float)this->m_Map.mapSize.x, (float)this->m_Map.mapSize.y), sf::Vector2f((float)(std::rand() % 100), (float)(std::rand() % 100)), sf::Color::Green));
+    }
+    //this->m_entities.push_back(entity(sf::Vector2f((float)this->m_Map.mapSize.x, (float)this->m_Map.mapSize.y), sf::Vector2f(15.f, 15.f), sf::Color::Green));
+    //this->m_entities.push_back(entity(sf::Vector2f((float)this->m_Map.mapSize.x, (float)this->m_Map.mapSize.y), sf::Vector2f(50.f, 15.f), sf::Color::Green));
 
     this->m_sprites.setPrimitiveType(sf::PrimitiveType::Quads);
     this->m_sprites.resize(this->m_entities.size() * 4);
