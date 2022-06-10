@@ -23,7 +23,6 @@ public:
 	virtual const void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 
-	const void sortSprites(std::vector<int>& order, std::vector<float>& dist, const std::size_t& amount) noexcept;
 private:
 	context* m_context;
 	world m_Map;
@@ -37,5 +36,7 @@ private:
 	sf::VertexArray m_sprites;
 	std::vector<entity> m_entities;
 	std::vector<float> zBuffer;
+
+	const void sortSprites(std::vector<int>& order, std::vector<float>& dist, const std::size_t& amount) noexcept;
 };
 
