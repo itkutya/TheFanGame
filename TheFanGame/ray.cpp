@@ -1,13 +1,15 @@
 #include "ray.h"
 
-ray::ray()
+ray::ray(const std::uint32_t& screenWidth)
 {
 	this->r_vertices.setPrimitiveType(sf::PrimitiveType::TriangleFan);
-	this->r_vertices.resize(601);
+    this->r_vertices.resize(static_cast<std::size_t>(screenWidth) + 1);
+
+    this->r_walls.setPrimitiveType(sf::PrimitiveType::Lines);
+    this->r_walls.resize((static_cast<std::size_t>(screenWidth)) * 2);
 
     this->r_rayDir = sf::Vector2f(0.f, 0.f);
     this->r_stepSize = sf::Vector2i(0, 0);
-    this->r_drawPos = sf::Vector2i(0, 0);
     this->r_mapPos = sf::Vector2i(0, 0);
     this->side = false;
     this->hit = false;
@@ -16,14 +18,16 @@ ray::ray()
 
 ray::~ray() {}
 
-const void ray::castRay(player& player, world& world, const std::uint32_t& screenWidth, const std::uint32_t& screenHeight, std::uint32_t& i)
+const void ray::castRay(player& player, world& world, const std::uint32_t& screenWidth, const std::uint32_t& screenHeight, const std::uint32_t& i)
 {
-    if (this->r_vertices.getVertexCount() != (static_cast<std::size_t>(screenWidth) + 1))
+    if (this->r_vertices.getVertexCount() != static_cast<std::size_t>(screenWidth) + 1)
         this->r_vertices.resize(static_cast<std::size_t>(screenWidth) + 1);
+
+    if (this->r_walls.getVertexCount() != static_cast<std::size_t>(screenWidth) * 2)
+        this->r_walls.resize((static_cast<std::size_t>(screenWidth)) * 2);
 
     this->r_rayDir = sf::Vector2f(0.f, 0.f);
     this->r_stepSize = sf::Vector2i(0, 0);
-    this->r_drawPos = sf::Vector2i(0, 0);
     this->r_mapPos = sf::Vector2i(0, 0);
     this->side = false;
     this->hit = false;
@@ -99,10 +103,41 @@ const void ray::castRay(player& player, world& world, const std::uint32_t& scree
     draw.x = (int)(-lineHeight / 2.f + screenHeight / 2.f * player.m_angle);
     draw.y = (int)(lineHeight / 2.f + screenHeight / 2.f * player.m_angle);
 
-    this->r_drawPos = draw;
+    sf::Vertex* line = &this->r_walls[static_cast<std::size_t>(i) * 2];
+    line[0].position = sf::Vector2f((float)i, (float)draw.x);
+    line[1].position = sf::Vector2f((float)i, (float)draw.y);
+
+    sf::Color color;
+    color = sf::Color(
+        255 - (int)(this->perpWallDist * 20 > 255 ? 255 : this->perpWallDist * 20),
+        255 - (int)(this->perpWallDist * 20 > 255 ? 255 : this->perpWallDist * 20),
+        255 - (int)(this->perpWallDist * 20 > 255 ? 255 : this->perpWallDist * 20), 255);
+
+    if (this->side)
+    {
+        color.r = sf::Uint8(color.r / 2.5f);
+        color.g = sf::Uint8(color.g / 2.5f);
+        color.b = sf::Uint8(color.b / 2.5f);
+    }
+
+    line[0].color = color;
+    line[1].color = color;
+
+    float wallX;
+    if (!this->side) wallX = player.getPosition().y / world.mapSize.y + this->perpWallDist * this->r_rayDir.y;
+    else             wallX = player.getPosition().x / world.mapSize.x + this->perpWallDist * this->r_rayDir.x;
+    wallX -= floor((wallX));
+
+    int texX = int(wallX * texWidth);
+    if (!this->side && this->r_rayDir.x > 0.f) texX = texWidth - texX - 1;
+    if (this->side && this->r_rayDir.y < 0.f) texX = texWidth - texX - 1;
+
+    int mapNum = world.getMapTile(this->r_mapPos.x, this->r_mapPos.y);
+    line[0].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), 0.f);
+    line[1].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), (float)texHeight);
 }
 
-sf::Vertex& ray::operator[](const std::size_t index)
+sf::Vertex& ray::operator[](const std::size_t& index)
 {
     if (index > this->r_vertices.getVertexCount())
         throw "Out of bound...\n";
@@ -112,5 +147,6 @@ sf::Vertex& ray::operator[](const std::size_t index)
 void ray::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
-    target.draw(this->r_vertices, states);
+    target.draw(this->r_walls, states);
+    target.draw(this->r_vertices);
 }

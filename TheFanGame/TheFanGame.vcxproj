@@ -175,9 +175,11 @@
     <ClCompile Include="ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="quad.cpp" />
     <ClCompile Include="ray.cpp" />
     <ClCompile Include="resourceManager.cpp" />
     <ClCompile Include="stateSystem.cpp" />
+    <ClCompile Include="triangle.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
@@ -196,10 +198,12 @@
     <ClInclude Include="ImGUI\imstb_textedit.h" />
     <ClInclude Include="ImGUI\imstb_truetype.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="quad.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resourceManager.h" />
     <ClInclude Include="stateSystem.h" />
+    <ClInclude Include="triangle.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>
