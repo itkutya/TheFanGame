@@ -9,7 +9,7 @@ public:
     ray(const std::uint32_t& screenWidth);
     virtual ~ray();
 
-    const void castRay(player& player, world& world, const std::uint32_t& screenWidth, const std::uint32_t& screenHeight, const std::uint32_t& i);
+    const void castRay(player& player, world& world, const std::uint32_t& screenWidth, const std::uint32_t& screenHeight, std::uint32_t& i);
 
     virtual sf::Vertex& operator[] (const std::size_t& index);
     

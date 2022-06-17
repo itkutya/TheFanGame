@@ -59,10 +59,10 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     this->m_view.setSize((float)window.getSize().x, (float)window.getSize().y);
     this->m_view.setCenter((float)window.getSize().x / 2.f, (float)window.getSize().y / 2.f);
     this->m_ray[0].position = this->m_player.getPosition();
-    for (std::uint32_t i = 1; i < window.getSize().x + 1; ++i)
+    for (std::uint32_t i = 0; i < window.getSize().x; ++i)
     {
-        this->m_ray.castRay(this->m_player, this->m_map, window.getSize().x, window.getSize().y, i - 1);
-        this->zBuffer[static_cast<std::vector<float, std::allocator<float>>::size_type>(i) - 1] = this->m_ray.perpWallDist * ((this->m_map.mapSize.x + this->m_map.mapSize.y) / 2.f);
+        this->m_ray.castRay(this->m_player, this->m_map, window.getSize().x, window.getSize().y, i);
+        this->zBuffer[i] = this->m_ray.perpWallDist * ((this->m_map.mapSize.x + this->m_map.mapSize.y) / 2.f);
     }
 
     std::vector<int> spriteOrder(this->m_entities.size());

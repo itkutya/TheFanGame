@@ -18,7 +18,7 @@ ray::ray(const std::uint32_t& screenWidth)
 
 ray::~ray() {}
 
-const void ray::castRay(player& player, world& world, const std::uint32_t& screenWidth, const std::uint32_t& screenHeight, const std::uint32_t& i)
+const void ray::castRay(player& player, world& world, const std::uint32_t& screenWidth, const std::uint32_t& screenHeight, std::uint32_t& i)
 {
     if (this->r_vertices.getVertexCount() != static_cast<std::size_t>(screenWidth) + 1)
         this->r_vertices.resize(static_cast<std::size_t>(screenWidth) + 1);
@@ -33,7 +33,7 @@ const void ray::castRay(player& player, world& world, const std::uint32_t& scree
     this->hit = false;
     this->perpWallDist = 0.f;
 
-    float cameraX = (float)(2.f * (i - 1.f) / screenWidth - 1.f);
+    float cameraX = (float)(2.f * i / screenWidth - 1.f);
     this->r_rayDir.x = player.m_direction.x + player.m_plane.x * cameraX;
     this->r_rayDir.y = player.m_direction.y + player.m_plane.y * cameraX;
 
@@ -91,7 +91,8 @@ const void ray::castRay(player& player, world& world, const std::uint32_t& scree
     if (fDistance > 10.f)
         fDistance = 10.f;
 
-    this->r_vertices[i].position = sf::Vector2f(player.getPosition().x + this->r_rayDir.x * fDistance * world.mapSize.x,
+    int a = i + 1;
+    this->r_vertices[a].position = sf::Vector2f(player.getPosition().x + this->r_rayDir.x * fDistance * world.mapSize.x,
                                                 player.getPosition().y + this->r_rayDir.y * fDistance * world.mapSize.y);
 
     if (!this->side) this->perpWallDist = (sideDist.x - deltaDist.x);
