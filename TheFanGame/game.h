@@ -6,6 +6,8 @@
 #include "stateSystem.h"
 #include "ray.h"
 
+#include "quad.h"
+
 struct context
 {
 	stateSystem g_states;
@@ -32,8 +34,7 @@ private:
 	sf::View m_view;
 	const sf::Texture* m_texture;
 
-	sf::VertexArray m_sprites;
-	std::vector<entity> m_entities;
+	std::vector<std::unique_ptr<entity>> m_entities;
 	std::vector<float> zBuffer;
 
 	const void sortSprites(std::vector<int>& order, std::vector<float>& dist, const std::size_t& amount) noexcept;

@@ -18,20 +18,9 @@ ray::ray(const std::uint32_t& screenWidth)
 
 ray::~ray() {}
 
-const void ray::castRay(player& player, world& world, const std::uint32_t& screenWidth, const std::uint32_t& screenHeight, std::uint32_t& i)
+const void ray::castRay(player& player, world& world, const std::uint32_t& screenWidth, const std::uint32_t& screenHeight, const std::uint32_t& i)
 {
-    if (this->r_vertices.getVertexCount() != static_cast<std::size_t>(screenWidth) + 1)
-        this->r_vertices.resize(static_cast<std::size_t>(screenWidth) + 1);
-
-    if (this->r_walls.getVertexCount() != static_cast<std::size_t>(screenWidth) * 2)
-        this->r_walls.resize((static_cast<std::size_t>(screenWidth)) * 2);
-
-    this->r_rayDir = sf::Vector2f(0.f, 0.f);
-    this->r_stepSize = sf::Vector2i(0, 0);
-    this->r_mapPos = sf::Vector2i(0, 0);
-    this->side = false;
     this->hit = false;
-    this->perpWallDist = 0.f;
 
     float cameraX = (float)(2.f * i / screenWidth - 1.f);
     this->r_rayDir.x = player.m_direction.x + player.m_plane.x * cameraX;
@@ -87,10 +76,10 @@ const void ray::castRay(player& player, world& world, const std::uint32_t& scree
             if (world.getMapTile(this->r_mapPos.x, this->r_mapPos.y) > 0)
                 this->hit = true;
     }
-    
+    /*
     if (fDistance > 10.f)
         fDistance = 10.f;
-
+    */
     int a = i + 1;
     this->r_vertices[a].position = sf::Vector2f(player.getPosition().x + this->r_rayDir.x * fDistance * world.mapSize.x,
                                                 player.getPosition().y + this->r_rayDir.y * fDistance * world.mapSize.y);
@@ -101,10 +90,10 @@ const void ray::castRay(player& player, world& world, const std::uint32_t& scree
     //TODO: aspect ratio??? or something idk... fix later...
     int lineHeight = (int)(screenHeight / this->perpWallDist);
     sf::Vector2i draw;
-    draw.x = (int)(-lineHeight / 2.f + screenHeight / 2.f * player.m_angle);
-    draw.y = (int)(lineHeight / 2.f + screenHeight / 2.f * player.m_angle);
+    draw.x = (int)(-lineHeight / 2.f + screenHeight / 2.f - player.m_angle);
+    draw.y = (int)(lineHeight / 2.f + screenHeight / 2.f - player.m_angle);
 
-    sf::Vertex* line = &this->r_walls[static_cast<std::size_t>(i) * 2];
+    sf::Vertex* line = &this->r_walls[std::size_t(i) * 2];
     line[0].position = sf::Vector2f((float)i, (float)draw.x);
     line[1].position = sf::Vector2f((float)i, (float)draw.y);
 
@@ -127,7 +116,7 @@ const void ray::castRay(player& player, world& world, const std::uint32_t& scree
     float wallX;
     if (!this->side) wallX = player.getPosition().y / world.mapSize.y + this->perpWallDist * this->r_rayDir.y;
     else             wallX = player.getPosition().x / world.mapSize.x + this->perpWallDist * this->r_rayDir.x;
-    wallX -= floor((wallX));
+    wallX -= std::floor((wallX));
 
     int texX = int(wallX * texWidth);
     if (!this->side && this->r_rayDir.x > 0.f) texX = texWidth - texX - 1;
