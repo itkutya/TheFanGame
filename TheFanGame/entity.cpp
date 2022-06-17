@@ -26,7 +26,7 @@ entity::entity(const sf::Vector2f& size, const sf::Vector2f& pos, const sf::Colo
 
 entity::~entity() noexcept {}
 
-sf::Vertex& entity::operator[](const std::size_t index) 
+sf::Vertex& entity::operator[](const std::size_t& index) 
 {
 	if (index > this->m_vertices.getVertexCount())
 		throw "Out of bound...\n";

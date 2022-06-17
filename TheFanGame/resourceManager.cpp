@@ -4,10 +4,10 @@ const void resourceManager::addTexture(const int& id, const std::string& filePat
 {
     this->m_textures[id] = std::make_unique<sf::Texture>();
 
-    if (!m_textures[id]->loadFromFile(filePath))
+    if (!this->m_textures[id]->loadFromFile(filePath))
         throw "Cannot load texture...\n";
         
-    m_textures[id]->setRepeated(wantRepeated);
+    this->m_textures[id]->setRepeated(wantRepeated);
 }
 
 const void resourceManager::addFont(const int& id, const std::string& filePath)

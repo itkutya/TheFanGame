@@ -25,14 +25,13 @@ public:
 
 private:
 	context* m_context;
-	world m_Map;
-	player m_Player;
-	ray m_Ray;
+	world m_map;
+	player m_player;
+	ray m_ray = ray(600);
 
 	sf::View m_view;
-	sf::RenderStates m_state;
+	const sf::Texture* m_texture;
 
-	sf::VertexArray m_walls;
 	sf::VertexArray m_sprites;
 	std::vector<entity> m_entities;
 	std::vector<float> zBuffer;

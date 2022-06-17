@@ -14,6 +14,9 @@
 	#endif
 #endif
 
+constexpr int texWidth = 64;
+constexpr int texHeight = 64;
+
 class resourceManager
 {
 public:

@@ -21,7 +21,7 @@ public:
 	entity(const sf::Vector2f& size = sf::Vector2f(0.f, 0.f), const sf::Vector2f& pos = sf::Vector2f(0.f, 0.f), const sf::Color& color = sf::Color::White) noexcept;
 	virtual ~entity() noexcept;
 
-	virtual sf::Vertex& operator[] (const std::size_t index);
+	virtual sf::Vertex& operator[] (const std::size_t& index);
 	const void setSize(const sf::IntRect& size) noexcept;
 
 	sf::VertexArray m_vertices;
