@@ -7,6 +7,7 @@
 #include "ray.h"
 
 #include "quad.h"
+#include "triangle.h"
 
 struct context
 {
