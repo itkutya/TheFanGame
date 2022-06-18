@@ -200,7 +200,6 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="quad.h" />
     <ClInclude Include="ray.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="resourceManager.h" />
     <ClInclude Include="stateSystem.h" />
     <ClInclude Include="triangle.h" />

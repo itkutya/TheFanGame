@@ -16,24 +16,54 @@
     <Filter Include="ImGUI">
       <UniqueIdentifier>{036377a5-d4a8-4847-8670-b58d531ec231}</UniqueIdentifier>
     </Filter>
+    <Filter Include="states">
+      <UniqueIdentifier>{cecacf1b-f02f-4760-bbd5-94fb88568951}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="states\Header Files">
+      <UniqueIdentifier>{4ac84b68-f962-489c-bc93-4819dccaf95c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="states\Source Files">
+      <UniqueIdentifier>{64da95ed-9f7e-477e-ae03-fe29df1b3371}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Header Files">
+      <UniqueIdentifier>{0ab112c3-cce8-409b-a199-6845c3930eb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Source Files">
+      <UniqueIdentifier>{c2449f82-1818-4f53-ada5-f7e099f4d4fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Other">
+      <UniqueIdentifier>{99781e73-3b32-465b-9bba-acc38b88e37e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{c76403f9-df3d-4b72-a245-edd0fc8af0ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\entities">
+      <UniqueIdentifier>{71405dd9-f412-415b-9bca-af7982af92ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\entities\Header Files">
+      <UniqueIdentifier>{4cdec82b-b800-4142-9d99-6fc0583f29ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\entities\Source Files">
+      <UniqueIdentifier>{2f1b14ed-9e0a-4025-b095-406cc0eeb0bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Header Files">
+      <UniqueIdentifier>{de1f83da-e4a5-4fce-9e23-8343a23c7b76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Source Files">
+      <UniqueIdentifier>{aad22bb8-c569-4731-963e-c54e25d94d7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="window">
+      <UniqueIdentifier>{a52902c9-4fab-47e0-b2c8-c03efe3ebc51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="window\Header Files">
+      <UniqueIdentifier>{c1f59b21-0aa7-48da-b278-f495b78c8d89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="window\Source Files">
+      <UniqueIdentifier>{13144452-0e5a-4c8f-90e0-181fd7df047e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="animation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stateSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ImGUI\imgui.cpp">
@@ -54,47 +84,44 @@
     <ClCompile Include="ImGUI\imgui_demo.cpp">
       <Filter>ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="resourceManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="entity.cpp">
+      <Filter>Objects\entities\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="world.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="triangle.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Objects\entities\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="quad.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Objects\entities\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="triangle.cpp">
+      <Filter>Objects\entities\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>states\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui.cpp">
+      <Filter>states\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="resourceManager.cpp">
+      <Filter>Resource Files\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stateSystem.cpp">
+      <Filter>Resource Files\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ray.cpp">
+      <Filter>Objects\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="animation.cpp">
+      <Filter>Resource Files\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="world.cpp">
+      <Filter>Objects\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="window.cpp">
+      <Filter>window\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="animation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stateSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImGUI\imconfig.h">
       <Filter>ImGUI</Filter>
     </ClInclude>
@@ -122,31 +149,46 @@
     <ClInclude Include="ImGUI\imstb_truetype.h">
       <Filter>ImGUI</Filter>
     </ClInclude>
-    <ClInclude Include="resourceManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="entity.h">
+      <Filter>Objects\entities\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="world.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="triangle.h">
-      <Filter>Header Files</Filter>
+      <Filter>Objects\entities\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="quad.h">
-      <Filter>Header Files</Filter>
+      <Filter>Objects\entities\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="triangle.h">
+      <Filter>Objects\entities\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui.h">
+      <Filter>states\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>states\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stateSystem.h">
+      <Filter>Resource Files\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resourceManager.h">
+      <Filter>Resource Files\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ray.h">
+      <Filter>Objects\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="animation.h">
+      <Filter>Resource Files\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="world.h">
+      <Filter>Objects\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="window.h">
+      <Filter>window\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\wolftextures.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Other</Filter>
     </Image>
   </ItemGroup>
 </Project>
