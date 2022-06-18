@@ -10,7 +10,6 @@ public:
     virtual ~ray();
 
     const void castRay(player& player, world& world, const std::uint32_t& screenWidth, const std::uint32_t& screenHeight, const std::uint32_t& i);
-    sf::Vertex& operator[] (const std::size_t& index);
     
     float perpWallDist;
     sf::VertexArray r_vertices;

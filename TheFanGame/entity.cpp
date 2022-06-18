@@ -15,6 +15,6 @@ const void entity::setTexture(const std::uint8_t& index) noexcept { this->m_text
 
 void entity::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
-	target.draw(this->m_sprites, states);
-	target.draw(this->m_vertices, states);
+	target.draw(this->m_sprites, states.texture);
+	target.draw(this->m_vertices, states.transform);
 }

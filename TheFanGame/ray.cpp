@@ -127,16 +127,9 @@ const void ray::castRay(player& player, world& world, const std::uint32_t& scree
     line[1].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), (float)texHeight);
 }
 
-sf::Vertex& ray::operator[](const std::size_t& index)
-{
-    if (index > this->r_vertices.getVertexCount())
-        throw "Out of bound...\n";
-    return this->r_vertices[index];
-}
-
 void ray::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
-    target.draw(this->r_walls, states);
-    target.draw(this->r_vertices);
+    target.draw(this->r_walls, states.texture);
+    target.draw(this->r_vertices, states.transform);
 }

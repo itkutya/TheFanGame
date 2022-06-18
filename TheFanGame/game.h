@@ -28,14 +28,17 @@ public:
 private:
 	context* m_context;
 	world m_map;
-	player m_player;
-	ray m_ray = ray(600);
 
 	sf::View m_view;
 	const sf::Texture* m_texture;
 
+	std::unique_ptr<player> m_player;
+	std::unique_ptr<ray> m_ray;
 	std::vector<std::unique_ptr<entity>> m_entities;
+
 	std::vector<float> zBuffer;
+	std::vector<int> spriteOrder;
+	std::vector<float> spriteDistance;
 
 	const void sortSprites(std::vector<int>& order, std::vector<float>& dist, const std::size_t& amount) noexcept;
 };

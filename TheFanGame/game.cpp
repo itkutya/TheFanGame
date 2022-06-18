@@ -9,21 +9,20 @@ game::game(context* context) noexcept
 game::~game() noexcept {}
 
 const void game::init(sf::RenderWindow& window) 
-{ 
-    this->m_player.setSize(sf::IntRect(-this->m_map.mapSize.x / 2, -this->m_map.mapSize.y / 2,
-                                        this->m_map.mapSize.x / 2, this->m_map.mapSize.y / 2));
-    this->m_player.setPosition(sf::Vector2f(20.f, 20.f));
-
+{
     this->m_texture = &this->m_context->g_resources.getTexture(0);
+    
+    this->m_player = std::make_unique<player>(sf::Vector2f((float)this->m_map.mapSize.x / 2.f, (float)this->m_map.mapSize.y / 2.f), sf::Vector2f(20.f, 20.f), sf::Color::Blue);
+    this->m_ray = std::make_unique<ray>(window.getSize().x);
 
-    for (std::size_t i = 0; i < 10; ++i)
-    {
-        this->m_entities.push_back(std::make_unique<quad>(sf::Vector2f((float)this->m_map.mapSize.x, (float)this->m_map.mapSize.y),
-            sf::Vector2f((float)(std::rand() % 50), (float)(std::rand() % 50)),
-            sf::Color::Green));
-    }
+    for (std::size_t i = 0; i < 20; ++i)
+        this->m_entities.push_back(std::make_unique<quad>(sf::Vector2f((float)this->m_map.mapSize.x / 2.f, (float)this->m_map.mapSize.y / 2.f), sf::Vector2f(10.f + (std::rand() % 50), 10.f + (std::rand() % 50)), sf::Color::Green));
+
+    this->spriteOrder.resize(this->m_entities.size());
+    this->spriteDistance.resize(this->m_entities.size());
 
     this->zBuffer.resize(window.getSize().x);
+
 }
 
 const void game::processEvent(const sf::Event& event) noexcept 
@@ -35,8 +34,8 @@ const void game::processEvent(const sf::Event& event) noexcept
 
     if (event.type == sf::Event::Resized)
     {
-        this->m_ray.r_vertices.resize(static_cast<std::size_t>(event.size.width) + 1);
-        this->m_ray.r_walls.resize((static_cast<std::size_t>(event.size.width)) * 2);
+        this->m_ray->r_vertices.resize(static_cast<std::size_t>(event.size.width) + 1);
+        this->m_ray->r_walls.resize((static_cast<std::size_t>(event.size.width)) * 2);
         this->zBuffer.resize(static_cast<std::size_t>(event.size.width));
         this->zBuffer.shrink_to_fit();
     }
@@ -44,13 +43,6 @@ const void game::processEvent(const sf::Event& event) noexcept
 
 const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
-    /*
-    if (1.f / dt.asSeconds() > 70.f)
-        std::cout << "high\n";
-    else if(1.f / dt.asSeconds() < 50.f)
-        std::cout << "low\n";
-    */
-
     ImGui::SFML::Update(window, dt);
     ImGui::Begin("FPS Counter", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
     ImGui::Text("FPS: %f", 1.f / dt.asSeconds());
@@ -59,41 +51,38 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     if (window.hasFocus() && !sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
     {
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        this->m_player.update(mousePos, window.getSize(), dt);
+        this->m_player->update(mousePos, window.getSize(), dt);
         sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
     }
 
     this->m_view.setSize((float)window.getSize().x, (float)window.getSize().y);
     this->m_view.setCenter((float)window.getSize().x / 2.f, (float)window.getSize().y / 2.f);
-    this->m_ray[0].position = this->m_player.getPosition();
+    this->m_ray->r_vertices[0].position = this->m_player->getPosition();
     for (std::uint32_t i = 0; i < window.getSize().x; ++i)
     {
-        this->m_ray.castRay(this->m_player, this->m_map, window.getSize().x, window.getSize().y, i);
-        this->zBuffer[i] = this->m_ray.perpWallDist * ((this->m_map.mapSize.x + this->m_map.mapSize.y) / 2.f);
+        this->m_ray->castRay(*this->m_player, this->m_map, window.getSize().x, window.getSize().y, i);
+        this->zBuffer[i] = this->m_ray->perpWallDist * ((this->m_map.mapSize.x + this->m_map.mapSize.y) / 2.f);
     }
-    
-    std::vector<int> spriteOrder(this->m_entities.size());
-    std::vector<float> spriteDistance(this->m_entities.size());
 
     for (std::uint32_t i = 0; i < this->m_entities.size(); ++i)
     {
-        spriteOrder[i] = i;
-        spriteDistance[i] = std::hypotf(this->m_player.getPosition().x - this->m_entities[i]->getPosition().x, this->m_player.getPosition().y - this->m_entities[i]->getPosition().y);
+        this->spriteOrder[i] = i;
+        this->spriteDistance[i] = std::hypotf(this->m_player->getPosition().x - this->m_entities[i]->getPosition().x, this->m_player->getPosition().y - this->m_entities[i]->getPosition().y);
     }
-    this->sortSprites(spriteOrder, spriteDistance, this->m_entities.size());
+    this->sortSprites(this->spriteOrder, this->spriteDistance, this->m_entities.size());
     
-    for (std::uint32_t i = 0; i < this->m_entities.size(); ++i)
-        this->m_entities[spriteOrder[i]]->update(this->m_player, window.getSize(), this->zBuffer);
+    for (std::vector<std::unique_ptr<entity>>::iterator it = this->m_entities.begin(); it != this->m_entities.end(); ++it)
+        it->get()->update(*this->m_player, window.getSize(), this->zBuffer);
 }
 
 const void game::draw(sf::RenderWindow& window) noexcept
 {
     window.setView(this->m_view);
-    window.draw(this->m_ray, this->m_texture);
+    window.draw(*this->m_ray, this->m_texture);
     window.draw(this->m_map);
-    window.draw(this->m_player);
-    for (auto& i : this->m_entities)
-        window.draw(*i, this->m_texture);
+    window.draw(*this->m_player);
+    for (std::uint32_t i = 0; i < this->m_entities.size(); ++i)
+        window.draw(*this->m_entities[this->spriteOrder[i]], this->m_texture);
 
     window.setView(window.getDefaultView());
     ImGui::SFML::Render(window);

@@ -4,6 +4,8 @@
 
 int main()
 {
+	std::srand(std::time(0));
+
 	try
 	{
 		context m_context;
@@ -11,7 +13,7 @@ int main()
 		window mainWindow(sf::VideoMode(600, 600), "TITLE!5!%!", &m_context);
 		mainWindow.setFramerateLimit(60);
 
-		while (mainWindow) 
+		while (mainWindow)
 		{
 			m_context.g_states.processStateChange(mainWindow);
 			mainWindow.pollEvents();
