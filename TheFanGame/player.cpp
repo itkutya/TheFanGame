@@ -29,7 +29,7 @@ player::player(const sf::Vector2f& size, const sf::Vector2f& pos, const sf::Colo
 
 player::~player() noexcept {}
 
-const void player::update(const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const sf::Time& dt) noexcept
+const void player::update(world& map, const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const sf::Time& dt) noexcept
 {
     float sensitivity = dt.asSeconds() * this->mouseSensivity;
     float moveSpeed = dt.asSeconds() * this->movementSpeed;
@@ -59,6 +59,12 @@ const void player::update(const sf::Vector2i& mousePos, const sf::Vector2u& wind
         this->move(sf::Vector2f(this->m_direction.y * moveSpeed, -this->m_direction.x * moveSpeed));
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         this->move(sf::Vector2f(-this->m_direction.y * moveSpeed, this->m_direction.x * moveSpeed));
+
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        this->ak47.shoot(*this, map, windowSize);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+        this->ak47.reload();
+    this->ak47.update(*this, windowSize);
 }
 
 const void player::setSize(const sf::IntRect& size) noexcept
@@ -67,4 +73,12 @@ const void player::setSize(const sf::IntRect& size) noexcept
     this->m_vertices[1].position = sf::Vector2f((float)size.width, (float)size.top);
     this->m_vertices[2].position = sf::Vector2f((float)size.width, (float)size.height);
     this->m_vertices[3].position = sf::Vector2f((float)size.left, (float)size.height);
+}
+
+void player::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+    states.transform *= getTransform();
+    target.draw(this->m_sprites, states.texture);
+    target.draw(this->m_vertices, states.transform);
+    target.draw(this->ak47);
 }

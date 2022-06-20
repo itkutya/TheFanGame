@@ -164,6 +164,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="animation.cpp" />
+    <ClCompile Include="circle.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gui.cpp" />
@@ -180,11 +181,13 @@
     <ClCompile Include="resourceManager.cpp" />
     <ClCompile Include="stateSystem.cpp" />
     <ClCompile Include="triangle.cpp" />
+    <ClCompile Include="weapon.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animation.h" />
+    <ClInclude Include="circle.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gui.h" />
@@ -203,6 +206,7 @@
     <ClInclude Include="resourceManager.h" />
     <ClInclude Include="stateSystem.h" />
     <ClInclude Include="triangle.h" />
+    <ClInclude Include="weapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>

@@ -2,16 +2,9 @@
 
 #include <math.h>
 
-#if _WIN32 || _WIN64
-	#if _WIN64
-		#include "SFML64/Graphics.hpp"
-	#else
-		#include "SFML32/Graphics.hpp"
-	#endif
-#endif
-
 #include "resourceManager.h"
 #include "animation.h"
+#include "world.h"
 
 constexpr float PI = 3.141592653589793116f;
 
@@ -25,7 +18,7 @@ public:
 	virtual const void setTexture(const std::uint8_t& index) noexcept;
 	virtual const void setSize(const sf::IntRect& size) noexcept = 0;
 	virtual const void update(entity& player, const sf::Vector2u& windowSize, const std::vector<float>& zBuffer) noexcept = 0;
-	virtual const void update(const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const sf::Time& dt) noexcept = 0;
+	virtual const void update(world& map, const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const sf::Time& dt) noexcept = 0;
 
 	sf::VertexArray m_vertices;
 	sf::VertexArray m_sprites;
