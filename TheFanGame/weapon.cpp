@@ -14,7 +14,7 @@ weapon::~weapon() noexcept {}
 
 const void weapon::shoot(entity& entity, world& world, const sf::Vector2u& screenSize) noexcept
 {
-    if (this->w_currAmmo > 0 && this->w_clock.getElapsedTime().asSeconds() > this->w_DPS.asSeconds())
+    if (this->w_currAmmo > 0 && this->w_clock.getElapsedTime().asSeconds() > this->w_DPS.asSeconds() && !this->w_isMelee)
     {
         bool hit = false;
         bool side = false;
@@ -90,7 +90,7 @@ const void weapon::shoot(entity& entity, world& world, const sf::Vector2u& scree
         
         if (this->w_impactPoint.size() == this->w_maxAmmoCap)
             this->w_impactPoint.clear();
-        this->w_impactPoint.emplace_back(std::make_unique<quad>(sf::Vector2f(5.f, 5.f), sf::Vector2f(0.f, 0.f)));
+        this->w_impactPoint.emplace_back(std::make_unique<quad>(sf::Vector2f(5.f, 5.f), sf::Vector2f(0.f, 0.f), sf::Color::Yellow));
 
         this->w_clock.restart();
         this->w_currAmmo--;
@@ -104,7 +104,7 @@ const void weapon::reload() noexcept
     this->distPos.clear();
     this->w_angle.clear();
     this->w_impactPoint.clear();
-    this->w_currAmmo = this->w_maxAmmoCap; 
+    this->w_currAmmo = this->w_maxAmmoCap;
 }
 
 const void weapon::update(entity& entity, const sf::Vector2u& screenSize) noexcept

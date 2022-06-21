@@ -8,6 +8,11 @@ ray::ray(const std::uint32_t& screenWidth)
     this->r_walls.setPrimitiveType(sf::PrimitiveType::Lines);
     this->r_walls.resize((static_cast<std::size_t>(screenWidth)) * 2);
 
+    this->r_floors.setPrimitiveType(sf::PrimitiveType::Lines);
+    this->r_floors.resize((static_cast<std::size_t>(screenWidth)) * 2);
+    this->r_ceilings.setPrimitiveType(sf::PrimitiveType::Lines);
+    this->r_ceilings.resize((static_cast<std::size_t>(screenWidth)) * 2);
+
     this->r_rayDir = sf::Vector2f(0.f, 0.f);
     this->r_stepSize = sf::Vector2i(0, 0);
     this->r_mapPos = sf::Vector2i(0, 0);
@@ -56,7 +61,7 @@ const void ray::castRay(player& player, world& world, const std::uint32_t& scree
     }
 
     float fDistance = 0.f;
-    while (!this->hit  && fDistance < 1000.f)
+    while (!this->hit && fDistance < 1000.f)
     {
         if (sideDist.x < sideDist.y)
         {
@@ -76,18 +81,14 @@ const void ray::castRay(player& player, world& world, const std::uint32_t& scree
             if (world.getMapTile(this->r_mapPos.x, this->r_mapPos.y) > 0)
                 this->hit = true;
     }
-    /*
-    if (fDistance > 10.f)
-        fDistance = 10.f;
-    */
+
     int a = i + 1;
     this->r_vertices[a].position = sf::Vector2f(player.getPosition().x + this->r_rayDir.x * fDistance * world.mapSize.x,
-                                                player.getPosition().y + this->r_rayDir.y * fDistance * world.mapSize.y);
+        player.getPosition().y + this->r_rayDir.y * fDistance * world.mapSize.y);
 
     if (!this->side) this->perpWallDist = (sideDist.x - deltaDist.x);
     else             this->perpWallDist = (sideDist.y - deltaDist.y);
 
-    //TODO: aspect ratio??? or something idk... fix later...
     int lineHeight = (int)(screenHeight / this->perpWallDist);
     sf::Vector2i draw;
     draw.x = (int)(-lineHeight / 2.f + screenHeight / 2.f - player.m_angle);
@@ -125,11 +126,28 @@ const void ray::castRay(player& player, world& world, const std::uint32_t& scree
     int mapNum = world.getMapTile(this->r_mapPos.x, this->r_mapPos.y);
     line[0].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), 0.f);
     line[1].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), (float)texHeight);
+
+    //floor
+    line = &this->r_floors[std::size_t(i) * 2];
+    line[0].position = sf::Vector2f(i, draw.y);
+    line[1].position = sf::Vector2f(i, screenHeight);
+
+    line[0].color = sf::Color::Black;
+    line[1].color = sf::Color(125, 125, 125, 255);
+    //ceiling
+    line = &this->r_ceilings[std::size_t(i) * 2];
+    line[0].position = sf::Vector2f(i, 0);
+    line[1].position = sf::Vector2f(i, draw.x);
+
+    line[0].color = sf::Color::Cyan;
+    line[1].color = sf::Color::Cyan;
 }
 
 void ray::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
+    target.draw(this->r_floors);
+    target.draw(this->r_ceilings);
     target.draw(this->r_walls, states.texture);
     target.draw(this->r_vertices, states.transform);
 }

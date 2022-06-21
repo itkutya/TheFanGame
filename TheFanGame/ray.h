@@ -14,6 +14,8 @@ public:
     float perpWallDist;
     sf::VertexArray r_vertices;
     sf::VertexArray r_walls;
+    sf::VertexArray r_floors;
+    sf::VertexArray r_ceilings;
 private:
     sf::Vector2f r_rayDir;
     sf::Vector2i r_stepSize;

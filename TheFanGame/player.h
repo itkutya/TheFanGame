@@ -16,7 +16,7 @@ private:
 	float movementSpeed;
 	float mouseSensivity;
 
-	weapon ak47 = weapon(20.f, 31, sf::seconds(0.05f), 50.f, false);
+	weapon ak47 = weapon(20.f, 31, sf::seconds(0.05f), 5.f, false);
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };

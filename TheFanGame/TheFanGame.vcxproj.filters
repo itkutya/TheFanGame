@@ -124,7 +124,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="weapon.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Objects\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -195,7 +195,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="weapon.h">
-      <Filter>Header Files</Filter>
+      <Filter>Objects\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

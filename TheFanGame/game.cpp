@@ -36,6 +36,8 @@ const void game::processEvent(const sf::Event& event) noexcept
     {
         this->m_ray->r_vertices.resize(static_cast<std::size_t>(event.size.width) + 1);
         this->m_ray->r_walls.resize((static_cast<std::size_t>(event.size.width)) * 2);
+        this->m_ray->r_floors.resize((static_cast<std::size_t>(event.size.width)) * 2);
+        this->m_ray->r_ceilings.resize((static_cast<std::size_t>(event.size.width)) * 2);
         this->zBuffer.resize(static_cast<std::size_t>(event.size.width));
         this->zBuffer.shrink_to_fit();
     }
