@@ -11,14 +11,14 @@ constexpr float PI = 3.141592653589793116f;
 class entity : public sf::Drawable, public sf::Transformable
 {
 public:
-	entity() noexcept;
+	entity(const sf::Vector2f& size = sf::Vector2f(), const sf::Vector2f& pos = sf::Vector2f(), const sf::Color& color = sf::Color::White) noexcept;
 	virtual ~entity() noexcept;
+	
+	const void update(entity& player, const sf::Vector2u& windowSize, const std::vector<float>& zBuffer) noexcept;
 
 	virtual sf::Vertex& operator[] (const std::size_t& index);
 	virtual const void setTexture(const std::uint8_t& index) noexcept;
-	virtual const void setSize(const sf::IntRect& size) noexcept = 0;
-	virtual const void update(entity& player, const sf::Vector2u& windowSize, const std::vector<float>& zBuffer) noexcept = 0;
-	virtual const void update(world& map, const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const std::vector<std::unique_ptr<entity>>& entities, const sf::Time& dt) noexcept = 0;
+	virtual const void setSize(const sf::IntRect& size) noexcept;
 
 	sf::VertexArray m_vertices;
 	sf::VertexArray m_sprites;

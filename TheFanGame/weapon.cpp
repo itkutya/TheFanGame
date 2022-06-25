@@ -93,14 +93,14 @@ const void weapon::shoot(entity& ent, world& world, const std::vector<std::uniqu
             this->hitPos.emplace_back(sf::Vector2f(ent.getPosition().x + rayDir.x * fDistance * world.mapSize.x, ent.getPosition().y + rayDir.y * fDistance * world.mapSize.y));
             this->distPos.emplace_back(sf::Vector2f((ent.getPosition().x + rayDir.x * fDistance * world.mapSize.x) - ent.getPosition().x, (ent.getPosition().y + rayDir.y * fDistance * world.mapSize.y) - ent.getPosition().y));
             this->w_angle.emplace_back(ent.m_angle);
-            this->w_impactPoint.emplace_back(std::make_unique<quad>(sf::Vector2f(5.f, 5.f), sf::Vector2f(0.f, 0.f), sf::Color::Yellow));
+            this->w_impactPoint.emplace_back(std::make_unique<entity>(sf::Vector2f(5.f, 5.f), sf::Vector2f(0.f, 0.f), sf::Color::Yellow));
         }
         else
         {
             this->hitPos.emplace_back(sf::Vector2f(ent.getPosition().x + rayDir.x * fDistance * world.mapSize.x, ent.getPosition().y + rayDir.y * fDistance * world.mapSize.y));
             this->distPos.emplace_back(sf::Vector2f((ent.getPosition().x + rayDir.x * fDistance * world.mapSize.x) - ent.getPosition().x, (ent.getPosition().y + rayDir.y * fDistance * world.mapSize.y) - ent.getPosition().y));
             this->w_angle.emplace_back(ent.m_angle);
-            this->w_impactPoint.emplace_back(std::make_unique<quad>(sf::Vector2f(5.f, 5.f), sf::Vector2f(0.f, 0.f), sf::Color::Red));
+            this->w_impactPoint.emplace_back(std::make_unique<entity>(sf::Vector2f(5.f, 5.f), sf::Vector2f(0.f, 0.f), sf::Color::Red));
         }
 
         this->w_clock.restart();

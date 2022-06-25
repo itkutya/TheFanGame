@@ -1,7 +1,7 @@
 #pragma once
 
 #include "world.h"
-#include "quad.h"
+#include "entity.h"
 
 class weapon : public sf::Drawable, public sf::Transformable
 {

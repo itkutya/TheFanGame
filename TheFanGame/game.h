@@ -6,9 +6,6 @@
 #include "stateSystem.h"
 #include "ray.h"
 
-#include "quad.h"
-#include "triangle.h"
-
 struct context
 {
 	stateSystem g_states;
