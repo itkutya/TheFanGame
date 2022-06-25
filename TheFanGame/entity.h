@@ -28,6 +28,8 @@ public:
 	std::uint8_t m_texture = 0;
 	sf::Vector3f m_size = sf::Vector3f(0.f, 0.f, 0.f);
 	//|| x = uDiv || y = vDiv || z = vMove ||
+
+	float health = 100.f;
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };

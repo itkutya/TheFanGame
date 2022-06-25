@@ -74,7 +74,24 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     this->sortSprites(this->spriteOrder, this->spriteDistance, this->m_entities.size());
     
     for (std::vector<entity>::iterator it = this->m_entities.begin(); it != this->m_entities.end(); ++it)
+    {
         it->update(*this->m_player, window.getSize(), this->zBuffer);
+        if (it->health <= 0)
+        {
+            this->m_entities.erase(it);
+            this->spriteOrder.resize(this->m_entities.size());
+            this->spriteDistance.resize(this->m_entities.size());
+            this->spriteOrder.shrink_to_fit();
+            this->spriteDistance.shrink_to_fit();
+            for (std::uint32_t i = 0; i < this->m_entities.size(); ++i)
+            {
+                this->spriteOrder[i] = i;
+                this->spriteDistance[i] = std::hypotf(this->m_player->getPosition().x - this->m_entities[i].getPosition().x, this->m_player->getPosition().y - this->m_entities[i].getPosition().y);
+            }
+            this->sortSprites(this->spriteOrder, this->spriteDistance, this->m_entities.size());
+            break;
+        }
+    }
 }
 
 const void game::draw(sf::RenderWindow& window) noexcept

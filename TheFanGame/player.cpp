@@ -29,7 +29,7 @@ player::player(const sf::Vector2f& size, const sf::Vector2f& pos, const sf::Colo
 
 player::~player() noexcept {}
 
-const void player::update(world& map, const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const std::vector<entity>& entities, const sf::Time& dt) noexcept
+const void player::update(world& map, const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, std::vector<entity>& entities, const sf::Time& dt) noexcept
 {
     float sensitivity = dt.asSeconds() * this->mouseSensivity;
     float moveSpeed = dt.asSeconds() * this->movementSpeed;

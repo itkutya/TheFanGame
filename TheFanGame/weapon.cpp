@@ -1,9 +1,10 @@
 #include "weapon.h"
 
-weapon::weapon(const float& dmg, const int& maxAmmo, const sf::Time& dps, const float& range, const bool& isMelee) noexcept 
-                : w_dmg(dmg), w_maxAmmoCap(maxAmmo), w_currAmmo(maxAmmo), w_DPS(dps), w_range(range), w_isMelee(isMelee)
+weapon::weapon(const float& dmg, const int& maxAmmo, const sf::Time& dps, const float& range, const float& reloadSpeed, const bool& isMelee) noexcept
+                : w_dmg(dmg), w_maxAmmoCap(maxAmmo), w_currAmmo(maxAmmo), w_DPS(dps), w_range(range), w_reloadSpeed(reloadSpeed), w_isMelee(isMelee)
 {
     this->w_clock.restart();
+    this->w_reload.restart();
     this->hitPos.reserve(maxAmmo);
     this->distPos.reserve(maxAmmo);
     this->w_angle.reserve(maxAmmo);
@@ -12,9 +13,9 @@ weapon::weapon(const float& dmg, const int& maxAmmo, const sf::Time& dps, const 
 
 weapon::~weapon() noexcept {}
 
-const void weapon::shoot(entity& ent, world& world, const std::vector<entity>& entities, const sf::Vector2u& screenSize) noexcept
+const void weapon::shoot(entity& ent, world& world, std::vector<entity>& entities, const sf::Vector2u& screenSize) noexcept
 {
-    if (this->w_currAmmo > 0 && this->w_clock.getElapsedTime().asSeconds() > this->w_DPS.asSeconds() && !this->w_isMelee)
+    if (this->w_currAmmo > 0 && this->w_clock.getElapsedTime().asSeconds() > this->w_DPS.asSeconds() && !this->w_isMelee && this->w_reload.getElapsedTime().asSeconds() > this->w_reloadSpeed)
     {
         bool hit = false;
         bool side = false;
@@ -83,6 +84,7 @@ const void weapon::shoot(entity& ent, world& world, const std::vector<entity>& e
                     fDistance >= std::hypotf(ent.getPosition().x - entities[i].getPosition().x, ent.getPosition().y - entities[i].getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f))
                 {
                     fDistance = std::hypotf(ent.getPosition().x - entities[i].getPosition().x, ent.getPosition().y - entities[i].getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f);
+                    entities[i].health -= w_dmg;
                     hit = true;
                 }
             }
@@ -105,17 +107,26 @@ const void weapon::shoot(entity& ent, world& world, const std::vector<entity>& e
 
         this->w_clock.restart();
         this->w_currAmmo--;
-        std::cout << w_currAmmo << "\\" << w_maxAmmoCap << '\n';
+        //std::cout << w_currAmmo << "\\" << w_maxAmmoCap << '\n';
     }
 }
 
-const void weapon::reload() noexcept 
+const bool weapon::reload() noexcept
 {
-    this->hitPos.clear();
-    this->distPos.clear();
-    this->w_angle.clear();
-    this->w_impactPoint.clear();
-    this->w_currAmmo = this->w_maxAmmoCap;
+    if (this->w_reload.getElapsedTime().asSeconds() > this->w_reloadSpeed && this->w_currAmmo != this->w_maxAmmoCap)
+    {
+        this->hitPos.clear();
+        this->distPos.clear();
+        this->w_angle.clear();
+        this->w_impactPoint.clear();
+        this->w_currAmmo = this->w_maxAmmoCap;
+
+        this->w_reload.restart();
+
+        return true;
+    }
+
+    return false;
 }
 
 const void weapon::update(entity& ent, const sf::Vector2u& screenSize) noexcept
