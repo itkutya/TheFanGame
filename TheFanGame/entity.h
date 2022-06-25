@@ -18,7 +18,7 @@ public:
 	virtual const void setTexture(const std::uint8_t& index) noexcept;
 	virtual const void setSize(const sf::IntRect& size) noexcept = 0;
 	virtual const void update(entity& player, const sf::Vector2u& windowSize, const std::vector<float>& zBuffer) noexcept = 0;
-	virtual const void update(world& map, const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const sf::Time& dt) noexcept = 0;
+	virtual const void update(world& map, const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const std::vector<std::unique_ptr<entity>>& entities, const sf::Time& dt) noexcept = 0;
 
 	sf::VertexArray m_vertices;
 	sf::VertexArray m_sprites;

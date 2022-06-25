@@ -12,7 +12,7 @@ weapon::weapon(const float& dmg, const int& maxAmmo, const sf::Time& dps, const 
 
 weapon::~weapon() noexcept {}
 
-const void weapon::shoot(entity& entity, world& world, const sf::Vector2u& screenSize) noexcept
+const void weapon::shoot(entity& ent, world& world, const std::vector<std::unique_ptr<entity>>& entities, const sf::Vector2u& screenSize) noexcept
 {
     if (this->w_currAmmo > 0 && this->w_clock.getElapsedTime().asSeconds() > this->w_DPS.asSeconds() && !this->w_isMelee)
     {
@@ -21,11 +21,11 @@ const void weapon::shoot(entity& entity, world& world, const sf::Vector2u& scree
         sf::Vector2f rayDir = sf::Vector2f();
         sf::Vector2i mapPos = sf::Vector2i();
 
-        rayDir.x = entity.m_direction.x;
-        rayDir.y = entity.m_direction.y;
+        rayDir.x = ent.m_direction.x;
+        rayDir.y = ent.m_direction.y;
 
-        mapPos.x = (int)(entity.getPosition().x / world.mapSize.x);
-        mapPos.y = (int)(entity.getPosition().y / world.mapSize.y);
+        mapPos.x = (int)(ent.getPosition().x / world.mapSize.x);
+        mapPos.y = (int)(ent.getPosition().y / world.mapSize.y);
 
         sf::Vector2f deltaDist = sf::Vector2f();
         deltaDist.x = (rayDir.x == 0.f) ? 1e30f : std::abs(1.f / rayDir.x);
@@ -36,22 +36,22 @@ const void weapon::shoot(entity& entity, world& world, const sf::Vector2u& scree
         if (rayDir.x < 0.f)
         {
             stepSize.x = -1;
-            sideDist.x = ((entity.getPosition().x / world.mapSize.x) - mapPos.x) * deltaDist.x;
+            sideDist.x = ((ent.getPosition().x / world.mapSize.x) - mapPos.x) * deltaDist.x;
         }
         else
         {
             stepSize.x = 1;
-            sideDist.x = (mapPos.x + 1.0f - (entity.getPosition().x / world.mapSize.x)) * deltaDist.x;
+            sideDist.x = (mapPos.x + 1.0f - (ent.getPosition().x / world.mapSize.x)) * deltaDist.x;
         }
         if (rayDir.y < 0.f)
         {
             stepSize.y = -1;
-            sideDist.y = ((entity.getPosition().y / world.mapSize.y) - mapPos.y) * deltaDist.y;
+            sideDist.y = ((ent.getPosition().y / world.mapSize.y) - mapPos.y) * deltaDist.y;
         }
         else
         {
             stepSize.y = 1;
-            sideDist.y = (mapPos.y + 1.0f - (entity.getPosition().y / world.mapSize.y)) * deltaDist.y;
+            sideDist.y = (mapPos.y + 1.0f - (ent.getPosition().y / world.mapSize.y)) * deltaDist.y;
         }
 
         float fDistance = 0.f;
@@ -74,23 +74,34 @@ const void weapon::shoot(entity& entity, world& world, const sf::Vector2u& scree
             if (mapPos.x >= 0 && mapPos.x <= world.mapWidth && mapPos.y >= 0 && mapPos.y <= world.mapHeight)
                 if (world.getMapTile(mapPos.x, mapPos.y) > 0)
                     hit = true;
+            for (std::size_t i = 0; i < entities.size(); ++i)
+            {
+                if (entities[i]->m_sprites[0].position.x < screenSize.x / 2.f && entities[i]->m_sprites[0].position.x > 0 &&
+                    entities[i]->m_sprites[1].position.x > screenSize.x / 2.f && entities[i]->m_sprites[1].position.x < screenSize.x &&
+                    entities[i]->m_sprites[0].position.y < screenSize.y / 2.f && entities[i]->m_sprites[0].position.y > 0 &&
+                    entities[i]->m_sprites[3].position.y > screenSize.y / 2.f && entities[i]->m_sprites[3].position.y < screenSize.y &&
+                    fDistance >= std::hypotf(ent.getPosition().x - entities[i]->getPosition().x, ent.getPosition().y - entities[i]->getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f))
+                {
+                    fDistance = std::hypotf(ent.getPosition().x - entities[i]->getPosition().x, ent.getPosition().y - entities[i]->getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f);
+                    hit = true;
+                }
+            }
         }
 
-        if (this->hitPos.size() == this->w_maxAmmoCap)
-            this->hitPos.clear();
-        this->hitPos.emplace_back(sf::Vector2f(entity.getPosition().x + rayDir.x * fDistance * world.mapSize.x, entity.getPosition().y + rayDir.y * fDistance * world.mapSize.y));
-        
-        if (this->distPos.size() == this->w_maxAmmoCap)
-            this->distPos.clear();
-        this->distPos.emplace_back(sf::Vector2f((entity.getPosition().x + rayDir.x * fDistance * world.mapSize.x) - entity.getPosition().x, (entity.getPosition().y + rayDir.y * fDistance * world.mapSize.y) - entity.getPosition().y));
-
-        if (this->w_angle.size() == this->w_maxAmmoCap)
-            this->w_angle.clear();
-        this->w_angle.emplace_back(entity.m_angle);
-        
-        if (this->w_impactPoint.size() == this->w_maxAmmoCap)
-            this->w_impactPoint.clear();
-        this->w_impactPoint.emplace_back(std::make_unique<quad>(sf::Vector2f(5.f, 5.f), sf::Vector2f(0.f, 0.f), sf::Color::Yellow));
+        if (hit)
+        {
+            this->hitPos.emplace_back(sf::Vector2f(ent.getPosition().x + rayDir.x * fDistance * world.mapSize.x, ent.getPosition().y + rayDir.y * fDistance * world.mapSize.y));
+            this->distPos.emplace_back(sf::Vector2f((ent.getPosition().x + rayDir.x * fDistance * world.mapSize.x) - ent.getPosition().x, (ent.getPosition().y + rayDir.y * fDistance * world.mapSize.y) - ent.getPosition().y));
+            this->w_angle.emplace_back(ent.m_angle);
+            this->w_impactPoint.emplace_back(std::make_unique<quad>(sf::Vector2f(5.f, 5.f), sf::Vector2f(0.f, 0.f), sf::Color::Yellow));
+        }
+        else
+        {
+            this->hitPos.emplace_back(sf::Vector2f(ent.getPosition().x + rayDir.x * fDistance * world.mapSize.x, ent.getPosition().y + rayDir.y * fDistance * world.mapSize.y));
+            this->distPos.emplace_back(sf::Vector2f((ent.getPosition().x + rayDir.x * fDistance * world.mapSize.x) - ent.getPosition().x, (ent.getPosition().y + rayDir.y * fDistance * world.mapSize.y) - ent.getPosition().y));
+            this->w_angle.emplace_back(ent.m_angle);
+            this->w_impactPoint.emplace_back(std::make_unique<quad>(sf::Vector2f(5.f, 5.f), sf::Vector2f(0.f, 0.f), sf::Color::Red));
+        }
 
         this->w_clock.restart();
         this->w_currAmmo--;
@@ -118,6 +129,7 @@ const void weapon::update(entity& entity, const sf::Vector2u& screenSize) noexce
         float transformY = invDet * (-entity.m_plane.y * spriteX + entity.m_plane.x * spriteY);
 
         float distance = std::hypotf(spriteX, spriteY) / std::hypotf(this->distPos[i].x, this->distPos[i].y);
+
         int spriteHeight = abs((int)((screenSize.y / transformY)));
         int drawStartY = (int)(-spriteHeight / 2.f + screenSize.y / 2.f - entity.m_angle + this->w_angle[i] / distance);
         int drawEndY = (int)(spriteHeight / 2.f + screenSize.y / 2.f - entity.m_angle + this->w_angle[i] / distance);
@@ -127,7 +139,7 @@ const void weapon::update(entity& entity, const sf::Vector2u& screenSize) noexce
         int drawStartX = (int)(-spriteWidth / 2.f + spriteScreenX);
         int drawEndX = (int)(spriteWidth / 2.f + spriteScreenX);
 
-        if (transformY > 0.f && this->w_impactPoint[i] != nullptr)
+        if (transformY > 0.f)
             this->w_impactPoint[i]->setPosition((drawStartX + drawEndX) / 2.f, (drawStartY + drawEndY) / 2.f);
     }
 }

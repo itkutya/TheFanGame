@@ -53,7 +53,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     if (window.hasFocus() && !sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
     {
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        this->m_player->update(this->m_map, mousePos, window.getSize(), dt);
+        this->m_player->update(this->m_map, mousePos, window.getSize(), this->m_entities, dt);
         sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
     }
 
@@ -62,7 +62,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     this->m_ray->r_vertices[0].position = this->m_player->getPosition();
     for (std::uint32_t i = 0; i < window.getSize().x; ++i)
     {
-        this->m_ray->castRay(*this->m_player, this->m_map, window.getSize().x, window.getSize().y, i);
+        this->m_ray->castRay(*this->m_player, this->m_map, window.getSize(), i);
         this->zBuffer[i] = this->m_ray->perpWallDist * ((this->m_map.mapSize.x + this->m_map.mapSize.y) / 2.f);
     }
 

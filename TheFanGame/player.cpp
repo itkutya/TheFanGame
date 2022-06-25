@@ -29,7 +29,7 @@ player::player(const sf::Vector2f& size, const sf::Vector2f& pos, const sf::Colo
 
 player::~player() noexcept {}
 
-const void player::update(world& map, const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const sf::Time& dt) noexcept
+const void player::update(world& map, const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const std::vector<std::unique_ptr<entity>>& entities, const sf::Time& dt) noexcept
 {
     float sensitivity = dt.asSeconds() * this->mouseSensivity;
     float moveSpeed = dt.asSeconds() * this->movementSpeed;
@@ -61,7 +61,7 @@ const void player::update(world& map, const sf::Vector2i& mousePos, const sf::Ve
         this->move(sf::Vector2f(-this->m_direction.y * moveSpeed, this->m_direction.x * moveSpeed));
 
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-        this->ak47.shoot(*this, map, windowSize);
+        this->ak47.shoot(*this, map, entities, windowSize);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
         this->ak47.reload();
     this->ak47.update(*this, windowSize);
