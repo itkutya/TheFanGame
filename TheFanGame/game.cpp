@@ -46,8 +46,17 @@ const void game::processEvent(const sf::Event& event) noexcept
 const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
     ImGui::SFML::Update(window, dt);
-    ImGui::Begin("FPS Counter", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+    ImGui::Begin("FPS Counter", 0, ImGuiWindowFlags_NoCollapse);
     ImGui::Text("FPS: %f", 1.f / dt.asSeconds());
+    ImGui::Text("Ammo: %i %c %i", this->m_player->ak47.w_currAmmo, '//', this->m_player->ak47.w_maxAmmoCap);
+    if (ImGui::BeginListBox("Entities: "))
+    {
+        for (int i = 0; i < this->m_entities.size(); ++i)
+        {
+            ImGui::Text("Health: %i %f", i, this->m_entities[i].health);
+        }
+        ImGui::EndListBox();
+    }
     ImGui::End();
 
     if (window.hasFocus() && !sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
