@@ -16,7 +16,7 @@ const void game::init(sf::RenderWindow& window)
     this->m_ray = std::make_unique<ray>(window.getSize().x);
 
     for (std::size_t i = 0; i < 20; ++i)
-        this->m_entities.push_back(std::make_unique<entity>(sf::Vector2f((float)this->m_map.mapSize.x / 2.f, (float)this->m_map.mapSize.y / 2.f), sf::Vector2f(10.f + (std::rand() % 50), 10.f + (std::rand() % 50)), sf::Color::Green));
+        this->m_entities.push_back(entity(sf::Vector2f((float)this->m_map.mapSize.x / 2.f, (float)this->m_map.mapSize.y / 2.f), sf::Vector2f(10.f + (std::rand() % 50), 10.f + (std::rand() % 50)), sf::Color::Green));
 
     this->spriteOrder.resize(this->m_entities.size());
     this->spriteDistance.resize(this->m_entities.size());
@@ -69,12 +69,12 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     for (std::uint32_t i = 0; i < this->m_entities.size(); ++i)
     {
         this->spriteOrder[i] = i;
-        this->spriteDistance[i] = std::hypotf(this->m_player->getPosition().x - this->m_entities[i]->getPosition().x, this->m_player->getPosition().y - this->m_entities[i]->getPosition().y);
+        this->spriteDistance[i] = std::hypotf(this->m_player->getPosition().x - this->m_entities[i].getPosition().x, this->m_player->getPosition().y - this->m_entities[i].getPosition().y);
     }
     this->sortSprites(this->spriteOrder, this->spriteDistance, this->m_entities.size());
     
-    for (std::vector<std::unique_ptr<entity>>::iterator it = this->m_entities.begin(); it != this->m_entities.end(); ++it)
-        it->get()->update(*this->m_player, window.getSize(), this->zBuffer);
+    for (std::vector<entity>::iterator it = this->m_entities.begin(); it != this->m_entities.end(); ++it)
+        it->update(*this->m_player, window.getSize(), this->zBuffer);
 }
 
 const void game::draw(sf::RenderWindow& window) noexcept
@@ -83,7 +83,7 @@ const void game::draw(sf::RenderWindow& window) noexcept
     window.draw(*this->m_ray, this->m_texture);
     window.draw(this->m_map);
     for (std::uint32_t i = 0; i < this->m_entities.size(); ++i)
-        window.draw(*this->m_entities[this->spriteOrder[i]], this->m_texture);
+        window.draw(this->m_entities[this->spriteOrder[i]], this->m_texture);
     window.draw(*this->m_player);
 
     window.setView(window.getDefaultView());

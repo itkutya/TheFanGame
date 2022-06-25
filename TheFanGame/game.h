@@ -32,7 +32,7 @@ private:
 
 	std::unique_ptr<player> m_player;
 	std::unique_ptr<ray> m_ray;
-	std::vector<std::unique_ptr<entity>> m_entities;
+	std::vector<entity> m_entities;
 
 	std::vector<float> zBuffer;
 	std::vector<int> spriteOrder;

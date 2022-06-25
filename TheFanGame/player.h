@@ -8,7 +8,7 @@ public:
 	player(const sf::Vector2f& size, const sf::Vector2f& pos, const sf::Color& color = sf::Color::White) noexcept;
 	virtual ~player() noexcept;
 
-	const void update(world& map, const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const std::vector<std::unique_ptr<entity>>& entities, const sf::Time& dt) noexcept;
+	const void update(world& map, const sf::Vector2i& mousePos, const sf::Vector2u& windowSize, const std::vector<entity>& entities, const sf::Time& dt) noexcept;
 
 	virtual const void setSize(const sf::IntRect& size) noexcept override;
 private:

@@ -12,7 +12,7 @@ weapon::weapon(const float& dmg, const int& maxAmmo, const sf::Time& dps, const 
 
 weapon::~weapon() noexcept {}
 
-const void weapon::shoot(entity& ent, world& world, const std::vector<std::unique_ptr<entity>>& entities, const sf::Vector2u& screenSize) noexcept
+const void weapon::shoot(entity& ent, world& world, const std::vector<entity>& entities, const sf::Vector2u& screenSize) noexcept
 {
     if (this->w_currAmmo > 0 && this->w_clock.getElapsedTime().asSeconds() > this->w_DPS.asSeconds() && !this->w_isMelee)
     {
@@ -76,13 +76,13 @@ const void weapon::shoot(entity& ent, world& world, const std::vector<std::uniqu
                     hit = true;
             for (std::size_t i = 0; i < entities.size(); ++i)
             {
-                if (entities[i]->m_sprites[0].position.x < screenSize.x / 2.f && entities[i]->m_sprites[0].position.x > 0 &&
-                    entities[i]->m_sprites[1].position.x > screenSize.x / 2.f && entities[i]->m_sprites[1].position.x < screenSize.x &&
-                    entities[i]->m_sprites[0].position.y < screenSize.y / 2.f && entities[i]->m_sprites[0].position.y > 0 &&
-                    entities[i]->m_sprites[3].position.y > screenSize.y / 2.f && entities[i]->m_sprites[3].position.y < screenSize.y &&
-                    fDistance >= std::hypotf(ent.getPosition().x - entities[i]->getPosition().x, ent.getPosition().y - entities[i]->getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f))
+                if (entities[i].m_sprites[0].position.x < screenSize.x / 2.f && entities[i].m_sprites[0].position.x > 0 &&
+                    entities[i].m_sprites[1].position.x > screenSize.x / 2.f && entities[i].m_sprites[1].position.x < screenSize.x &&
+                    entities[i].m_sprites[0].position.y < screenSize.y / 2.f && entities[i].m_sprites[0].position.y > 0 &&
+                    entities[i].m_sprites[3].position.y > screenSize.y / 2.f && entities[i].m_sprites[3].position.y < screenSize.y &&
+                    fDistance >= std::hypotf(ent.getPosition().x - entities[i].getPosition().x, ent.getPosition().y - entities[i].getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f))
                 {
-                    fDistance = std::hypotf(ent.getPosition().x - entities[i]->getPosition().x, ent.getPosition().y - entities[i]->getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f);
+                    fDistance = std::hypotf(ent.getPosition().x - entities[i].getPosition().x, ent.getPosition().y - entities[i].getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f);
                     hit = true;
                 }
             }
@@ -118,21 +118,21 @@ const void weapon::reload() noexcept
     this->w_currAmmo = this->w_maxAmmoCap;
 }
 
-const void weapon::update(entity& entity, const sf::Vector2u& screenSize) noexcept
+const void weapon::update(entity& ent, const sf::Vector2u& screenSize) noexcept
 {
     for (std::size_t i = 0; i < this->hitPos.size(); i++)
     {
-        float spriteX = this->hitPos[i].x - entity.getPosition().x;
-        float spriteY = this->hitPos[i].y - entity.getPosition().y;
-        float invDet = 1.f / (entity.m_plane.x * entity.m_direction.y - entity.m_direction.x * entity.m_plane.y);
-        float transformX = invDet * (entity.m_direction.y * spriteX - entity.m_direction.x * spriteY);
-        float transformY = invDet * (-entity.m_plane.y * spriteX + entity.m_plane.x * spriteY);
+        float spriteX = this->hitPos[i].x - ent.getPosition().x;
+        float spriteY = this->hitPos[i].y - ent.getPosition().y;
+        float invDet = 1.f / (ent.m_plane.x * ent.m_direction.y - ent.m_direction.x * ent.m_plane.y);
+        float transformX = invDet * (ent.m_direction.y * spriteX - ent.m_direction.x * spriteY);
+        float transformY = invDet * (-ent.m_plane.y * spriteX + ent.m_plane.x * spriteY);
 
         float distance = std::hypotf(spriteX, spriteY) / std::hypotf(this->distPos[i].x, this->distPos[i].y);
 
         int spriteHeight = abs((int)((screenSize.y / transformY)));
-        int drawStartY = (int)(-spriteHeight / 2.f + screenSize.y / 2.f - entity.m_angle + this->w_angle[i] / distance);
-        int drawEndY = (int)(spriteHeight / 2.f + screenSize.y / 2.f - entity.m_angle + this->w_angle[i] / distance);
+        int drawStartY = (int)(-spriteHeight / 2.f + screenSize.y / 2.f - ent.m_angle + this->w_angle[i] / distance);
+        int drawEndY = (int)(spriteHeight / 2.f + screenSize.y / 2.f - ent.m_angle + this->w_angle[i] / distance);
 
         int spriteScreenX = (int)((screenSize.x / 2.f) * (1.f + (transformX / transformY)));
         int spriteWidth = abs((int)((screenSize.y / transformY)));

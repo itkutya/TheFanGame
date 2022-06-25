@@ -9,9 +9,9 @@ public:
 	weapon(const float& dmg, const int& maxAmmo, const sf::Time& dps, const float& range, const bool& isMelee) noexcept;
 	virtual ~weapon() noexcept;
 
-	const void shoot(entity& ent, world& world, const std::vector<std::unique_ptr<entity>>& entities, const sf::Vector2u& screenSize) noexcept;
+	const void shoot(entity& ent, world& world, const std::vector<entity>& entities, const sf::Vector2u& screenSize) noexcept;
 	const void reload() noexcept;
-	const void update(entity& entity, const sf::Vector2u& screenSize) noexcept;
+	const void update(entity& ent, const sf::Vector2u& screenSize) noexcept;
 private:
 	std::vector<std::unique_ptr<entity>> w_impactPoint;
 	std::vector<sf::Vector2f> hitPos;
