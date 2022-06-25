@@ -10,7 +10,7 @@ public:
 	virtual ~weapon() noexcept;
 
 	const void shoot(entity& ent, world& world, std::vector<entity>& entities, const sf::Vector2u& screenSize) noexcept;
-	const bool reload() noexcept;
+	const void reload() noexcept;
 	const void update(entity& ent, const sf::Vector2u& screenSize) noexcept;
 
 	int w_maxAmmoCap;

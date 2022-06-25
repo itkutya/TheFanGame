@@ -111,7 +111,7 @@ const void weapon::shoot(entity& ent, world& world, std::vector<entity>& entitie
     }
 }
 
-const bool weapon::reload() noexcept
+const void weapon::reload() noexcept
 {
     if (this->w_reload.getElapsedTime().asSeconds() > this->w_reloadSpeed && this->w_currAmmo != this->w_maxAmmoCap)
     {
@@ -122,11 +122,7 @@ const bool weapon::reload() noexcept
         this->w_currAmmo = this->w_maxAmmoCap;
 
         this->w_reload.restart();
-
-        return true;
     }
-
-    return false;
 }
 
 const void weapon::update(entity& ent, const sf::Vector2u& screenSize) noexcept
