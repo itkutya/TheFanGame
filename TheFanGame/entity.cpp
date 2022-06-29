@@ -66,6 +66,11 @@ const void entity::update(entity& player, const sf::Vector2u& windowSize, const 
         }
     }
 
+    this->m_sprites[0].position = sf::Vector2f();
+    this->m_sprites[1].position = sf::Vector2f();
+    this->m_sprites[2].position = sf::Vector2f();
+    this->m_sprites[3].position = sf::Vector2f();
+
     if (transformY > 0 && firstX > 0 && lastX < (int)(windowSize.x))
     {
         if (transformY < zBuffer[firstX] && transformY < zBuffer[lastX])
@@ -106,13 +111,6 @@ const void entity::update(entity& player, const sf::Vector2u& windowSize, const 
                                                        (float)(texWidth * this->m_texture + texWidth), (float)texHeight));
             }
         }
-    }
-    else
-    {
-        this->m_sprites[0].position = sf::Vector2f();
-        this->m_sprites[1].position = sf::Vector2f();
-        this->m_sprites[2].position = sf::Vector2f();
-        this->m_sprites[3].position = sf::Vector2f();
     }
 }
  
