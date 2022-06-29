@@ -6,6 +6,8 @@
 #include "stateSystem.h"
 #include "ray.h"
 
+#include "Timer.h"
+
 struct context
 {
 	stateSystem g_states;

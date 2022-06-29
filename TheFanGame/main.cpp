@@ -5,7 +5,6 @@
 int main()
 {
 	std::srand(std::time(0));
-
 	try
 	{
 		context m_context;

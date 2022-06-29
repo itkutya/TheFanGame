@@ -22,7 +22,6 @@ const void game::init(sf::RenderWindow& window)
     this->spriteDistance.resize(this->m_entities.size());
 
     this->zBuffer.resize(window.getSize().x);
-
 }
 
 const void game::processEvent(const sf::Event& event) noexcept 
@@ -45,6 +44,8 @@ const void game::processEvent(const sf::Event& event) noexcept
 
 const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
+    ScopedTimer timer("Update", 5000.f);
+
     ImGui::SFML::Update(window, dt);
     ImGui::Begin("FPS Counter", 0, ImGuiWindowFlags_NoCollapse);
     ImGui::Text("FPS: %f", 1.f / dt.asSeconds());

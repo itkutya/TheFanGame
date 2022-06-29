@@ -155,6 +155,5 @@ void weapon::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
     for (auto& i : this->w_impactPoint)
-        if (i != nullptr)
-            target.draw(*i, states);
+        target.draw(*i, states);
 }
