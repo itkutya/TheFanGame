@@ -121,7 +121,7 @@ const void ray::castRay(player& player, world& world, const sf::Vector2u& screen
 
     int texX = int(wallX * texWidth);
     if (!this->side && this->r_rayDir.x > 0.f) texX = texWidth - texX - 1;
-    if (this->side && this->r_rayDir.y < 0.f) texX = texWidth - texX - 1;
+    if (this->side && this->r_rayDir.y < 0.f)  texX = texWidth - texX - 1;
 
     int mapNum = world.getMapTile(this->r_mapPos.x, this->r_mapPos.y);
     line[0].texCoords = sf::Vector2f(texX + (texWidth * mapNum + 0.5f), 0.f);

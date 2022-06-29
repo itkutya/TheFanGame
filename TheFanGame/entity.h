@@ -6,6 +6,8 @@
 #include "animation.h"
 #include "world.h"
 
+#include "ImGUI/imgui.h"
+
 constexpr float PI = 3.141592653589793116f;
 
 class entity : public sf::Drawable, public sf::Transformable
@@ -20,6 +22,8 @@ public:
 	virtual const void setTexture(const std::uint8_t& index) noexcept;
 	virtual const void setSize(const sf::IntRect& size) noexcept;
 
+	const sf::Color getDistanceColor(const sf::Vector2f& pos);
+
 	sf::VertexArray m_vertices;
 	sf::VertexArray m_sprites;
 	sf::Vector2f m_direction = sf::Vector2f(0.f, 0.f);
@@ -30,6 +34,8 @@ public:
 	//|| x = uDiv || y = vDiv || z = vMove ||
 
 	float health = 100.f;
+	animation m_animation;
+	float animationSpeed = 0.5f;
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };

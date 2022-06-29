@@ -10,14 +10,18 @@
 	#endif
 #endif
 
+constexpr int texWidth = 64;
+constexpr int texHeight = 64;
+
 class animation
 {
 public:
 	animation() noexcept;
 	virtual ~animation() noexcept;
 
-	const bool update(const sf::Time& speed) noexcept;
+	const bool update(const sf::Time& speed, sf::VertexArray& obj, const std::uint8_t& maxFrame, const sf::FloatRect& pos) noexcept;
 private:
+	std::uint8_t currentFrame;
 	sf::Clock timer;
 };
 
