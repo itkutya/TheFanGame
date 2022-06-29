@@ -95,8 +95,8 @@ const void ray::castRay(player& player, world& world, const sf::Vector2u& screen
     draw.y = (int)(lineHeight / 2.f + screenSize.y / 2.f - player.m_angle);
 
     sf::Vertex* line = &this->r_walls[std::size_t(i) * 2];
-    line[0].position = sf::Vector2f((float)i, (float)draw.x);
-    line[1].position = sf::Vector2f((float)i, (float)draw.y);
+    line[0].position = sf::Vector2f((float)i + 1.f, (float)draw.x);
+    line[1].position = sf::Vector2f((float)i + 1.f, (float)draw.y);
 
     sf::Color color;
     color = sf::Color(
@@ -129,15 +129,15 @@ const void ray::castRay(player& player, world& world, const sf::Vector2u& screen
 
     //floor
     line = &this->r_floors[std::size_t(i) * 2];
-    line[0].position = sf::Vector2f((float)i, (float)draw.y);
-    line[1].position = sf::Vector2f((float)i, (float)screenSize.y);
+    line[0].position = sf::Vector2f((float)i + 1.f, (float)draw.y);
+    line[1].position = sf::Vector2f((float)i + 1.f, (float)screenSize.y);
     line[0].color = sf::Color::Black;
     line[1].color = sf::Color(125, 125, 125, 255);
 
     //ceiling
     line = &this->r_ceilings[std::size_t(i) * 2];
-    line[0].position = sf::Vector2f((float)i, 0.f);
-    line[1].position = sf::Vector2f((float)i, (float)draw.x);
+    line[0].position = sf::Vector2f((float)i + 1.f, 0.f);
+    line[1].position = sf::Vector2f((float)i + 1.f, (float)draw.x);
     line[0].color = sf::Color::Cyan;
     line[1].color = sf::Color::Cyan;
 }
