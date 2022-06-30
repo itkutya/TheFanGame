@@ -22,7 +22,7 @@ private:
 class ScopedTimer
 {
 public:
-	ScopedTimer(const std::string& name, const float& treshold);
+	ScopedTimer(const std::string& name, const float& treshold = 0.f);
 	virtual ~ScopedTimer();
 private:
 	std::string m_name;

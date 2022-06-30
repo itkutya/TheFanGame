@@ -77,15 +77,17 @@ const void weapon::shoot(entity& ent, world& world, std::vector<entity>& entitie
                     hit = true;
             for (std::size_t i = 0; i < entities.size(); ++i)
             {
-                if (entities[i].m_sprites[0].position.x < screenSize.x / 2.f && entities[i].m_sprites[0].position.x > 0 &&
-                    entities[i].m_sprites[1].position.x > screenSize.x / 2.f && entities[i].m_sprites[1].position.x < screenSize.x &&
-                    entities[i].m_sprites[0].position.y < screenSize.y / 2.f && entities[i].m_sprites[0].position.y > 0 &&
-                    entities[i].m_sprites[3].position.y > screenSize.y / 2.f && entities[i].m_sprites[3].position.y < screenSize.y &&
-                    fDistance >= std::hypotf(ent.getPosition().x - entities[i].getPosition().x, ent.getPosition().y - entities[i].getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f))
+                if (entities[i].m_sprites[0].position.x < screenSize.x / 2.f &&
+                    entities[i].m_sprites[1].position.x > screenSize.x / 2.f &&
+                    entities[i].m_sprites[0].position.y < screenSize.y / 2.f &&
+                    entities[i].m_sprites[3].position.y > screenSize.y / 2.f)
                 {
-                    fDistance = std::hypotf(ent.getPosition().x - entities[i].getPosition().x, ent.getPosition().y - entities[i].getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f);
-                    entities[i].health -= w_dmg;
-                    hit = true;
+                    if (fDistance >= std::hypotf(ent.getPosition().x - entities[i].getPosition().x, ent.getPosition().y - entities[i].getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f))
+                    {
+                        fDistance = std::hypotf(ent.getPosition().x - entities[i].getPosition().x, ent.getPosition().y - entities[i].getPosition().y) / ((world.mapSize.x + world.mapSize.y) / 2.f);
+                        entities[i].health -= this->w_dmg;
+                        hit = true;
+                    }
                 }
             }
         }
@@ -107,7 +109,6 @@ const void weapon::shoot(entity& ent, world& world, std::vector<entity>& entitie
 
         this->w_clock.restart();
         this->w_currAmmo--;
-        //std::cout << w_currAmmo << "\\" << w_maxAmmoCap << '\n';
     }
 }
 
@@ -148,6 +149,11 @@ const void weapon::update(entity& ent, const sf::Vector2u& screenSize) noexcept
 
         if (transformY > 0.f)
             this->w_impactPoint[i]->setPosition((drawStartX + drawEndX) / 2.f, (drawStartY + drawEndY) / 2.f);
+
+        this->w_impactPoint[i]->m_vertices[0].color = this->w_impactPoint[i]->getDistanceColor(sf::Vector2f(spriteX, spriteY));
+        this->w_impactPoint[i]->m_vertices[1].color = this->w_impactPoint[i]->getDistanceColor(sf::Vector2f(spriteX, spriteY));
+        this->w_impactPoint[i]->m_vertices[2].color = this->w_impactPoint[i]->getDistanceColor(sf::Vector2f(spriteX, spriteY));
+        this->w_impactPoint[i]->m_vertices[3].color = this->w_impactPoint[i]->getDistanceColor(sf::Vector2f(spriteX, spriteY));
     }
 }
 
