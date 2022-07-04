@@ -86,7 +86,7 @@ const void entity::update(entity& player, const sf::Vector2u& windowSize, const 
             this->m_sprites[3].color = this->getDistanceColor(sf::Vector2f(spriteX, spriteY));
 
             //float at the end is how much frame does it have +1. if 0 then sprite those not have any other "side". if it's 1 then it has 2 "sides", etc...
-            this->m_texture = std::round(std::abs((spriteY * this->m_direction.x + -spriteX * this->m_direction.y) / (std::hypotf(spriteY, spriteX) * std::hypotf(this->m_direction.x, this->m_direction.y)) * 2.f));
+            this->m_texture = (int)std::round(std::abs((spriteY * this->m_direction.x + -spriteX * this->m_direction.y) / (std::hypotf(spriteY, spriteX) * std::hypotf(this->m_direction.x, this->m_direction.y)) * 2.f));
 
             float diff = ((float)firstX - (float)lastX) / ((float)drawEndX - (float)drawStartX);
             if (firstX + 1 < drawEndX && lastX > drawStartX)
