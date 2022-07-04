@@ -9,7 +9,7 @@ window::window(const sf::VideoMode& size, const char* name, context* context) no
 	this->m_context->g_states.add(this->m_window, std::make_unique<gui>(this->m_context));
 }
 
-window::~window() noexcept 
+window::~window() noexcept
 {
 	std::size_t maxSize = this->m_context->g_states.getCurrentSize();
 	for (std::size_t i = 0; i < maxSize; ++i)
@@ -48,5 +48,3 @@ window::operator const bool() noexcept { return this->m_window.isOpen(); }
 window::operator sf::RenderWindow&() noexcept { return this->m_window; }
 
 const void window::setFramerateLimit(const unsigned int& limit) noexcept { this->m_window.setFramerateLimit(limit); }
-
-const void window::addToDrawPool(const sf::Drawable* object) noexcept { this->objects.emplace_back(object); }

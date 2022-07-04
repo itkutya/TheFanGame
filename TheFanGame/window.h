@@ -21,7 +21,4 @@ private:
 	sf::Clock deltaTime;
 
 	context* m_context;
-
-	std::vector<const sf::Drawable*> objects;
-	const void addToDrawPool(const sf::Drawable* object) noexcept;
 };

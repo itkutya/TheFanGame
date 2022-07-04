@@ -107,6 +107,14 @@ const void weapon::shoot(entity& ent, world& world, std::vector<entity>& entitie
             this->w_impactPoint.emplace_back(std::make_unique<entity>(sf::Vector2f(5.f, 5.f), sf::Vector2f(0.f, 0.f), sf::Color::Red));
         }
 
+        if (this->w_impactPoint.size() > 0)
+        {
+            this->w_impactPoint[this->w_impactPoint.size() - 1]->m_vertices[0].color = this->w_impactPoint[this->w_impactPoint.size() - 1]->getDistanceColor(sf::Vector2f(this->hitPos[this->w_impactPoint.size() - 1].x - ent.getPosition().x, this->hitPos[this->w_impactPoint.size() - 1].y - ent.getPosition().y));
+            this->w_impactPoint[this->w_impactPoint.size() - 1]->m_vertices[1].color = this->w_impactPoint[this->w_impactPoint.size() - 1]->getDistanceColor(sf::Vector2f(this->hitPos[this->w_impactPoint.size() - 1].x - ent.getPosition().x, this->hitPos[this->w_impactPoint.size() - 1].y - ent.getPosition().y));
+            this->w_impactPoint[this->w_impactPoint.size() - 1]->m_vertices[2].color = this->w_impactPoint[this->w_impactPoint.size() - 1]->getDistanceColor(sf::Vector2f(this->hitPos[this->w_impactPoint.size() - 1].x - ent.getPosition().x, this->hitPos[this->w_impactPoint.size() - 1].y - ent.getPosition().y));
+            this->w_impactPoint[this->w_impactPoint.size() - 1]->m_vertices[3].color = this->w_impactPoint[this->w_impactPoint.size() - 1]->getDistanceColor(sf::Vector2f(this->hitPos[this->w_impactPoint.size() - 1].x - ent.getPosition().x, this->hitPos[this->w_impactPoint.size() - 1].y - ent.getPosition().y));
+        }
+
         this->w_clock.restart();
         this->w_currAmmo--;
     }
@@ -149,11 +157,6 @@ const void weapon::update(entity& ent, const sf::Vector2u& screenSize) noexcept
 
         if (transformY > 0.f)
             this->w_impactPoint[i]->setPosition((drawStartX + drawEndX) / 2.f, (drawStartY + drawEndY) / 2.f);
-
-        this->w_impactPoint[i]->m_vertices[0].color = this->w_impactPoint[i]->getDistanceColor(sf::Vector2f(spriteX, spriteY));
-        this->w_impactPoint[i]->m_vertices[1].color = this->w_impactPoint[i]->getDistanceColor(sf::Vector2f(spriteX, spriteY));
-        this->w_impactPoint[i]->m_vertices[2].color = this->w_impactPoint[i]->getDistanceColor(sf::Vector2f(spriteX, spriteY));
-        this->w_impactPoint[i]->m_vertices[3].color = this->w_impactPoint[i]->getDistanceColor(sf::Vector2f(spriteX, spriteY));
     }
 }
 

@@ -24,13 +24,13 @@ public:
 	virtual const void processEvent(const sf::Event& event) noexcept override;
 	virtual const void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
-
 private:
 	context* m_context;
 	world m_map;
 
 	sf::View m_view;
 	const sf::Texture* m_texture;
+	const sf::Texture* m_char;
 
 	std::unique_ptr<player> m_player;
 	std::unique_ptr<ray> m_ray;

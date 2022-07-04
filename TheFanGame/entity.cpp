@@ -85,35 +85,38 @@ const void entity::update(entity& player, const sf::Vector2u& windowSize, const 
             this->m_sprites[2].color = this->getDistanceColor(sf::Vector2f(spriteX, spriteY));
             this->m_sprites[3].color = this->getDistanceColor(sf::Vector2f(spriteX, spriteY));
 
+            //float at the end is how much frame does it have +1. if 0 then sprite those not have any other "side". if it's 1 then it has 2 "sides", etc...
+            this->m_texture = std::round(std::abs((spriteY * this->m_direction.x + -spriteX * this->m_direction.y) / (std::hypotf(spriteY, spriteX) * std::hypotf(this->m_direction.x, this->m_direction.y)) * 2.f));
+
             float diff = ((float)firstX - (float)lastX) / ((float)drawEndX - (float)drawStartX);
             if (firstX + 1 < drawEndX && lastX > drawStartX)
             {
-                this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 3,
+                this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 1,
                                          sf::FloatRect((float)(texWidth * this->m_texture + texWidth * (1 - diff)), 0.f,
                                                        (float)(texWidth * this->m_texture + texWidth - texWidth * (1 - diff)), (float)texHeight));
             }
             else if (lastX > drawStartX)
             {
-                this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 3,
+                this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 1,
                                          sf::FloatRect((float)(texWidth * this->m_texture + texWidth * (1 - diff)), 0.f,
                                                        (float)(texWidth * this->m_texture + texWidth), (float)texHeight));
             }
             else if (firstX + 1 < drawEndX)
             {
-                this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 3,
+                this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 1,
                                          sf::FloatRect((float)(texWidth * this->m_texture), 0.f,
                                                        (float)(texWidth * this->m_texture + texWidth - texWidth * (1 - diff)), (float)texHeight));
             }
             else
             {
-                this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 3,
+                this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 1,
                                          sf::FloatRect((float)(texWidth * this->m_texture), 0.f,
                                                        (float)(texWidth * this->m_texture + texWidth), (float)texHeight));
             }
         }
     }
 }
- 
+
 sf::Vertex& entity::operator[](const std::size_t& index)
 {
 	if (index > this->m_vertices.getVertexCount())
