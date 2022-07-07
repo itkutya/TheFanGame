@@ -6,7 +6,6 @@ int main()
 {
 	//Uses the current time to generate random numbers.
 	std::srand((std::uint32_t)std::time(0));
-
 	try
 	{
 		context m_context;

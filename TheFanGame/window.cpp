@@ -1,6 +1,6 @@
 #include "window.h"
 
-window::window() noexcept : m_context(nullptr) {}
+window::window() noexcept : m_context(nullptr), isFullscreen(false), FPSLimit(60) {}
 
 window::~window() noexcept
 {
@@ -42,7 +42,10 @@ const void window::update() noexcept
 		this->m_context->m_states.getState()->update(this->m_window, this->deltaTime.restart());
 }
 
-const void window::onResize() noexcept {}
+const void window::onResize() noexcept 
+{
+	std::cout << "Window resized, new size is: " << this->m_window.getSize().x << "x" << this->m_window.getSize().y << '\n';
+}
 
 window::operator const bool() noexcept { return this->m_window.isOpen(); }
 
@@ -50,11 +53,17 @@ window::operator sf::RenderWindow&() noexcept { return this->m_window; }
 
 const void window::create(const sf::VideoMode& size, const char* name) noexcept
 {
+	this->m_videomode = size;
+	this->title = name;
 	this->m_window.create(size, name);
 	this->deltaTime.restart();
 }
 
-const void window::setFramerateLimit(const unsigned int& limit) noexcept { this->m_window.setFramerateLimit(limit); }
+const void window::setFramerateLimit(const std::uint32_t& limit) noexcept 
+{
+	this->FPSLimit = limit;
+	this->m_window.setFramerateLimit(limit);
+}
 
 const void window::setContext(context& context) noexcept { this->m_context = &context; }
 
@@ -63,3 +72,25 @@ const void window::processStateChange(sf::RenderWindow& window) noexcept { this-
 const void window::popCurrent() { this->m_context->m_states.popCurrent(); }
 
 const sf::Texture& window::getTexture(const int& index) const { return this->m_context->m_resources.getTexture(index); }
+
+const void window::setSize(const sf::Vector2u& size) noexcept 
+{
+	this->m_videomode = sf::VideoMode(size.x, size.y);
+	this->recreate();
+}
+
+const void window::setFullscreen(const bool& active) noexcept
+{
+	this->isFullscreen = active;
+	this->recreate();
+}
+
+const void window::recreate() noexcept
+{
+	if (this->isFullscreen)
+		this->m_window.create(this->m_videomode, this->title, sf::Style::Fullscreen);
+	else
+		this->m_window.create(this->m_videomode, this->title);
+
+	this->setFramerateLimit(this->FPSLimit);
+}

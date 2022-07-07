@@ -32,7 +32,7 @@ public:
 			throw "No context was found...\n";
 	}
 	//Set's the framerate of the m_window.
-	const void setFramerateLimit(const unsigned int& limit) noexcept;
+	const void setFramerateLimit(const std::uint32_t& limit) noexcept;
 	//Set's the context for the main loop.
 	const void setContext(context& context) noexcept;
 	//Processes the state changes.
@@ -41,6 +41,13 @@ public:
 	const void popCurrent();
 	//Get the texture at the given index.
 	const sf::Texture& getTexture(const int& index) const;
+	//Set's the window size.
+	const void setSize(const sf::Vector2u& size) noexcept;
+	//Set's the window to fullscreen mode.
+	const void setFullscreen(const bool& active) noexcept;
+	//Recreate's the window.
+	const void recreate() noexcept;
+
 	//Poll events in the main loop.
 	const void pollEvents() noexcept;
 	//Draw's everything on the m_window.
@@ -49,6 +56,10 @@ public:
 	const void update() noexcept;
 private:
 	sf::RenderWindow m_window;
+	sf::VideoMode m_videomode;
+	std::string title;
+	bool isFullscreen;
+	int FPSLimit;
 	sf::Clock deltaTime;
 	context* m_context;
 
