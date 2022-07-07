@@ -3,29 +3,28 @@
 #include "ImGUI/imgui.h"
 #include "ImGUI/imgui-SFML.h"
 
-#include "stateSystem.h"
+#include "window.h"
+
 #include "ray.h"
-
 #include "Timer.h"
-
-struct context
-{
-	stateSystem g_states;
-	resourceManager g_resources;
-};
 
 class game : public state
 {
 public:
-	game(context* context) noexcept;
+	//Construct the main game class.
+	game(window& window) noexcept;
+	//Defauilt destructor.
 	virtual ~game() noexcept;
-
+	//Init main game class.
 	virtual const void init(sf::RenderWindow& window) override;
+	//Process event in the main game class.
 	virtual const void processEvent(const sf::Event& event) noexcept override;
+	//Update the main game class.
 	virtual const void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
+	//Draw the main game objects.
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 private:
-	context* m_context;
+	window* m_window;
 	world m_map;
 
 	sf::View m_view;

@@ -1,9 +1,6 @@
 #include "gui.h"
 
-gui::gui(context* context) noexcept
-{
-	this->m_context = context;
-}
+gui::gui(window& window) noexcept { this->m_window = &window; }
 
 gui::~gui() noexcept { ImGui::SFML::Shutdown(); }
 
@@ -11,42 +8,74 @@ const void gui::init(sf::RenderWindow& window)
 {
 	ImGui::SFML::Init(window);
 	ImGui::StyleColorsDark();
-
-	this->xp = 0.f;
-	this->sprite.setTexture(this->m_context->g_resources.getTexture(0));
 }
 
 const void gui::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
 	ImGui::SFML::Update(window, dt);
-	ImGui::Begin("Main Window", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
-	ImGui::SetWindowSize(ImVec2((float)window.getSize().x, (float)window.getSize().y));
-	ImGui::SetWindowPos(ImVec2(0.f, 0.f));
 
-	ImGui::Text("FPS: %f", 1.f / dt.asSeconds());
-	ImGui::SetCursorPos(ImVec2(25.f, 45.f));
-	this->sprite.setTextureRect(sf::IntRect(0, 0, 64, 64));
-	ImGui::Image(this->sprite, sf::Vector2f(50.f, 50.f));
-	if (ImGui::IsItemHovered())
-		ImGui::SetTooltip("This is a test tip!");
-	ImGui::SetCursorPos(ImVec2(300.f, 115.f));
-	this->sprite.setTextureRect(sf::IntRect(64, 0, 64, 64));
-	ImGui::Image(this->sprite, sf::Vector2f(200.f, 200.f));
-	ImGui::SetCursorPos(ImVec2(100.f, 65.f));
-	ImGui::SliderFloat("Level: ", &this->xp, 0.f, 100.f, "%.3f", ImGuiSliderFlags_NoInput);
-	ImGui::SetCursorPos(ImVec2(50.f, 115.f));
-	if (ImGui::Button("Play", ImVec2(200.f, 50.f)))
-		this->m_context->g_states.add(window, std::make_unique<game>(this->m_context));
-	ImGui::SetCursorPos(ImVec2(50.f, 215.f));
-	if (ImGui::Button("Settings", ImVec2(200.f, 50.f)))
-		std::cout << "Settings\n";
-	ImGui::SetCursorPos(ImVec2(50.f, 315.f));
-	if (ImGui::Button("Quit", ImVec2(200.f, 50.f)))
-		window.close();
+	if (ImGui::Begin("Main Window", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+	{
+		ImGui::SetWindowSize("Main Window", ImVec2((float)window.getSize().x, (float)window.getSize().y));
+		ImGui::SetWindowPos("Main Window", ImVec2(0.f, 0.f));
 
-	ImGui::End();
+		ImGui::Text("FPS: %f", 1.f / dt.asSeconds());
+		this->createImage(this->m_window->getTexture(0), sf::IntRect(0, 0, 64, 64), sf::Vector2f(350.f, 175.f), sf::Vector2f(300.f, 300.f));
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("This is a test tip!");
+
+		ImGui::SetCursorPos(ImVec2(100.f, 65.f));
+		ImGui::SliderFloat("Level: ", &this->xp, 0.f, 100.f, "%.3f", ImGuiSliderFlags_NoInput);
+
+		if (this->createButton("Play", sf::Vector2f(50.f, 115.f), sf::Vector2f(200.f, 50.f)))
+			this->m_window->addState<game>();
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Starts the game state.");
+
+		if (this->createButton("Settings", sf::Vector2f(50.f, 215.f), sf::Vector2f(200.f, 50.f)))
+			this->settingsPanel = true;
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Opens the setting menu.");
+
+		if (this->createButton("Quit", sf::Vector2f(50.f, 315.f), sf::Vector2f(200.f, 50.f)))
+			window.close();
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Goodbye!");
+
+		if (this->settingsPanel)
+		{
+			if (ImGui::Begin("Settings Panel", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+			{
+				ImGui::SetWindowSize("Settings Panel", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
+				ImGui::SetWindowPos("Settings Panel", ImVec2(25.f, 25.f));
+				ImGui::SetWindowFocus("Settings Panel");
+
+				if (this->createButton("Back", sf::Vector2f(ImGui::GetWindowSize().x - 250.f, ImGui::GetWindowSize().y - 100.f), sf::Vector2f(200.f, 50.f)))
+					this->settingsPanel = false;
+
+				ImGui::End();
+			}
+		}
+		ImGui::End();
+	}
 }
 
 const void gui::processEvent(const sf::Event& event) noexcept { ImGui::SFML::ProcessEvent(event); }
 
 const void gui::draw(sf::RenderWindow& window) noexcept { ImGui::SFML::Render(window); }
+
+const bool gui::createButton(const char* name, const sf::Vector2f& pos, const sf::Vector2f& size)
+{
+	ImGui::SetCursorPos(ImVec2(pos.x, pos.y));
+	if (ImGui::Button(name, ImVec2(size.x, size.y)))
+		return true;
+	return false;
+}
+
+const void gui::createImage(const sf::Texture& texture, const sf::IntRect& rect, const sf::Vector2f& pos, const sf::Vector2f& size)
+{
+	this->sprite.setTexture(texture);
+	this->sprite.setTextureRect(rect);
+	ImGui::SetCursorPos(ImVec2(pos.x, pos.y));
+	ImGui::Image(this->sprite, size);
+}

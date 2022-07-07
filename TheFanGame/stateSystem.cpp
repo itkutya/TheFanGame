@@ -36,6 +36,6 @@ const void stateSystem::processStateChange(sf::RenderWindow& window) noexcept
     }
 }
 
-const std::unique_ptr<state>& stateSystem::getCurrentState() const noexcept { return this->m_stateStack.top(); }
+const std::unique_ptr<state>& stateSystem::getState() const noexcept { return this->m_stateStack.top(); }
 
-const std::size_t stateSystem::getCurrentSize() const noexcept { return this->m_stateStack.size(); }
+const std::size_t stateSystem::getSize() const noexcept { return this->m_stateStack.size(); }

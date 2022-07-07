@@ -30,8 +30,8 @@ public:
 	sf::Vector2f m_plane = sf::Vector2f(0.f, 0.f);
 	float m_angle = 0.f;
 	std::uint8_t m_texture = 0;
+	//					|| x = uDiv || y = vDiv || z = vMove ||
 	sf::Vector3f m_size = sf::Vector3f(0.f, 0.f, 0.f);
-	//|| x = uDiv || y = vDiv || z = vMove ||
 
 	float health = 100.f;
 	animation m_animation;

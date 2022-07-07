@@ -13,6 +13,12 @@ ray::ray(const std::uint32_t& screenWidth)
     this->r_ceilings.setPrimitiveType(sf::PrimitiveType::Lines);
     this->r_ceilings.resize((static_cast<std::size_t>(screenWidth)) * 2);
 
+    for (std::size_t i = 0; i < this->r_floors.getVertexCount(); ++i)
+        this->r_floors[i].color = sf::Color(100, 175, 150, 255);
+
+    for (std::size_t i = 0; i < this->r_ceilings.getVertexCount(); ++i)
+        this->r_ceilings[i].color = sf::Color(125, 175, 200, 255);
+
     this->r_rayDir = sf::Vector2f(0.f, 0.f);
     this->r_stepSize = sf::Vector2i(0, 0);
     this->r_mapPos = sf::Vector2i(0, 0);
@@ -131,15 +137,11 @@ const void ray::castRay(player& player, world& world, const sf::Vector2u& screen
     line = &this->r_floors[std::size_t(i) * 2];
     line[0].position = sf::Vector2f((float)i + 1.f, (float)draw.y);
     line[1].position = sf::Vector2f((float)i + 1.f, (float)screenSize.y);
-    line[0].color = sf::Color::Black;
-    line[1].color = sf::Color(125, 125, 125, 255);
 
     //ceiling
     line = &this->r_ceilings[std::size_t(i) * 2];
     line[0].position = sf::Vector2f((float)i + 1.f, 0.f);
     line[1].position = sf::Vector2f((float)i + 1.f, (float)draw.x);
-    line[0].color = sf::Color::Cyan;
-    line[1].color = sf::Color::Cyan;
 }
 
 void ray::draw(sf::RenderTarget& target, sf::RenderStates states) const
