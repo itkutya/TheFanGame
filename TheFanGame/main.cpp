@@ -1,6 +1,6 @@
 #include <exception>
 
-#include "gui.h"
+#include "menu.h"
 
 int main()
 {
@@ -15,7 +15,7 @@ int main()
 		window mainWindow;
 		mainWindow.create(sf::VideoMode(600, 600), "Project stuff");
 		mainWindow.setContext(m_context);
-		mainWindow.addState<gui>();
+		mainWindow.addState<menu>();
 		mainWindow.setFramerateLimit(60);
 
 		while (mainWindow)

@@ -166,7 +166,7 @@
     <ClCompile Include="animation.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="game.cpp" />
-    <ClCompile Include="gui.cpp" />
+    <ClCompile Include="menu.cpp" />
     <ClCompile Include="ImGUI\imgui-SFML.cpp" />
     <ClCompile Include="ImGUI\imgui.cpp" />
     <ClCompile Include="ImGUI\imgui_demo.cpp" />
@@ -187,7 +187,7 @@
     <ClInclude Include="animation.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="game.h" />
-    <ClInclude Include="gui.h" />
+    <ClInclude Include="menu.h" />
     <ClInclude Include="ImGUI\imconfig-SFML.h" />
     <ClInclude Include="ImGUI\imconfig.h" />
     <ClInclude Include="ImGUI\imgui-SFML.h" />

@@ -2,13 +2,13 @@
 
 #include "game.h"
 
-class gui : public state
+class menu : public state
 {
 public:
 	//Construct a GUI interface.
-	gui(window& window) noexcept;
+	menu(window& window) noexcept;
 	//Default destructor.
-	virtual ~gui() noexcept;
+	virtual ~menu() noexcept;
 	//Init a GUI interface.
 	virtual const void init(sf::RenderWindow& window) override;
 	//Process events on the GUI interface.
@@ -19,9 +19,10 @@ public:
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 private:
 	window* m_window;
-	sf::Sprite sprite;
-	float xp = 0.f;
+	sf::View m_view;
+
 	bool settingsPanel = false;
+	bool charactersPanel = false;
 	std::vector<sf::VideoMode> m_videomodes;
 	bool fullscreen = false;
 	bool isFPSLimited = true;
@@ -29,6 +30,29 @@ private:
 	float sensivity = 2.5f;
 	float game_volume = 100.f;
 	float music_volume = 100.f;
+
+	sf::RectangleShape backgroundImage;
+	int currProfilePicture = 0;
+	int currFrontPicture = 0;
+	int currBackgroundPicture = 0;
+	sf::RectangleShape xp_bar;
+	sf::RectangleShape curr_xp;
+	float xp = 0.f;
+	float xp_cap = 100.f;
+	int account_lvl = 1;
+	std::string account_name = "Unkown";
+	std::uint32_t currency = 1000;
+	bool play_selecter = false;
+
+	//Update it to a struct or something later...
+	struct talents
+	{
+		std::string m_name = "Some randrom name..." + std::to_string(std::rand() % 1000);
+		bool unlocked = false;
+	};
+	std::vector<talents> characters;
+
+	const void giveXP(const float& amount) noexcept;
 
 	//Creates a button, return's true if it's pressed, false if not.
 	const bool createButton(const char* name, const sf::Vector2f& pos, const sf::Vector2f& size) noexcept;

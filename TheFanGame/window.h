@@ -56,10 +56,12 @@ public:
 	const void update() noexcept;
 private:
 	sf::RenderWindow m_window;
+
 	sf::VideoMode m_videomode;
 	std::string title;
 	bool isFullscreen;
 	int FPSLimit;
+
 	sf::Clock deltaTime;
 	context* m_context;
 
