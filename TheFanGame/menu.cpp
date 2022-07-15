@@ -88,8 +88,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		ImGui::SetCursorPos(ImVec2(ImGui::GetWindowSize().x - 100.f, 25.f));
 		ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
 		
-		if (!this->settingsPanel && !this->charactersPanel)
+		switch (this->curr_panel)
 		{
+		case panels::mainmenu:
 			this->createImage(this->m_window->getTexture(0), sf::IntRect(64 * this->currProfilePicture, 0, 64, 64), sf::Vector2f(25.f, 30.f), sf::Vector2f(50.f, 50.f));
 			this->setToolTip("This is the profile picture!");
 			ImGui::SetCursorPos(ImVec2(80.f, 22.5f));
@@ -122,26 +123,24 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				if (this->createButton("Multiplayer", sf::Vector2f(250.f, window.getSize().y / 5.f + 35.f), sf::Vector2f(200.f, 50.f)))
 				{
 					std::cout << "Working on it...\n";
-					this->multiplayerPanel = true;
+					this->curr_panel = panels::multiplayer;
 					this->play_selecter = false;
 				}
 			}
 
 			if (this->createButton("Characters", sf::Vector2f(50.f, window.getSize().y / 5.f + 75.f), sf::Vector2f(200.f, 50.f)))
-				this->charactersPanel = true;
+				this->curr_panel = panels::characters;
 			this->setToolTip("Unlocked characters and the character shop, etc...");
 
 			if (this->createButton("Settings", sf::Vector2f(50.f, window.getSize().y / 5.f + 150.f), sf::Vector2f(200.f, 50.f)))
-				this->settingsPanel = true;
+				this->curr_panel = panels::settings;
 			this->setToolTip("Opens the setting menu.");
 
 			if (this->createButton("Quit", sf::Vector2f(50.f, window.getSize().y / 5.f + 225.f), sf::Vector2f(200.f, 50.f)))
 				window.close();
 			this->setToolTip("Goodbye!");
-		}
-
-		if (this->settingsPanel && !this->charactersPanel)
-		{
+			break;
+		case panels::settings:
 			if (ImGui::Begin("Settings Panel", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Settings Panel", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
@@ -191,14 +190,12 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					this->backgroundImage.setTextureRect(sf::IntRect(64 * this->currBackgroundPicture, 0, 64, 64));
 
 				if (this->createButton("Back##Settings", sf::Vector2f(ImGui::GetWindowSize().x - 215.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
-					this->settingsPanel = false;
+					this->curr_panel = panels::mainmenu;
 
 				ImGui::End();
 			}
-		}
-
-		if (this->charactersPanel && !this->settingsPanel)
-		{
+			break;
+		case panels::characters:
 			if (ImGui::Begin("Characters Panel", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Characters Panel", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
@@ -287,14 +284,12 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 
 				if (this->createButton("Back##Characters", sf::Vector2f(ImGui::GetWindowSize().x - 215.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
-					this->charactersPanel = false;
-				
+					this->curr_panel = panels::mainmenu;
+
 				ImGui::End();
 			}
-		}
-
-		if (this->multiplayerPanel)
-		{
+			break;
+		case panels::multiplayer:
 			if (ImGui::Begin("Multiplayer Panel", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Multiplayer Panel", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
@@ -319,18 +314,23 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetCursorPos(ImVec2(25.f, ImGui::GetWindowSize().y - 150.f));
 				if (ImGui::InputTextWithHint("Server IP: ", "127.0.0.0", this->buffer, 12))
 					std::cout << this->buffer << "\n";
-				
+
 				if (this->createButton("Join", sf::Vector2f(175.f, ImGui::GetWindowSize().y - 125.f), sf::Vector2f(100.f, 25.f)))
 					std::cout << "Joining...\n";
 
 				if (this->createButton("Back##Multiplayer", sf::Vector2f(ImGui::GetWindowSize().x - 215.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
-					this->multiplayerPanel = false;
+					this->curr_panel = panels::mainmenu;
 
 				ImGui::End();
 			}
-
+			break;
+		case panels::singleplayer:
+			//SoonTM
+			break;
+		default:
+			ImGui::Text("You're not suposed to see this LOL...");
+			break;
 		}
-
 		ImGui::End();
 	}
 }
