@@ -18,6 +18,7 @@ const void menu::init(sf::RenderWindow& window)
 	style.ScrollbarRounding = 2.5f;
 	style.GrabRounding = 2.5f;
 
+	//Bruh maybie not here? idk...
 	style.Colors[ImGuiCol_Text] = ImVec4(0.90f, 0.90f, 0.90f, 0.90f);
 	style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
 	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.09f, 0.09f, 0.15f, 1.00f);
@@ -87,53 +88,57 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		ImGui::SetCursorPos(ImVec2(ImGui::GetWindowSize().x - 100.f, 25.f));
 		ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
 		
-		this->createImage(this->m_window->getTexture(0), sf::IntRect(64 * this->currProfilePicture, 0, 64, 64), sf::Vector2f(25.f, 30.f), sf::Vector2f(50.f, 50.f));
-		this->setToolTip("This is the profile picture!");
-		ImGui::SetCursorPos(ImVec2(80.f, 22.5f));
-		ImGui::BeginGroup();
-		ImGui::Text("Account: %s", this->account_name.c_str());
-		ImGui::Text("XP: %.0f / %.0f", this->xp, this->xp_cap);
-		ImGui::Text("Level: %i", this->account_lvl);
-		ImGui::Text("CoverCoin: %ic", this->currency);
-		ImGui::EndGroup();
-
-		this->createImage(this->m_window->getTexture(0), sf::IntRect(64 * this->currFrontPicture, 0, 64, 64), sf::Vector2f(300.f, 175.f), sf::Vector2f(300.f, 300.f));
-		this->setToolTip("This is the front image!");
-
-		if (this->createButton("Play", sf::Vector2f(50.f, window.getSize().y / 5.f), sf::Vector2f(200.f, 50.f)))
+		if (!this->settingsPanel && !this->charactersPanel)
 		{
-			if (!this->play_selecter)
-				this->play_selecter = true;
-			else if (this->play_selecter)
-				this->play_selecter = false;
-		}
+			this->createImage(this->m_window->getTexture(0), sf::IntRect(64 * this->currProfilePicture, 0, 64, 64), sf::Vector2f(25.f, 30.f), sf::Vector2f(50.f, 50.f));
+			this->setToolTip("This is the profile picture!");
+			ImGui::SetCursorPos(ImVec2(80.f, 22.5f));
+			ImGui::BeginGroup();
+			ImGui::Text("Account: %s", this->account_name.c_str());
+			ImGui::Text("XP: %.0f / %.0f", this->xp, this->xp_cap);
+			ImGui::Text("Level: %i", this->account_lvl);
+			ImGui::Text("CoverCoin: %ic", this->currency);
+			ImGui::EndGroup();
 
-		if (this->play_selecter)
-		{
-			if (this->createButton("Singleplayer", sf::Vector2f(250.f, window.getSize().y / 5.f - 35.f), sf::Vector2f(200.f, 50.f)))
+			this->createImage(this->m_window->getTexture(0), sf::IntRect(64 * this->currFrontPicture, 0, 64, 64), sf::Vector2f(300.f, 175.f), sf::Vector2f(300.f, 300.f));
+			this->setToolTip("This is the front image!");
+
+			if (this->createButton("Play", sf::Vector2f(50.f, window.getSize().y / 5.f), sf::Vector2f(200.f, 50.f)))
 			{
-				this->m_window->addState<game>();
-				this->play_selecter = false;
+				if (!this->play_selecter)
+					this->play_selecter = true;
+				else if (this->play_selecter)
+					this->play_selecter = false;
 			}
-			this->setToolTip("Starts the game state.");
-			if (this->createButton("Multiplayer", sf::Vector2f(250.f, window.getSize().y / 5.f + 35.f), sf::Vector2f(200.f, 50.f)))
+
+			if (this->play_selecter)
 			{
-				std::cout << "Not yet\n";
-				this->play_selecter = false;
+				if (this->createButton("Singleplayer", sf::Vector2f(250.f, window.getSize().y / 5.f - 35.f), sf::Vector2f(200.f, 50.f)))
+				{
+					this->m_window->addState<game>();
+					this->play_selecter = false;
+				}
+				this->setToolTip("Starts the game state.");
+				if (this->createButton("Multiplayer", sf::Vector2f(250.f, window.getSize().y / 5.f + 35.f), sf::Vector2f(200.f, 50.f)))
+				{
+					std::cout << "Working on it...\n";
+					this->multiplayerPanel = true;
+					this->play_selecter = false;
+				}
 			}
+
+			if (this->createButton("Characters", sf::Vector2f(50.f, window.getSize().y / 5.f + 75.f), sf::Vector2f(200.f, 50.f)))
+				this->charactersPanel = true;
+			this->setToolTip("Unlocked characters and the character shop, etc...");
+
+			if (this->createButton("Settings", sf::Vector2f(50.f, window.getSize().y / 5.f + 150.f), sf::Vector2f(200.f, 50.f)))
+				this->settingsPanel = true;
+			this->setToolTip("Opens the setting menu.");
+
+			if (this->createButton("Quit", sf::Vector2f(50.f, window.getSize().y / 5.f + 225.f), sf::Vector2f(200.f, 50.f)))
+				window.close();
+			this->setToolTip("Goodbye!");
 		}
-
-		if (this->createButton("Characters", sf::Vector2f(50.f, window.getSize().y / 5.f + 75.f), sf::Vector2f(200.f, 50.f)))
-			this->charactersPanel = true;
-		this->setToolTip("Unlocked characters and the character shop, etc...");
-
-		if (this->createButton("Settings", sf::Vector2f(50.f, window.getSize().y / 5.f + 150.f), sf::Vector2f(200.f, 50.f)))
-			this->settingsPanel = true;
-		this->setToolTip("Opens the setting menu.");
-
-		if (this->createButton("Quit", sf::Vector2f(50.f, window.getSize().y / 5.f + 225.f), sf::Vector2f(200.f, 50.f)))
-			window.close();
-		this->setToolTip("Goodbye!");
 
 		if (this->settingsPanel && !this->charactersPanel)
 		{
@@ -237,11 +242,20 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 								this->characters[i].unlocked = true;
 							}
 						}
-						if (ImGui::IsItemHovered() && this->currency < 699)
+						if (ImGui::IsItemHovered())
 						{
-							ImGui::BeginTooltip();
-							ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Not enough currency, come back later.\nAnd put some usefull information here later...");
-							ImGui::EndTooltip();
+							if (this->currency < 699)
+							{
+								ImGui::BeginTooltip();
+								ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Not enough currency, come back later.\nAnd put some usefull information here later...");
+								ImGui::EndTooltip();
+							}
+							else
+							{
+								ImGui::BeginTooltip();
+								ImGui::TextColored(ImVec4(0.f, 1.f, 0.4f, 1.f), "This item costs 699c.");
+								ImGui::EndTooltip();
+							}
 						}
 						ImGui::PopID();
 					}
@@ -250,7 +264,26 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 				if (this->createButton("Unlock more characters", sf::Vector2f(25.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
 				{
-					std::cout << "Will do it later... But this will cost less than stuff above...\n";
+					if (this->currency >= 420)
+					{
+						this->currency -= 420;
+						std::cout << "Will do it later... But this will cost less than stuff above...\n";
+					}
+				}
+				if (ImGui::IsItemHovered())
+				{
+					if (this->currency < 420)
+					{
+						ImGui::BeginTooltip();
+						ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Not enough currency, come back later.\nAnd put some usefull information here later...");
+						ImGui::EndTooltip();
+					}
+					else
+					{
+						ImGui::BeginTooltip();
+						ImGui::TextColored(ImVec4(0.f, 1.f, 0.4f, 1.f), "This item costs 420c.");
+						ImGui::EndTooltip();
+					}
 				}
 
 				if (this->createButton("Back##Characters", sf::Vector2f(ImGui::GetWindowSize().x - 215.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
@@ -259,6 +292,45 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::End();
 			}
 		}
+
+		if (this->multiplayerPanel)
+		{
+			if (ImGui::Begin("Multiplayer Panel", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+			{
+				ImGui::SetWindowSize("Multiplayer Panel", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
+				ImGui::SetWindowPos("Multiplayer Panel", ImVec2(25.f, 25.f));
+				ImGui::SetWindowFocus("Multiplayer Panel");
+
+				if (ImGui::BeginListBox("Servers", ImVec2(ImGui::GetWindowSize().x - 100.f, ImGui::GetWindowSize().y - 200.f)))
+				{
+					for (size_t i = 0; i < 20; i++)
+					{
+						ImGui::PushID(i);
+						if (ImGui::Selectable("Server with an IP... blah blah blah 127.0.0.0.0"))
+							std::cout << "connecting to the server... " << i << "\n";
+						ImGui::PopID();
+					}
+					ImGui::EndListBox();
+				}
+
+				if (this->createButton("Host", sf::Vector2f(25.f, ImGui::GetWindowSize().y - 125.f), sf::Vector2f(100.f, 25.f)))
+					std::cout << "Hosting...\n";
+
+				ImGui::SetCursorPos(ImVec2(25.f, ImGui::GetWindowSize().y - 150.f));
+				if (ImGui::InputTextWithHint("Server IP: ", "127.0.0.0", this->buffer, 12))
+					std::cout << this->buffer << "\n";
+				
+				if (this->createButton("Join", sf::Vector2f(175.f, ImGui::GetWindowSize().y - 125.f), sf::Vector2f(100.f, 25.f)))
+					std::cout << "Joining...\n";
+
+				if (this->createButton("Back##Multiplayer", sf::Vector2f(ImGui::GetWindowSize().x - 215.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
+					this->multiplayerPanel = false;
+
+				ImGui::End();
+			}
+
+		}
+
 		ImGui::End();
 	}
 }
