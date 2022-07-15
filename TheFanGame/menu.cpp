@@ -303,9 +303,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 				if (ImGui::BeginListBox("Servers", ImVec2(ImGui::GetWindowSize().x - 100.f, ImGui::GetWindowSize().y - 200.f)))
 				{
-					for (size_t i = 0; i < 20; i++)
+					for (std::size_t i = 0; i < 20; ++i)
 					{
-						ImGui::PushID(i);
+						ImGui::PushID((int)i);
 						if (ImGui::Selectable("Server with an IP... blah blah blah 127.0.0.0.0"))
 							std::cout << "connecting to the server... " << i << "\n";
 						ImGui::PopID();
