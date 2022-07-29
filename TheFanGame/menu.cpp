@@ -96,7 +96,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			this->setToolTip("This is the profile picture!");
 			ImGui::SetCursorPos(ImVec2(80.f, 22.5f));
 			ImGui::BeginGroup();
-			ImGui::Text("Account: %s", this->myAccount.account_name.c_str());
+			ImGui::Text("Account: %s", this->myAccount.account_name);
 			ImGui::Text("XP: %.0f / %.0f", this->myAccount.xp, this->myAccount.xp_cap);
 			ImGui::Text("Level: %i", this->myAccount.account_lvl);
 			ImGui::Text("CoverCoin: %ic", this->myAccount.currency);
@@ -166,6 +166,11 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					}
 					ImGui::EndListBox();
 				}
+				if (ImGui::InputText("Account name: ", this->myAccount.account_name, MAX_CHAR_SIZE))
+				{
+					std::cout << "New account name: " << this->myAccount.account_name << '\n';
+				}
+				this->setToolTip("Set your account name here.\nYou can just type it and it will be automaticaly saved.\nMaximum characters that are allowed is 16.");
 
 				if (ImGui::Checkbox("FPS Limit: ", &this->isFPSLimited))
 				{

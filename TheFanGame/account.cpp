@@ -3,10 +3,18 @@
 account::account() noexcept
 {
 	//Log in and load values...
-    std::ifstream profile("AccountInfo.txt");
+    std::ifstream profile("AccountInfo.ini");
     if (profile.is_open())
     {
-        profile >> this->account_name >> this->xp >> this->xp_cap >> this->account_lvl >> this->currency;
+        std::string temp;
+        std::getline(profile, temp);
+        for (std::size_t i = 0; i < temp.size(); ++i)
+        {
+            if (i > MAX_CHAR_SIZE)
+                break;
+            this->account_name[i] = temp[i];
+        }
+        profile >> this->xp >> this->xp_cap >> this->account_lvl >> this->currency;
 
         std::cout << "Account name: " << this->account_name << "\n"
             << "Account current xp: " << this->xp << "\n"
@@ -20,7 +28,7 @@ account::account() noexcept
 account::~account() noexcept
 {
     //When we quit the game save everything to the file.
-    std::ofstream profile("AccountInfo.txt", std::ios::trunc);
+    std::ofstream profile("AccountInfo.ini", std::ios::trunc);
     if (profile.is_open())
     {
         profile << this->account_name << '\n' << this->xp << "\n" << this->xp_cap << '\n' << this->account_lvl << '\n' << this->currency;
