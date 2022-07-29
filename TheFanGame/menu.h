@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game.h"
+#include "account.h"
 
 class menu : public state
 {
@@ -23,7 +24,7 @@ private:
 
 	enum class panels
 	{
-		mainmenu = 0, settings, characters, singleplayer, multiplayer
+		mainmenu = 0, settings, characters, singleplayer, multiplayer, multilobby
 	};
 
 	panels curr_panel = panels::mainmenu;
@@ -46,11 +47,7 @@ private:
 
 	sf::RectangleShape xp_bar;
 	sf::RectangleShape curr_xp;
-	float xp = 0.f;
-	float xp_cap = 100.f;
-	int account_lvl = 1;
-	std::string account_name = "Unkown";
-	std::uint32_t currency = 1000;
+	account myAccount;
 
 	struct talents
 	{

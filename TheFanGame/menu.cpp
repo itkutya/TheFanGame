@@ -56,7 +56,7 @@ const void menu::init(sf::RenderWindow& window)
 	this->xp_bar.setOutlineColor(sf::Color::Black);
 
 	this->curr_xp.setPosition(this->xp_bar.getPosition());
-	this->curr_xp.setSize(sf::Vector2f(this->xp_bar.getSize().x * this->xp, this->xp_bar.getSize().y));
+	this->curr_xp.setSize(sf::Vector2f(this->xp_bar.getSize().x * (this->myAccount.xp / this->myAccount.xp_cap), this->xp_bar.getSize().y));
 	this->curr_xp.setFillColor(sf::Color::Yellow);
 	this->curr_xp.setOutlineThickness(0.f);
 	this->curr_xp.setOutlineColor(sf::Color::Yellow);
@@ -64,6 +64,7 @@ const void menu::init(sf::RenderWindow& window)
 	this->m_view.setSize(sf::Vector2f(window.getSize()));
 	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
 
+	//Load characters...
 	for (std::size_t i = 0; i < 5; ++i)
 	{
 		this->characters.emplace_back();
@@ -75,10 +76,10 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 	ImGui::SFML::Update(window, dt);
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::K))
+	{
 		this->giveXP(10.f);
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::K))
-		this->currency += 10;
+		this->myAccount.currency += 10;
+	}
 
 	if (ImGui::Begin("Main Window", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground))
 	{
@@ -95,10 +96,10 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			this->setToolTip("This is the profile picture!");
 			ImGui::SetCursorPos(ImVec2(80.f, 22.5f));
 			ImGui::BeginGroup();
-			ImGui::Text("Account: %s", this->account_name.c_str());
-			ImGui::Text("XP: %.0f / %.0f", this->xp, this->xp_cap);
-			ImGui::Text("Level: %i", this->account_lvl);
-			ImGui::Text("CoverCoin: %ic", this->currency);
+			ImGui::Text("Account: %s", this->myAccount.account_name.c_str());
+			ImGui::Text("XP: %.0f / %.0f", this->myAccount.xp, this->myAccount.xp_cap);
+			ImGui::Text("Level: %i", this->myAccount.account_lvl);
+			ImGui::Text("CoverCoin: %ic", this->myAccount.currency);
 			ImGui::EndGroup();
 
 			this->createImage(this->m_window->getTexture(0), sf::IntRect(64 * this->currFrontPicture, 0, 64, 64), sf::Vector2f(300.f, 175.f), sf::Vector2f(300.f, 300.f));
@@ -233,15 +234,15 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						ImGui::PushID((int)i);
 						if (this->createButton("Unlock", sf::Vector2f(25.f + 250.f * (float)x, 92.5f + 75.f * (float)y), sf::Vector2f(50.f, 20.f)))
 						{
-							if (this->currency > 699)
+							if (this->myAccount.currency > 699)
 							{
-								this->currency -= 699;
+								this->myAccount.currency -= 699;
 								this->characters[i].unlocked = true;
 							}
 						}
 						if (ImGui::IsItemHovered())
 						{
-							if (this->currency < 699)
+							if (this->myAccount.currency < 699)
 							{
 								ImGui::BeginTooltip();
 								ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Not enough currency, come back later.\nAnd put some usefull information here later...");
@@ -261,15 +262,15 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 				if (this->createButton("Unlock more characters", sf::Vector2f(25.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
 				{
-					if (this->currency >= 420)
+					if (this->myAccount.currency >= 420)
 					{
-						this->currency -= 420;
+						this->myAccount.currency -= 420;
 						std::cout << "Will do it later... But this will cost less than stuff above...\n";
 					}
 				}
 				if (ImGui::IsItemHovered())
 				{
-					if (this->currency < 420)
+					if (this->myAccount.currency < 420)
 					{
 						ImGui::BeginTooltip();
 						ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Not enough currency, come back later.\nAnd put some usefull information here later...");
@@ -359,14 +360,15 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 
 const void menu::giveXP(const float& amount) noexcept
 {
-	this->xp += amount;
-	while (this->xp >= this->xp_cap)
+	this->myAccount.xp += amount;
+	//LvL up...
+	while (this->myAccount.xp >= this->myAccount.xp_cap)
 	{
-		this->xp -= this->xp_cap;
-		this->xp_cap += (10.f * this->account_lvl);
-		++this->account_lvl;
+		this->myAccount.xp -= this->myAccount.xp_cap;
+		this->myAccount.xp_cap += (10.f * this->myAccount.account_lvl);
+		++this->myAccount.account_lvl;
 	}
-	this->curr_xp.setSize(sf::Vector2f(this->xp_bar.getSize().x * (this->xp / this->xp_cap), this->xp_bar.getSize().y));
+	this->curr_xp.setSize(sf::Vector2f(this->xp_bar.getSize().x * (this->myAccount.xp / this->myAccount.xp_cap), this->xp_bar.getSize().y));
 }
 
 const bool menu::createButton(const char* name, const sf::Vector2f& pos, const sf::Vector2f& size) noexcept
