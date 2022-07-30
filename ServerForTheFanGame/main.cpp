@@ -18,11 +18,54 @@
 	#endif
 #endif
 
-sf::TcpListener listener;
-std::list<sf::TcpSocket*> clients;
-sf::SocketSelector selector;
+static sf::TcpListener listener;
+static std::list<sf::TcpSocket*> clients;
+static sf::SocketSelector selector;
 
-const void startServer();
+const void startServer()
+{
+    listener.listen(52420);
+    selector.add(listener);
+
+    while (true)
+    {
+        if (selector.wait())
+        {
+            if (selector.isReady(listener))
+            {
+                sf::TcpSocket* client = new sf::TcpSocket;
+                if (listener.accept(*client) == sf::Socket::Done)
+                {
+                    clients.push_back(client);
+                    selector.add(*client);
+                    std::cout << "A client has connected: " << client->getRemoteAddress() << ":" << client->getRemotePort() << '\n';
+                }
+                else
+                {
+                    delete client;
+                }
+            }
+            else
+            {
+                for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it)
+                {
+                    sf::TcpSocket& client = **it;
+                    if (selector.isReady(client))
+                    {
+                        sf::Packet packet;
+                        if (client.receive(packet) == sf::Socket::Done)
+                        {
+                            char msg[256] = { "" };
+                            packet >> msg;
+                            std::cout << "Client " << client.getRemoteAddress() << " has sent us a msg: " << msg << '\n';
+                        }
+                        packet.clear();
+                    }
+                }
+            }
+        }
+    }
+};
 
 int main()
 {
@@ -82,58 +125,12 @@ int main()
     return 0;
 }
 
-const void startServer()
-{
-    listener.listen(52420);
-    selector.add(listener);
-
-    while (true)
-    {
-        if (selector.wait())
-        {
-            if (selector.isReady(listener))
-            {
-                sf::TcpSocket* client = new sf::TcpSocket;
-                if (listener.accept(*client) == sf::Socket::Done)
-                {
-                    clients.push_back(client);
-                    selector.add(*client);
-                    std::cout << "A client has connected: " << client->getRemoteAddress() << ":" << client->getRemotePort() << '\n';
-                }
-                else
-                {
-                    delete client;
-                }
-            }
-            else
-            {
-                for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it)
-                {
-                    sf::TcpSocket& client = **it;
-                    if (selector.isReady(client))
-                    {
-                        sf::Packet packet;
-                        if (client.receive(packet) == sf::Socket::Done)
-                        {
-                            char msg[256] = { "" };
-                            packet >> msg;
-                            std::cout << "Client " << client.getRemoteAddress() << " has sent us a msg: " << msg << '\n';
-                        }
-                        packet.clear();
-                    }
-                }
-            }
-        }
-    }
-};
-
 /*
 sf::TcpSocket socket;
 if (socket.connect(sf::IpAddress::getLocalAddress(), 52420) != sf::Socket::Done)
     std::cout << "Error!\n";
 
 char buff[256] = { "" };
-
 ImGui::InputText("Msg to the server", buff, 256);
 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 {
