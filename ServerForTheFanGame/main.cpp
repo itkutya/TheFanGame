@@ -114,21 +114,22 @@ int main()
                 for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it)
                 {
                     sf::TcpSocket& client = **it;
-                    if (selector.isReady(client))
+                    std::string clientInfo = client.getRemoteAddress().toString() + ":" + std::to_string(client.getRemotePort());
+                    ImGui::Text(clientInfo.c_str());
+                    ImGui::SameLine(200.f);
+                    ImGui::PushID(clientInfo.c_str());
+                    if (ImGui::Button("Kick"))
                     {
-                        std::string clientInfo = client.getRemoteAddress().toString() + ":" + std::to_string(client.getRemotePort());
-                        ImGui::Text(clientInfo.c_str());
-                        ImGui::SameLine(200.f);
-                        if (ImGui::Button("Kick"))
-                        {
-                            //TODO: FIX it later...
-                        }
-                        ImGui::SameLine(275.f);
-                        if (ImGui::Button("Ban"))
-                        {
-                            //TODO: Make a ban list or something...
-                        }
+                        //TODO: FIX me later...
                     }
+                    ImGui::PopID();
+                    ImGui::SameLine(275.f);
+                    ImGui::PushID(clientInfo.c_str());
+                    if (ImGui::Button("Ban"))
+                    {
+                        //TODO: Make a ban list or something...
+                    }
+                    ImGui::PopID();
                 }
                 ImGui::EndListBox();
             }
@@ -149,6 +150,14 @@ int main()
 sf::TcpSocket socket;
 if (socket.connect(sf::IpAddress::getLocalAddress(), 52420) != sf::Socket::Done)
     std::cout << "Error!\n";
+
+std::vector<std::unique_ptr<sf::TcpSocket>> players;
+if (sf::Keyboard::isKeyPressed(sf::Keyboard::J))
+{
+    players.push_back(std::make_unique<sf::TcpSocket>());
+    if (players[players.size() - 1]->connect(sf::IpAddress::getLocalAddress(), 52420) != sf::Socket::Done)
+        std::cout << "Error!\n";
+}
 
 char buff[256] = { "" };
 ImGui::InputText("Msg to the server", buff, 256);
