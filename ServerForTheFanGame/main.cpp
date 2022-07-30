@@ -21,6 +21,7 @@
 static sf::TcpListener listener;
 static std::list<sf::TcpSocket*> clients;
 static sf::SocketSelector selector;
+static std::uint32_t currPlayers = 0;
 
 const void startServer()
 {
@@ -39,6 +40,7 @@ const void startServer()
                     clients.push_back(client);
                     selector.add(*client);
                     std::cout << "A client has connected: " << client->getRemoteAddress() << ":" << client->getRemotePort() << '\n';
+                    ++currPlayers;
                 }
                 else
                 {
@@ -58,6 +60,15 @@ const void startServer()
                             char msg[256] = { "" };
                             packet >> msg;
                             std::cout << "Client " << client.getRemoteAddress() << " has sent us a msg: " << msg << '\n';
+                        }
+                        if (client.receive(packet) == sf::Socket::Disconnected)
+                        {
+                            selector.remove(client);
+                            client.disconnect();
+                            clients.erase(it);
+                            --currPlayers;
+                            clients.resize(currPlayers);
+                            break;
                         }
                         packet.clear();
                     }
@@ -96,18 +107,27 @@ int main()
         if(ImGui::Begin("Teszt"))
         {
             ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
+            ImGui::Text("Current online players: %u", currPlayers);
 
-            if (ImGui::BeginListBox("Current connections to the server"))
+            if (ImGui::BeginListBox("Current connections\nto the server"))
             {
                 for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it)
                 {
                     sf::TcpSocket& client = **it;
-                    std::string clientIP = client.getRemoteAddress().toString();
-                    std::string clientPort = std::to_string(client.getRemotePort());
-                    std::string clientInfo = clientIP + ":" + clientPort;
-                    if (ImGui::Selectable(clientInfo.c_str()))
+                    if (selector.isReady(client))
                     {
-                        std::cout << "A client has been selected.\n";
+                        std::string clientInfo = client.getRemoteAddress().toString() + ":" + std::to_string(client.getRemotePort());
+                        ImGui::Text(clientInfo.c_str());
+                        ImGui::SameLine(200.f);
+                        if (ImGui::Button("Kick"))
+                        {
+                            //TODO: FIX it later...
+                        }
+                        ImGui::SameLine(275.f);
+                        if (ImGui::Button("Ban"))
+                        {
+                            //TODO: Make a ban list or something...
+                        }
                     }
                 }
                 ImGui::EndListBox();
