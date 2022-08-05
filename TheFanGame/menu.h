@@ -1,5 +1,15 @@
 #pragma once
 
+#if _WIN32 || _WIN64
+	#if _WIN64
+		#include "SFML64/System.hpp"
+		#include "SFML64/Network.hpp"
+	#else
+		#include "SFML32/System.hpp"
+		#include "SFML32/Network.hpp"
+	#endif
+#endif
+
 #include "game.h"
 #include "account.h"
 
@@ -48,6 +58,13 @@ private:
 	sf::RectangleShape xp_bar;
 	sf::RectangleShape curr_xp;
 	account myAccount;
+	sf::TcpSocket socket;
+	sf::IpAddress server = sf::IpAddress::getLocalAddress();
+	sf::Uint32 port = 52420;
+
+	std::vector<sf::IpAddress> servers;
+	std::vector<std::pair<sf::IpAddress, std::uint32_t>> iport;
+	std::uint32_t activeServerNum;
 
 	struct talents
 	{

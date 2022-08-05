@@ -1,4 +1,4 @@
-#include <list>
+#include <vector>
 #include <string>
 #include <iostream>
 #include <stdlib.h>
@@ -19,7 +19,7 @@
 #endif
 
 static sf::TcpListener listener;
-static std::list<sf::TcpSocket*> clients;
+static std::vector<sf::TcpSocket*> clients;
 static sf::SocketSelector selector;
 static std::uint32_t currPlayers = 0;
 
@@ -41,6 +41,26 @@ const void startServer()
                     selector.add(*client);
                     std::cout << "A client has connected: " << client->getRemoteAddress() << ":" << client->getRemotePort() << '\n';
                     ++currPlayers;
+
+                    for (std::size_t i = 0; i < clients.size(); ++i)
+                    {
+                        sf::Packet packet;
+                        packet << std::uint32_t(clients.size());
+                        if (clients[i]->send(packet) == sf::Socket::Done)
+                        {
+                            packet.clear();
+                            for (std::size_t j = 0; j < clients.size(); ++j)
+                            {
+                                packet << clients[j]->getRemoteAddress().toString();
+                                if (clients[i]->send(packet) != sf::Socket::Done)
+                                {
+                                    std::cout << "Error! Cannot reach the client...\n";
+                                }
+                                packet.clear();
+                            }
+                        }
+                        packet.clear();
+                    }
                 }
                 else
                 {
@@ -49,7 +69,7 @@ const void startServer()
             }
             else
             {
-                for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it)
+                for (std::vector<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it)
                 {
                     sf::TcpSocket& client = **it;
                     if (selector.isReady(client))
@@ -111,7 +131,7 @@ int main()
 
             if (ImGui::BeginListBox("Current connections\nto the server"))
             {
-                for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it)
+                for (std::vector<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it)
                 {
                     sf::TcpSocket& client = **it;
                     std::string clientInfo = client.getRemoteAddress().toString() + ":" + std::to_string(client.getRemotePort());

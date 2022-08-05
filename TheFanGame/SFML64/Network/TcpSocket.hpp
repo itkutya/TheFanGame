@@ -28,9 +28,9 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Network/Export.hpp>
-#include <SFML/Network/Socket.hpp>
-#include <SFML/System/Time.hpp>
+#include <Network/Export.hpp>
+#include <Network/Socket.hpp>
+#include <System/Time.hpp>
 
 
 namespace sf
