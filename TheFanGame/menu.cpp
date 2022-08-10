@@ -1,11 +1,12 @@
 ﻿#include "menu.h"
 
-menu::menu(window& window) noexcept 
-{ 
-	this->m_window = &window;
-}
+menu::menu(window& window) noexcept { this->m_window = &window; }
 
-menu::~menu() noexcept { ImGui::SFML::Shutdown(); }
+menu::~menu() noexcept 
+{
+	this->shutdownServer();
+	ImGui::SFML::Shutdown(); 
+}
 
 const void menu::init(sf::RenderWindow& window)
 {
@@ -18,7 +19,6 @@ const void menu::init(sf::RenderWindow& window)
 	style.ScrollbarRounding = 2.5f;
 	style.GrabRounding = 2.5f;
 
-	//Bruh maybie not here? idk...
 	style.Colors[ImGuiCol_Text] = ImVec4(0.90f, 0.90f, 0.90f, 0.90f);
 	style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
 	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.09f, 0.09f, 0.15f, 1.00f);
@@ -113,42 +113,37 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					this->play_selecter = false;
 			}
 
+			if (this->pErrorClose)
+			{
+				if (ImGui::Begin("Error!", &this->pErrorClose, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
+				{
+					ImGui::SetWindowFocus("Error!");
+					ImGui::SetWindowSize("Error!", ImVec2(400.f, 100.f));
+					ImGui::SetWindowPos("Error!", ImVec2(100.f, 200.f));
+
+					ImGui::TextColored(ImVec4(1, 0, 0, 1), "An error has occured!\nCannot connect to the servers.\n");
+
+					ImGui::End();
+				}
+			}
+
 			if (this->play_selecter)
 			{
 				if (this->createButton("Singleplayer", sf::Vector2f(250.f, window.getSize().y / 5.f - 35.f), sf::Vector2f(200.f, 50.f)))
 				{
+					this->curr_panel = panels::singleplayer;
 					this->m_window->addState<game>();
 					this->play_selecter = false;
 				}
 				this->setToolTip("Starts the game state.");
 				if (this->createButton("Multiplayer", sf::Vector2f(250.f, window.getSize().y / 5.f + 35.f), sf::Vector2f(200.f, 50.f)))
 				{
-					std::cout << "Working on it...\n";
 					if (this->socket.connect(this->server, this->port, sf::seconds(3.f)) != sf::Socket::Done)
-					{
-						std::cout << "Error! Cannot join the multiplayer lobby\n";
-					}
+						this->pErrorClose = true;
 					else
 					{
-						sf::Packet packet;
-						if (this->socket.receive(packet) == sf::Socket::Done)
-						{
-							packet >> this->activeServerNum;
-							packet.clear();
-							for (std::size_t i = 0; i < this->activeServerNum; ++i)
-							{
-								this->servers.emplace_back();
-								if (this->socket.receive(packet) == sf::Socket::Done)
-								{
-									std::string ip;
-									packet >> ip;
-									this->servers[i] = sf::IpAddress(ip);
-									std::cout << this->servers[i].toString() << '\n';
-								}
-								packet.clear();
-							}
-						}
-						packet.clear();
+						this->refreshServerList();
+						this->curr_panel = panels::multiplayer;
 					}
 				}
 			}
@@ -330,8 +325,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				{
 					for (std::size_t i = 0; i < this->servers.size(); ++i)
 					{
-						ImGui::PushID((int)i);
-						if (ImGui::Selectable(this->servers[i].toString().c_str()))
+						std::string serverInfo = this->servers[i].first.toString() + ':' + std::to_string(this->servers[i].second);
+						ImGui::PushID("ServerInfo" + i);
+						if (ImGui::Selectable(serverInfo.c_str()))
 							std::cout << "connecting to the server... " << i << "\n";
 						ImGui::PopID();
 					}
@@ -339,20 +335,18 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 
 				if (ImGui::Button("Refress"))
-					std::cout << "Refreshes the server list...\n";
+				{
+					this->refreshServerList();
+				}
 
 				if (this->createButton("Host", sf::Vector2f(25.f, ImGui::GetWindowSize().y - 125.f), sf::Vector2f(100.f, 25.f)))
 				{
-					//Send data to the server...
-					sf::Packet packet;
-					//packet >> data...
-					if (this->socket.send(packet) == sf::Socket::Done)
+					if(this->serverThread == nullptr)
 					{
-						//Send data...
-						//Start your own local server...
+						std::cout << "Started hosting a server...\n";
+						this->serverThread = std::make_unique<sf::Thread>(&menu::startServer, this);
+						this->serverThread->launch();
 					}
-					packet.clear();
-					std::cout << "Hosting...\n";
 				}
 
 				ImGui::SetCursorPos(ImVec2(25.f, ImGui::GetWindowSize().y - 150.f));
@@ -366,13 +360,61 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 
 				if (this->createButton("Back##Multiplayer", sf::Vector2f(ImGui::GetWindowSize().x - 215.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
+				{
+					this->shutdownServer();
+					this->servers.clear();
+					this->socket.disconnect();
 					this->curr_panel = panels::mainmenu;
-
+				}
 				ImGui::End();
 			}
 			break;
 		case panels::singleplayer:
-			//SoonTM
+			if (ImGui::Begin("Singleplayer", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+			{
+				ImGui::SetWindowSize("Singleplayer", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
+				ImGui::SetWindowPos("Singleplayer", ImVec2(25.f, 25.f));
+				ImGui::SetWindowFocus("Singleplayer");
+				ImGui::End();
+			}
+			break;
+		case panels::multilobby:
+			if (ImGui::Begin("Lobby", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+			{
+				ImGui::SetWindowSize("Lobby", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
+				ImGui::SetWindowPos("Lobby", ImVec2(25.f, 25.f));
+				ImGui::SetWindowFocus("Lobby");
+
+				if (ImGui::BeginListBox("Connected players", ImVec2(ImGui::GetWindowSize().x - 100.f, ImGui::GetWindowSize().y - 200.f)))
+				{
+					for (std::size_t i = 0; i < 12; ++i)
+					{
+						ImGui::PushID((int)i);
+						if (ImGui::Selectable("Player"))
+						{
+							//Mute
+							// if admin...
+							//	Kick
+							//	Ban
+						}
+						ImGui::PopID();
+					}
+
+					if (ImGui::Button("Start"))
+					{
+						//Start lobby...
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("Back##Lobby"))
+					{
+						this->shutdownServer();
+						this->refreshServerList();
+						this->curr_panel = panels::multiplayer;
+					}
+					ImGui::EndListBox();
+				}
+				ImGui::End();
+			}
 			break;
 		default:
 			ImGui::Text("You're not suposed to see this LOL...");
@@ -402,6 +444,114 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 	window.draw(this->curr_xp);
 	window.setView(window.getDefaultView());
 	ImGui::SFML::Render(window);
+}
+
+void menu::startServer()
+{
+	if (this->hosting.listen(sf::TcpListener::AnyPort, sf::IpAddress::getLocalAddress()) == sf::Socket::Done)
+	{
+		this->curr_panel = panels::multilobby;
+
+		sf::Packet packet;
+		packet << sf::IpAddress::getLocalAddress().toString() << this->hosting.getLocalPort();
+		if (this->socket.send(packet) != sf::Socket::Done)
+			return;
+		packet.clear();
+
+		this->selector.add(this->hosting);
+
+		while (this->m_window)
+		{
+			if (this->selector.wait())
+			{
+				if (this->selector.isReady(this->hosting))
+				{
+					sf::TcpSocket* client = new sf::TcpSocket;
+					if (this->hosting.accept(*client) == sf::Socket::Done)
+					{
+						this->clients.push_back(client);
+						this->selector.add(*client);
+						std::cout << "A client has connected: " << client->getRemoteAddress() << ":" << client->getRemotePort() << '\n';
+					}
+					else
+					{
+						delete client;
+					}
+				}
+				else
+				{
+					for (std::vector<sf::TcpSocket*>::iterator it = this->clients.begin(); it != this->clients.end(); ++it)
+					{
+						sf::TcpSocket& client = **it;
+						if (this->selector.isReady(client))
+						{
+							sf::Packet packet;
+							if (client.receive(packet) == sf::Socket::Disconnected)
+							{
+								this->selector.remove(client);
+								client.disconnect();
+								this->clients.erase(it);
+								break;
+							}
+							if (client.receive(packet) == sf::Socket::Done)
+							{
+								char msg[255] = { "" };
+								packet >> msg;
+								std::cout << "Client " << client.getRemoteAddress() << " sent us a msg: " << msg << '\n';
+							}
+							packet.clear();
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void menu::shutdownServer()
+{
+	if (this->serverThread != nullptr)
+	{
+		this->serverThread->terminate();
+		this->serverThread.release();
+		this->selector.clear();
+		this->hosting.close();
+
+		sf::Packet packet;
+		packet << std::uint8_t(52);
+		if (this->socket.send(packet) != sf::Socket::Done)
+			std::cout << "Error! Cannot send quit msg to the server...\n";
+		packet.clear();
+	}
+}
+
+void menu::refreshServerList()
+{
+	this->servers.clear();
+
+	sf::Packet packet;
+	packet << std::uint8_t(53);
+	if (this->socket.send(packet) != sf::Socket::Done)
+		std::cout << "Cannot refress server list...\n";
+	packet.clear();
+
+	if (this->socket.receive(packet) == sf::Socket::Done)
+	{
+		packet >> this->activeServerNum;
+		packet.clear();
+		for (std::size_t i = 0; i < this->activeServerNum; ++i)
+		{
+			if (this->socket.receive(packet) == sf::Socket::Done)
+			{
+				std::string ip;
+				sf::Uint16 g_port;
+				packet >> ip >> g_port;
+				this->servers.push_back(std::pair<sf::IpAddress, sf::Uint16>(sf::IpAddress(ip), g_port));
+				std::cout << this->servers[i].first.toString() << ":" << this->servers[i].second << '\n';
+			}
+			packet.clear();
+		}
+	}
 }
 
 const void menu::giveXP(const float& amount) noexcept

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #if _WIN32 || _WIN64
 	#if _WIN64
 		#include "SFML64/System.hpp"
@@ -42,6 +44,7 @@ private:
 
 	std::vector<sf::VideoMode> m_videomodes;
 	bool fullscreen = false;
+	bool pErrorClose = false;
 	bool isFPSLimited = true;
 	int fps_limit = 60;
 	float sensivity = 2.5f;
@@ -60,11 +63,18 @@ private:
 	account myAccount;
 	sf::TcpSocket socket;
 	sf::IpAddress server = sf::IpAddress::getLocalAddress();
-	sf::Uint32 port = 52420;
+	sf::Uint16 port = 52420;
 
-	std::vector<sf::IpAddress> servers;
-	std::vector<std::pair<sf::IpAddress, std::uint32_t>> iport;
+	std::vector<std::pair<sf::IpAddress, sf::Uint16>> servers;
 	std::uint32_t activeServerNum;
+
+	void startServer();
+	void shutdownServer();
+	void refreshServerList();
+	std::unique_ptr<sf::Thread> serverThread;
+	sf::TcpListener hosting;
+	std::vector<sf::TcpSocket*> clients;
+	sf::SocketSelector selector;
 
 	struct talents
 	{

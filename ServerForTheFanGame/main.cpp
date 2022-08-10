@@ -22,8 +22,10 @@ static sf::TcpListener listener;
 static std::vector<sf::TcpSocket*> clients;
 static sf::SocketSelector selector;
 static std::uint32_t currPlayers = 0;
+static std::vector<std::pair<sf::IpAddress, sf::Uint16>> servers;
+static sf::Mutex mutex;
 
-const void startServer()
+void startServer()
 {
     listener.listen(52420);
     selector.add(listener);
@@ -42,47 +44,90 @@ const void startServer()
                     std::cout << "A client has connected: " << client->getRemoteAddress() << ":" << client->getRemotePort() << '\n';
                     ++currPlayers;
 
-                    for (std::size_t i = 0; i < clients.size(); ++i)
+                    sf::Packet packet;
+                    packet << std::uint32_t(servers.size());
+                    if (client->send(packet) == sf::Socket::Done)
                     {
-                        sf::Packet packet;
-                        packet << std::uint32_t(clients.size());
-                        if (clients[i]->send(packet) == sf::Socket::Done)
-                        {
-                            packet.clear();
-                            for (std::size_t j = 0; j < clients.size(); ++j)
-                            {
-                                packet << clients[j]->getRemoteAddress().toString();
-                                if (clients[i]->send(packet) != sf::Socket::Done)
-                                {
-                                    std::cout << "Error! Cannot reach the client...\n";
-                                }
-                                packet.clear();
-                            }
-                        }
                         packet.clear();
+                        for (std::size_t j = 0; j < servers.size(); ++j)
+                        {
+                            packet << servers[j].first.toString() << servers[j].second;
+                            if (client->send(packet) != sf::Socket::Done)
+                                std::cout << "Error! Cannot reach the client...\n";
+                            packet.clear();
+                        }
                     }
+                    packet.clear();
                 }
                 else
-                {
                     delete client;
-                }
             }
             else
             {
+                sf::Lock lock(mutex);
                 for (std::vector<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it)
                 {
                     sf::TcpSocket& client = **it;
-                    if (selector.isReady(client))
+                    if (selector.isReady(client)) 
                     {
                         sf::Packet packet;
                         if (client.receive(packet) == sf::Socket::Done)
                         {
-                            char msg[256] = { "" };
-                            packet >> msg;
-                            std::cout << "Client " << client.getRemoteAddress() << " has sent us a msg: " << msg << '\n';
+                            if(packet.getDataSize() == sizeof(std::uint8_t))
+                            {
+                                std::uint8_t data;
+                                packet >> data;
+                                std::cout << data << '\n';
+                                packet.clear();
+
+                                switch (data)
+                                {
+                                case 52:
+                                    std::cout << "Quit!\n";
+                                    for (std::vector<std::pair<sf::IpAddress, sf::Uint16>>::iterator it = servers.begin(); it != servers.end(); ++it)
+                                    {
+                                        if (client.getRemoteAddress() == it->first)
+                                        {
+                                            std::cout << "deleted\n";
+                                            servers.erase(it);
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                case 53:
+                                    std::cout << "Refress!\n";
+                                    packet << std::uint32_t(servers.size());
+                                    if (client.send(packet) == sf::Socket::Done)
+                                    {
+                                        packet.clear();
+                                        for (std::size_t j = 0; j < servers.size(); ++j)
+                                        {
+                                            packet << servers[j].first.toString() << servers[j].second;
+                                            if (client.send(packet) != sf::Socket::Done)
+                                                std::cout << "Error! Cannot reach the client...\n";
+                                            packet.clear();
+                                        }
+                                    }
+                                    packet.clear();
+                                    break;
+                                default:
+                                    std::cout << "Client sent an unknown command...\n";
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                std::string ip;
+                                sf::Uint16 port;
+                                packet >> ip >> port;
+                                std::cout << "Client " << client.getRemoteAddress() << " has sent us a msg: " << ip << ":" << port << '\n';
+                                servers.push_back(std::pair<sf::IpAddress, sf::Uint16>(sf::IpAddress(ip), port));
+                            }
                         }
-                        if (client.receive(packet) == sf::Socket::Disconnected)
+                        else
                         {
+                            //std::cout << "Error! while receeving the packet...\n";
+                            std::cout << "Player disconnected: " << client.getRemoteAddress().toString() << ":" << client.getRemotePort() << '\n';
                             selector.remove(client);
                             client.disconnect();
                             clients.erase(it);
@@ -128,6 +173,7 @@ int main()
         {
             ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
             ImGui::Text("Current online players: %u", currPlayers);
+            ImGui::Text("Current local servers: %u", servers.size());
 
             if (ImGui::BeginListBox("Current connections\nto the server"))
             {
@@ -151,9 +197,7 @@ int main()
                     }
                     ImGui::PopID();
                 }
-                ImGui::EndListBox();
-            }
-
+            }ImGui::EndListBox();
         }ImGui::End();
 
         window.clear();
@@ -165,27 +209,3 @@ int main()
 
     return 0;
 }
-
-/*
-sf::TcpSocket socket;
-if (socket.connect(sf::IpAddress::getLocalAddress(), 52420) != sf::Socket::Done)
-    std::cout << "Error!\n";
-
-std::vector<std::unique_ptr<sf::TcpSocket>> players;
-if (sf::Keyboard::isKeyPressed(sf::Keyboard::J))
-{
-    players.push_back(std::make_unique<sf::TcpSocket>());
-    if (players[players.size() - 1]->connect(sf::IpAddress::getLocalAddress(), 52420) != sf::Socket::Done)
-        std::cout << "Error!\n";
-}
-
-char buff[256] = { "" };
-ImGui::InputText("Msg to the server", buff, 256);
-if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
-{
-    sf::Packet packet;
-    packet << buff;
-    socket.send(packet);
-    packet.clear();
-}
-*/
