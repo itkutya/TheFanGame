@@ -13,6 +13,11 @@ const void menu::init(sf::RenderWindow& window)
 	ImGui::SFML::Init(window);
 	ImGui::StyleColorsDark();
 
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->Clear();
+	io.Fonts->AddFontFromFileTTF("res/Gen Jyuu Gothic Monospace Bold.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+	ImGui::SFML::UpdateFontTexture();
+
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.WindowRounding = 0.f;
 	style.FrameRounding = 15.3f;
@@ -88,6 +93,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 		ImGui::SetCursorPos(ImVec2(ImGui::GetWindowSize().x - 100.f, 25.f));
 		ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
+		ImGui::SetCursorPos(ImVec2(300.f, 100.f));
+		ImGui::Text(u8"こんにちは！テスト");
 		
 		switch (this->curr_panel)
 		{
