@@ -171,6 +171,7 @@ int main()
 
         if(ImGui::Begin("Teszt"))
         {
+            sf::Lock lock(mutex);
             ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
             ImGui::Text("Current online players: %u", currPlayers);
             ImGui::Text("Current local servers: %u", servers.size());

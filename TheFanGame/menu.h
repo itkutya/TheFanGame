@@ -34,24 +34,34 @@ private:
 	window* m_window;
 	sf::View m_view;
 
-	enum class panels
+	enum class state
 	{
-		mainmenu = 0, settings, characters, singleplayer, multiplayer, multilobby
+		MainMenu = 0, Settings, Characters, Singleplayer, Multiplayer, MultiLobby
 	};
+	state m_State = state::MainMenu;
+	bool m_PlaySelected = false;
+	bool m_ServerError = false;
 
-	panels curr_panel = panels::mainmenu;
-	bool play_selecter = false;
+	enum class settingState
+	{
+		Graphics = 0, Game, Audio, Mainmenu
+	};settingState SS = settingState::Graphics;
 
+
+	/*Game settings -> different class... / maybie part of context?*/
 	std::vector<sf::VideoMode> m_videomodes;
 	bool fullscreen = false;
-	bool pErrorClose = false;
 	bool isFPSLimited = true;
 	int fps_limit = 60;
 	float sensivity = 2.5f;
 	float game_volume = 100.f;
 	float music_volume = 100.f;
 
-	char buffer[12] = "";
+	sf::Sprite profilePicture;
+	sf::Sprite frontPicture;
+
+	char InputIp[12] = "";
+	char InputPort[6] = "";
 
 	sf::RectangleShape backgroundImage;
 	int currProfilePicture = 0;
@@ -62,8 +72,8 @@ private:
 	sf::RectangleShape curr_xp;
 	account myAccount;
 	sf::TcpSocket socket;
-	sf::IpAddress server = sf::IpAddress::getLocalAddress();
-	sf::Uint16 port = 52420;
+	sf::IpAddress serverIP = sf::IpAddress::getLocalAddress();
+	sf::Uint16 serverPort = 52420;
 
 	std::vector<std::pair<sf::IpAddress, sf::Uint16>> servers;
 	std::uint32_t activeServerNum;
@@ -84,12 +94,5 @@ private:
 	};
 	std::vector<talents> characters;
 
-	//Gives a certain amount of xp to the account.
 	const void giveXP(const float& amount) noexcept;
-	//Creates a button, return's true if it's pressed, false if not.
-	const bool createButton(const char* name, const sf::Vector2f& pos, const sf::Vector2f& size) noexcept;
-	//Creates an image.
-	const void createImage(const sf::Texture& texture, const sf::IntRect& rect, const sf::Vector2f& pos, const sf::Vector2f& size) noexcept;
-	//Set's a tooltip when you hover over an imgui item, use it after you created an imgui item.
-	const bool setToolTip(const char* text) noexcept;
 };

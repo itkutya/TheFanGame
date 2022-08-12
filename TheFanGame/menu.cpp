@@ -23,6 +23,7 @@ const void menu::init(sf::RenderWindow& window)
 	style.FrameRounding = 15.3f;
 	style.ScrollbarRounding = 2.5f;
 	style.GrabRounding = 2.5f;
+	style.ItemSpacing = ImVec2(50.f, 20.f);
 
 	style.Colors[ImGuiCol_Text] = ImVec4(0.90f, 0.90f, 0.90f, 0.90f);
 	style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
@@ -49,6 +50,7 @@ const void menu::init(sf::RenderWindow& window)
 	style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.80f, 0.50f, 0.50f, 1.00f);
 
 	this->m_videomodes = sf::VideoMode::getFullscreenModes();
+
 	this->backgroundImage.setTexture(&this->m_window->getTexture(0));
 	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
 	this->backgroundImage.setTextureRect(sf::IntRect(64 * this->currBackgroundPicture, 0, 64, 64));
@@ -80,159 +82,196 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
 	ImGui::SFML::Update(window, dt);
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::K))
-	{
-		this->giveXP(10.f);
-		this->myAccount.currency += 10;
-	}
-
 	if (ImGui::Begin("Main Window", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground))
 	{
 		ImGui::SetWindowSize("Main Window", ImVec2((float)window.getSize().x, (float)window.getSize().y));
 		ImGui::SetWindowPos("Main Window", ImVec2(0.f, 0.f));
 
-		ImGui::SetCursorPos(ImVec2(ImGui::GetWindowSize().x - 100.f, 25.f));
+		ImVec2 WidgetPos;
+		ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+		ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+		vMin.x += ImGui::GetWindowPos().x;
+		vMin.y += ImGui::GetWindowPos().y;
+		vMax.x += ImGui::GetWindowPos().x;
+		vMax.y += ImGui::GetWindowPos().y;
+
+		ImGui::SetCursorPos(ImVec2(vMax.x - 100.f, vMin.y + 25.f));
 		ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
-		ImGui::SetCursorPos(ImVec2(300.f, 100.f));
-		ImGui::Text(u8"こんにちは！テスト");
-		
-		switch (this->curr_panel)
+
+		if (this->m_ServerError)
 		{
-		case panels::mainmenu:
-			this->createImage(this->m_window->getTexture(0), sf::IntRect(64 * this->currProfilePicture, 0, 64, 64), sf::Vector2f(25.f, 30.f), sf::Vector2f(50.f, 50.f));
-			this->setToolTip("This is the profile picture!");
-			ImGui::SetCursorPos(ImVec2(80.f, 22.5f));
-			ImGui::BeginGroup();
-			ImGui::Text("Account: %s", this->myAccount.account_name);
-			ImGui::Text("XP: %.0f / %.0f", this->myAccount.xp, this->myAccount.xp_cap);
-			ImGui::Text("Level: %i", this->myAccount.account_lvl);
-			ImGui::Text("CoverCoin: %ic", this->myAccount.currency);
-			ImGui::EndGroup();
-
-			this->createImage(this->m_window->getTexture(0), sf::IntRect(64 * this->currFrontPicture, 0, 64, 64), sf::Vector2f(300.f, 175.f), sf::Vector2f(300.f, 300.f));
-			this->setToolTip("This is the front image!");
-
-			if (this->createButton("Play", sf::Vector2f(50.f, window.getSize().y / 5.f), sf::Vector2f(200.f, 50.f)))
+			if (ImGui::Begin("Error!", &this->m_ServerError, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
-				if (!this->play_selecter)
-					this->play_selecter = true;
-				else if (this->play_selecter)
-					this->play_selecter = false;
+				ImGui::SetWindowFocus("Error!");
+				ImGui::SetWindowSize("Error!", ImVec2(400.f, 100.f));
+				ImGui::TextColored(ImVec4(1, 0, 0, 1), "An error has occured!\nCannot connect to the servers.\n");
+				ImGui::End();
 			}
+		}
+		
+		switch (this->m_State)
+		{
+		case state::MainMenu:
+			this->profilePicture.setTexture(this->m_window->getTexture(0));
+			this->profilePicture.setTextureRect(sf::IntRect(64 * this->currProfilePicture, 0, 64, 64));
+			ImGui::SetCursorPos(ImVec2(vMin.x + 25.f, vMin.y + 5.f));
+			ImGui::Image(this->profilePicture, sf::Vector2f(50.f, 50.f));
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("This is the profile picture!");
 
-			if (this->pErrorClose)
-			{
-				if (ImGui::Begin("Error!", &this->pErrorClose, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
-				{
-					ImGui::SetWindowFocus("Error!");
-					ImGui::SetWindowSize("Error!", ImVec2(400.f, 100.f));
-					ImGui::SetWindowPos("Error!", ImVec2(100.f, 200.f));
+			this->frontPicture.setTexture(this->m_window->getTexture(0));
+			this->frontPicture.setTextureRect(sf::IntRect(64 * this->currFrontPicture, 0, 64, 64));
+			ImGui::SetCursorPos(ImVec2(vMax.x - 325.f, vMax.y - 450.f));
+			ImGui::Image(this->profilePicture, sf::Vector2f(300.f, 300.f));
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("This is the front image!");
 
-					ImGui::TextColored(ImVec4(1, 0, 0, 1), "An error has occured!\nCannot connect to the servers.\n");
+			ImGui::SetCursorPos(ImVec2(vMin.x + 80.f, vMin.y - 5.f));
+			ImGui::Text("Account: %s\nXP: %0.f / %0.f\nLevel: %i\nCoverCoin: %i$", this->myAccount.account_name, 
+																				   this->myAccount.xp, this->myAccount.xp_cap,
+																				   this->myAccount.account_lvl, 
+																				   this->myAccount.currency);
+			
+			WidgetPos = ImGui::GetCursorPos();
+			if (ImGui::Button("Play", ImVec2(200.f, 50.f)))
+				this->m_PlaySelected ? this->m_PlaySelected = false : this->m_PlaySelected = true;
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Start playing the game RIGHT NOW!");
 
-					ImGui::End();
-				}
-			}
+			if (ImGui::Button("Characters", ImVec2(200.f, 50.f)))
+				this->m_State = state::Characters;
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Unlocked characters and the character shop, etc...");
 
-			if (this->play_selecter)
-			{
-				if (this->createButton("Singleplayer", sf::Vector2f(250.f, window.getSize().y / 5.f - 35.f), sf::Vector2f(200.f, 50.f)))
-				{
-					this->curr_panel = panels::singleplayer;
-					this->m_window->addState<game>();
-					this->play_selecter = false;
-				}
-				this->setToolTip("Starts the game state.");
-				if (this->createButton("Multiplayer", sf::Vector2f(250.f, window.getSize().y / 5.f + 35.f), sf::Vector2f(200.f, 50.f)))
-				{
-					if (this->socket.connect(this->server, this->port, sf::seconds(3.f)) != sf::Socket::Done)
-						this->pErrorClose = true;
-					else
-					{
-						this->refreshServerList();
-						this->curr_panel = panels::multiplayer;
-					}
-				}
-			}
+			if (ImGui::Button("Settings", ImVec2(200.f, 50.f)))
+				this->m_State = state::Settings;
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Opens the setting menu.");
 
-			if (this->createButton("Characters", sf::Vector2f(50.f, window.getSize().y / 5.f + 75.f), sf::Vector2f(200.f, 50.f)))
-				this->curr_panel = panels::characters;
-			this->setToolTip("Unlocked characters and the character shop, etc...");
-
-			if (this->createButton("Settings", sf::Vector2f(50.f, window.getSize().y / 5.f + 150.f), sf::Vector2f(200.f, 50.f)))
-				this->curr_panel = panels::settings;
-			this->setToolTip("Opens the setting menu.");
-
-			if (this->createButton("Quit", sf::Vector2f(50.f, window.getSize().y / 5.f + 225.f), sf::Vector2f(200.f, 50.f)))
+			if (ImGui::Button("Quit", ImVec2(200.f, 50.f)))
 				window.close();
-			this->setToolTip("Goodbye!");
-			break;
-		case panels::settings:
-			if (ImGui::Begin("Settings Panel", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Goodbye!");
+
+			if (this->m_PlaySelected)
 			{
-				ImGui::SetWindowSize("Settings Panel", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
-				ImGui::SetWindowPos("Settings Panel", ImVec2(25.f, 25.f));
-				ImGui::SetWindowFocus("Settings Panel");
-
-				if (ImGui::Checkbox("Fullscreen: ", &this->fullscreen))
-					this->m_window->setFullscreen(this->fullscreen);
-
-				if (ImGui::BeginListBox("Resolution: ", ImVec2(200, 200)))
+				ImGui::SetCursorPos(ImVec2(WidgetPos.x + 205.f, WidgetPos.y - 5.f));
+				if (ImGui::Button("Singleplayer", ImVec2(200.f, 25.f)))
 				{
-					for (std::size_t i = 0; i < this->m_videomodes.size(); ++i)
+					this->m_PlaySelected = false;
+					this->m_State = state::Singleplayer;
+					this->m_window->addState<game>();
+				}
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Starts the game state.");
+
+				ImGui::SetCursorPos(ImVec2(WidgetPos.x + 205.f, WidgetPos.y + 30.f));
+				if (ImGui::Button("Multiplayer", ImVec2(200.f, 25.f)))
+				{
+					if (this->socket.connect(this->serverIP, this->serverPort, sf::seconds(3.f)) != sf::Socket::Done)
 					{
-						std::string text = std::to_string(this->m_videomodes[i].width) + "x" + std::to_string(this->m_videomodes[i].height);
-						if (ImGui::Selectable(text.c_str()))
-						{
-							this->m_window->setSize(sf::Vector2u(this->m_videomodes[i].width, this->m_videomodes[i].height));
-							this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
-							this->m_view.setSize(sf::Vector2f(window.getSize()));
-							this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
-						}
+						this->m_PlaySelected = false;
+						this->m_ServerError = true;
 					}
-					ImGui::EndListBox();
-				}
-				if (ImGui::InputText("Account name: ", this->myAccount.account_name, MAX_CHAR_SIZE))
-				{
-					std::cout << "New account name: " << this->myAccount.account_name << '\n';
-				}
-				this->setToolTip("Set your account name here.\nYou can just type it and it will be automaticaly saved.\nMaximum characters that are allowed is 16.");
-
-				if (ImGui::Checkbox("FPS Limit: ", &this->isFPSLimited))
-				{
-					if (!this->isFPSLimited)
-						this->m_window->setFramerateLimit(0);
 					else
-						this->m_window->setFramerateLimit(this->fps_limit);
+					{
+						this->m_PlaySelected = false;
+						this->refreshServerList();
+						this->m_State = state::Multiplayer;
+					}
 				}
-				if (this->isFPSLimited)
+			}
+			break;
+		case state::Settings:
+			if (ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_MenuBar))
+			{
+				ImGui::SetWindowSize("Settings", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
+				ImGui::SetWindowPos("Settings", ImVec2(25.f, 25.f));
+				ImGui::SetWindowFocus("Settings");
+
+				if (ImGui::BeginMenuBar())
 				{
-					ImGui::SameLine();
-					if (ImGui::SliderInt("###Limit: ", &this->fps_limit, 30, 180))
-						this->m_window->setFramerateLimit(this->fps_limit);
+					if (ImGui::MenuItem("Graphics"))
+						this->SS = settingState::Graphics;
+					if (ImGui::MenuItem("Game"))
+						this->SS = settingState::Game;
+					if (ImGui::MenuItem("Mainmenu"))
+						this->SS = settingState::Mainmenu;
+					if (ImGui::MenuItem("Audio"))
+						this->SS = settingState::Audio;
+					ImGui::EndMenuBar();
 				}
+				switch (this->SS)
+				{
+				case settingState::Graphics:
+					if (ImGui::Checkbox("Fullscreen: ", &this->fullscreen))
+						this->m_window->setFullscreen(this->fullscreen);
 
-				ImGui::SliderFloat("Sensivity: ", &this->sensivity, 0.f, 20.f);
-				ImGui::SliderFloat("Game volume: ", &this->game_volume, 0.f, 100.f);
-				ImGui::SliderFloat("Music volume: ", &this->music_volume, 0.f, 100.f);
+					if (ImGui::BeginListBox("Resolution: ", ImVec2(200, 200)))
+					{
+						for (std::size_t i = 0; i < this->m_videomodes.size(); ++i)
+						{
+							std::string text = std::to_string(this->m_videomodes[i].width) + "x" + std::to_string(this->m_videomodes[i].height);
+							if (ImGui::Selectable(text.c_str()))
+							{
+								this->m_window->setSize(sf::Vector2u(this->m_videomodes[i].width, this->m_videomodes[i].height));
+								this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
+								this->m_view.setSize(sf::Vector2f(window.getSize()));
+								this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
+							}
+						}
+						ImGui::EndListBox();
+					}
+					if (ImGui::Checkbox("FPS Limit: ", &this->isFPSLimited))
+					{
+						if (!this->isFPSLimited)
+							this->m_window->setFramerateLimit(0);
+						else
+							this->m_window->setFramerateLimit(this->fps_limit);
+					}
+					if (this->isFPSLimited)
+					{
+						ImGui::SameLine();
+						if (ImGui::SliderInt("###Limit: ", &this->fps_limit, 30, 180))
+							this->m_window->setFramerateLimit(this->fps_limit);
+					}
+					break;
+				case settingState::Game:
+					ImGui::SliderFloat("Sensivity: ", &this->sensivity, 0.f, 20.f);
+					break;
+				case settingState::Mainmenu:
+					if (ImGui::InputText("Account name: ", this->myAccount.account_name, MAX_CHAR_SIZE))
+					{
+						std::cout << "New account name: " << this->myAccount.account_name << '\n';
+					}
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Set your account name here.\nYou can just type it and it will be automaticaly saved.\nMaximum characters that are allowed is 16.");
 
-				ImGui::SliderInt("Front image: ", &this->currFrontPicture, 0, 5);
-				ImGui::SliderInt("Profile picture: ", &this->currProfilePicture, 0, 5);
-				if (ImGui::SliderInt("Background image: ", &this->currBackgroundPicture, 0, 5))
-					this->backgroundImage.setTextureRect(sf::IntRect(64 * this->currBackgroundPicture, 0, 64, 64));
-
-				if (this->createButton("Back##Settings", sf::Vector2f(ImGui::GetWindowSize().x - 215.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
-					this->curr_panel = panels::mainmenu;
+					ImGui::SliderInt("Front image: ", &this->currFrontPicture, 0, 5);
+					ImGui::SliderInt("Profile picture: ", &this->currProfilePicture, 0, 5);
+					if (ImGui::SliderInt("Background image: ", &this->currBackgroundPicture, 0, 5))
+						this->backgroundImage.setTextureRect(sf::IntRect(64 * this->currBackgroundPicture, 0, 64, 64));
+					break;
+				case settingState::Audio:
+					ImGui::SliderFloat("Game volume: ", &this->game_volume, 0.f, 100.f);
+					ImGui::SliderFloat("Music volume: ", &this->music_volume, 0.f, 100.f);
+					break;
+				default:
+					break;
+				}
+				ImGui::SetCursorPos(ImVec2(400.f, 400.f));
+				if(ImGui::Button("Back###Settings", ImVec2(200.f, 50.f)))
+					this->m_State = state::MainMenu;
 
 				ImGui::End();
 			}
 			break;
-		case panels::characters:
-			if (ImGui::Begin("Characters Panel", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+		case state::Characters:
+			if (ImGui::Begin("Characters", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
-				ImGui::SetWindowSize("Characters Panel", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
-				ImGui::SetWindowPos("Characters Panel", ImVec2(25.f, 25.f));
-				ImGui::SetWindowFocus("Characters Panel");
+				ImGui::SetWindowSize("Characters", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
+				ImGui::SetWindowPos("Characters", ImVec2(25.f, 25.f));
+				ImGui::SetWindowFocus("Characters");
 
 				int y = 0;
 				int x = 0;
@@ -244,14 +283,30 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						y = 0;
 					}
 					if (!this->characters[i].unlocked)
-						this->createImage(this->m_window->getTexture(0), sf::IntRect(64 * (int)i, 0, 64, 64), sf::Vector2f(25.f + 250.f * (float)x, 40.f + 75.f * (float)y), sf::Vector2f(50.f, 50.f));
+					{
+						sf::Sprite temp;
+						temp.setTexture(this->m_window->getTexture(0));
+						temp.setTextureRect(sf::IntRect(64 * (int)i, 0, 64, 64));
+						ImGui::SetCursorPos(ImVec2(25.f + 250.f * (float)x, 40.f + 75.f * (float)y));
+						ImGui::Image(this->profilePicture, sf::Vector2f(50.f, 50.f));
+					}
 					else
-						this->createImage(this->m_window->getTexture(1), sf::IntRect(64 * (int)i, 0, 64, 64), sf::Vector2f(25.f + 250.f * (float)x, 40.f + 75.f * (float)y), sf::Vector2f(50.f, 50.f));
+					{
+						sf::Sprite temp;
+						temp.setTexture(this->m_window->getTexture(1));
+						temp.setTextureRect(sf::IntRect(64 * (int)i, 0, 64, 64));
+						ImGui::SetCursorPos(ImVec2(25.f + 250.f * (float)x, 40.f + 75.f * (float)y));
+						ImGui::Image(this->profilePicture, sf::Vector2f(50.f, 50.f));
+					}
 
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
-						this->createImage(this->m_window->getTexture(0), sf::IntRect(128, 0, 64, 64), sf::Vector2f(5.f, 5.f), sf::Vector2f(50.f, 50.f));
+						sf::Sprite temp;
+						temp.setTexture(this->m_window->getTexture(0));
+						temp.setTextureRect(sf::IntRect(128, 0, 64, 64));
+						ImGui::SetCursorPos(ImVec2(5.f, 5.f));
+						ImGui::Image(this->profilePicture, sf::Vector2f(50.f, 50.f));
 						ImGui::SameLine();
 						ImGui::TextColored(ImVec4(1.f, 0.0f, 0.1f, 1.f), "Can be an image of any ability or something like that.");
 						ImGui::TextColored(ImVec4(0.f, 0.8f, 0.1f, 1.f), "This will be updated later so it displays information\nabout the charater that is currently being hoverd.");
@@ -263,7 +318,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					if (!this->characters[i].unlocked)
 					{
 						ImGui::PushID((int)i);
-						if (this->createButton("Unlock", sf::Vector2f(25.f + 250.f * (float)x, 92.5f + 75.f * (float)y), sf::Vector2f(50.f, 20.f)))
+						ImGui::SetCursorPos(ImVec2(25.f + 250.f * (float)x, 92.5f + 75.f * (float)y));
+						if (ImGui::Button("Unlock", ImVec2(50.f, 20.f)))
 						{
 							if (this->myAccount.currency > 699)
 							{
@@ -290,8 +346,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					}
 					++y;
 				}
-
-				if (this->createButton("Unlock more characters", sf::Vector2f(25.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
+				ImGui::SetCursorPos(ImVec2(25.f, 400.f));
+				if (ImGui::Button("Open loot box", ImVec2(200.f, 50.f)))
 				{
 					if (this->myAccount.currency >= 420)
 					{
@@ -315,18 +371,19 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					}
 				}
 
-				if (this->createButton("Back##Characters", sf::Vector2f(ImGui::GetWindowSize().x - 215.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
-					this->curr_panel = panels::mainmenu;
+				ImGui::SetCursorPos(ImVec2(400.f, 400.f));
+				if (ImGui::Button("Back###Characters", ImVec2(200.f, 50.f)))
+					this->m_State = state::MainMenu;
 
 				ImGui::End();
 			}
 			break;
-		case panels::multiplayer:
-			if (ImGui::Begin("Multiplayer Panel", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+		case state::Multiplayer:
+			if (ImGui::Begin("Multiplayer", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
-				ImGui::SetWindowSize("Multiplayer Panel", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
-				ImGui::SetWindowPos("Multiplayer Panel", ImVec2(25.f, 25.f));
-				ImGui::SetWindowFocus("Multiplayer Panel");
+				ImGui::SetWindowSize("Multiplayer", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
+				ImGui::SetWindowPos("Multiplayer", ImVec2(25.f, 25.f));
+				ImGui::SetWindowFocus("Multiplayer");
 
 				if (ImGui::BeginListBox("Servers", ImVec2(ImGui::GetWindowSize().x - 100.f, ImGui::GetWindowSize().y - 200.f)))
 				{
@@ -335,18 +392,27 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						std::string serverInfo = this->servers[i].first.toString() + ':' + std::to_string(this->servers[i].second);
 						ImGui::PushID("ServerInfo" + i);
 						if (ImGui::Selectable(serverInfo.c_str()))
-							std::cout << "connecting to the server... " << i << "\n";
+						{ 
+							std::cout << "connecting to the server... " << this->servers[i].first.toString() << ":" << this->servers[i].second << "\n";
+							this->socket.disconnect();
+							if (this->socket.connect(this->servers[i].first, this->servers[i].second) == sf::Socket::Done)
+							{
+								std::cout << "Succesfuly connected to the server...\n";
+								//Get lobby data from server
+								//Load them
+								this->m_State = state::MultiLobby;
+							}
+						}
 						ImGui::PopID();
 					}
 					ImGui::EndListBox();
 				}
 
 				if (ImGui::Button("Refress"))
-				{
 					this->refreshServerList();
-				}
 
-				if (this->createButton("Host", sf::Vector2f(25.f, ImGui::GetWindowSize().y - 125.f), sf::Vector2f(100.f, 25.f)))
+				ImGui::SetCursorPos(ImVec2(25.f, 400.f));
+				if (ImGui::Button("Host", ImVec2(200.f, 50.f)))
 				{
 					if(this->serverThread == nullptr)
 					{
@@ -354,29 +420,40 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						this->serverThread = std::make_unique<sf::Thread>(&menu::startServer, this);
 						this->serverThread->launch();
 					}
+					else
+						std::cout << "You are already hosting a game...\n";
 				}
 
-				ImGui::SetCursorPos(ImVec2(25.f, ImGui::GetWindowSize().y - 150.f));
-				if (ImGui::InputTextWithHint("Server IP: ", "127.0.0.0", this->buffer, 12))
-					std::cout << this->buffer << "\n";
+				ImGui::SetCursorPos(ImVec2(25.f, ImGui::GetWindowSize().y - 125.f));
+				if (ImGui::InputTextWithHint("Server IP: ", "127.0.0.0", this->InputIp, 12, ImGuiInputTextFlags_EnterReturnsTrue))
+					std::cout << this->InputIp << "\n";
+				ImGui::SameLine();
+				if (ImGui::InputTextWithHint("Port: ", "52420", this->InputPort, 6, ImGuiInputTextFlags_EnterReturnsTrue))
+					std::cout << this->InputPort << "\n";
 
-				if (this->createButton("Join", sf::Vector2f(175.f, ImGui::GetWindowSize().y - 125.f), sf::Vector2f(100.f, 25.f)))
+				ImGui::SetCursorPos(ImVec2(175.f, 400.f));
+				if (ImGui::Button("Join", ImVec2(200.f, 50.f)))
 				{
-					//Join someone else's local server...
-					std::cout << "Joining...\n";
+					this->socket.disconnect();
+					//this->socket.connect();
+					//if succesful 
+					// -> get data from lobbya
+					// -> load lobby
 				}
 
-				if (this->createButton("Back##Multiplayer", sf::Vector2f(ImGui::GetWindowSize().x - 215.f, ImGui::GetWindowSize().y - 75.f), sf::Vector2f(200.f, 50.f)))
+				
+				ImGui::SetCursorPos(ImVec2(400.f, 400.f));
+				if (ImGui::Button("Back###Multiplayer", ImVec2(200.f, 50.f)))
 				{
 					this->shutdownServer();
 					this->servers.clear();
 					this->socket.disconnect();
-					this->curr_panel = panels::mainmenu;
+					this->m_State = state::MainMenu;
 				}
 				ImGui::End();
 			}
 			break;
-		case panels::singleplayer:
+		case state::Singleplayer:
 			if (ImGui::Begin("Singleplayer", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Singleplayer", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
@@ -385,7 +462,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::End();
 			}
 			break;
-		case panels::multilobby:
+		case state::MultiLobby:
 			if (ImGui::Begin("Lobby", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Lobby", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
@@ -407,16 +484,16 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						ImGui::PopID();
 					}
 
-					if (ImGui::Button("Start"))
+					if (ImGui::Button("Start###Lobby"))
 					{
 						//Start lobby...
 					}
 					ImGui::SameLine();
-					if (ImGui::Button("Back##Lobby"))
+					if (ImGui::Button("Back###Lobby"))
 					{
 						this->shutdownServer();
 						this->refreshServerList();
-						this->curr_panel = panels::multiplayer;
+						this->m_State = state::Multiplayer;
 					}
 					ImGui::EndListBox();
 				}
@@ -424,7 +501,10 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			}
 			break;
 		default:
-			ImGui::Text("You're not suposed to see this LOL...");
+			ImGui::Text("You're not suposed to see this LOL...\nSomething went horibly wrong...");
+			ImGui::LogButtons();
+			if (ImGui::Button("Help me!"))
+				this->m_State = state::MainMenu;
 			break;
 		}
 		ImGui::End();
@@ -457,7 +537,7 @@ void menu::startServer()
 {
 	if (this->hosting.listen(sf::TcpListener::AnyPort, sf::IpAddress::getLocalAddress()) == sf::Socket::Done)
 	{
-		this->curr_panel = panels::multilobby;
+		this->m_State = state::MultiLobby;
 
 		sf::Packet packet;
 		packet << sf::IpAddress::getLocalAddress().toString() << this->hosting.getLocalPort();
@@ -572,31 +652,4 @@ const void menu::giveXP(const float& amount) noexcept
 		++this->myAccount.account_lvl;
 	}
 	this->curr_xp.setSize(sf::Vector2f(this->xp_bar.getSize().x * (this->myAccount.xp / this->myAccount.xp_cap), this->xp_bar.getSize().y));
-}
-
-const bool menu::createButton(const char* name, const sf::Vector2f& pos, const sf::Vector2f& size) noexcept
-{
-	ImGui::SetCursorPos(ImVec2(pos.x, pos.y));
-	if (ImGui::Button(name, ImVec2(size.x, size.y)))
-		return true;
-	return false;
-}
-
-const void menu::createImage(const sf::Texture& texture, const sf::IntRect& rect, const sf::Vector2f& pos, const sf::Vector2f& size) noexcept
-{
-	sf::Sprite temp;
-	temp.setTexture(texture);
-	temp.setTextureRect(rect);
-	ImGui::SetCursorPos(ImVec2(pos.x, pos.y));
-	ImGui::Image(temp, size);
-}
-
-const bool menu::setToolTip(const char* text) noexcept
-{
-	if (ImGui::IsItemHovered())
-	{
-		ImGui::SetTooltip(text);
-		return true;
-	}
-	return false;
 }
