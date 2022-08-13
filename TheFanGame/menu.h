@@ -45,7 +45,7 @@ private:
 	enum class settingState
 	{
 		Graphics = 0, Game, Audio, Mainmenu
-	};settingState SS = settingState::Graphics;
+	};settingState m_SettingState = settingState::Graphics;
 
 
 	/*Game settings -> different class... / maybie part of context?*/
@@ -91,6 +91,7 @@ private:
 		std::string m_name = "Some randrom name..." + std::to_string(std::rand() % 1000);
 		bool unlocked = false;
 		std::uint32_t level = 1;
+		std::uint32_t price = 690;
 	};
 	std::vector<talents> characters;
 

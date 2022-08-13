@@ -13,7 +13,7 @@ int main()
 		m_context.m_resources.addTexture(1, "res/char.png");
 
 		window mainWindow;
-		mainWindow.create(sf::VideoMode(600, 600), "Project stuff");
+		mainWindow.create(sf::VideoMode(1920, 1080), "Project stuff");
 		mainWindow.setContext(m_context);
 		mainWindow.addState<menu>();
 		mainWindow.setFramerateLimit(60);

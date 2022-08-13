@@ -15,7 +15,7 @@ const void menu::init(sf::RenderWindow& window)
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->Clear();
-	io.Fonts->AddFontFromFileTTF("res/Gen Jyuu Gothic Monospace Bold.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+	io.Fonts->AddFontFromFileTTF("res/Gen Jyuu Gothic Monospace Bold.ttf", 25.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 	ImGui::SFML::UpdateFontTexture();
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -23,7 +23,6 @@ const void menu::init(sf::RenderWindow& window)
 	style.FrameRounding = 15.3f;
 	style.ScrollbarRounding = 2.5f;
 	style.GrabRounding = 2.5f;
-	style.ItemSpacing = ImVec2(50.f, 20.f);
 
 	style.Colors[ImGuiCol_Text] = ImVec4(0.90f, 0.90f, 0.90f, 0.90f);
 	style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
@@ -56,8 +55,11 @@ const void menu::init(sf::RenderWindow& window)
 	this->backgroundImage.setTextureRect(sf::IntRect(64 * this->currBackgroundPicture, 0, 64, 64));
 	this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 125));
 
-	this->xp_bar.setPosition(sf::Vector2f(190.f, 50.f));
-	this->xp_bar.setSize(sf::Vector2f(300.f, 10.f));
+	this->m_view.setSize(sf::Vector2f(window.getSize()));
+	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
+
+	this->xp_bar.setPosition(sf::Vector2f(300.f, 85.f));
+	this->xp_bar.setSize(sf::Vector2f(350.f, 15.f));
 	this->xp_bar.setFillColor(sf::Color::White);
 	this->xp_bar.setOutlineThickness(2.f);
 	this->xp_bar.setOutlineColor(sf::Color::Black);
@@ -67,9 +69,6 @@ const void menu::init(sf::RenderWindow& window)
 	this->curr_xp.setFillColor(sf::Color::Yellow);
 	this->curr_xp.setOutlineThickness(0.f);
 	this->curr_xp.setOutlineColor(sf::Color::Yellow);
-
-	this->m_view.setSize(sf::Vector2f(window.getSize()));
-	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
 
 	//Load characters...
 	for (std::size_t i = 0; i < 5; ++i)
@@ -112,51 +111,55 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		switch (this->m_State)
 		{
 		case state::MainMenu:
-			this->profilePicture.setTexture(this->m_window->getTexture(0));
-			this->profilePicture.setTextureRect(sf::IntRect(64 * this->currProfilePicture, 0, 64, 64));
-			ImGui::SetCursorPos(ImVec2(vMin.x + 25.f, vMin.y + 5.f));
-			ImGui::Image(this->profilePicture, sf::Vector2f(50.f, 50.f));
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("This is the profile picture!");
-
 			this->frontPicture.setTexture(this->m_window->getTexture(0));
 			this->frontPicture.setTextureRect(sf::IntRect(64 * this->currFrontPicture, 0, 64, 64));
-			ImGui::SetCursorPos(ImVec2(vMax.x - 325.f, vMax.y - 450.f));
-			ImGui::Image(this->profilePicture, sf::Vector2f(300.f, 300.f));
+			ImGui::SetCursorPos(ImVec2(ImGui::GetWindowContentRegionMin().x + 600.f, ImGui::GetWindowContentRegionMin().y + 100.f));
+			ImGui::Image(this->frontPicture, sf::Vector2f(ImGui::GetWindowContentRegionMax().x / 1.6f, ImGui::GetWindowContentRegionMax().y / 1.3f));
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("This is the front image!");
 
-			ImGui::SetCursorPos(ImVec2(vMin.x + 80.f, vMin.y - 5.f));
-			ImGui::Text("Account: %s\nXP: %0.f / %0.f\nLevel: %i\nCoverCoin: %i$", this->myAccount.account_name, 
-																				   this->myAccount.xp, this->myAccount.xp_cap,
-																				   this->myAccount.account_lvl, 
-																				   this->myAccount.currency);
-			
+			this->profilePicture.setTexture(this->m_window->getTexture(0));
+			this->profilePicture.setTextureRect(sf::IntRect(64 * this->currProfilePicture, 0, 64, 64));
+			ImGui::SetCursorPos(ImVec2(vMin.x + 25.f, vMin.y + 5.f));
+			ImGui::Image(this->profilePicture, sf::Vector2f(100.f, 100.f));
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("This is the profile picture!");
+
+			ImGui::SameLine();
+			ImGui::Text("Account: %s\nXP: %0.f / %0.f\nLevel: %i\nCoverCoin: %i$", this->myAccount.account_name,
+				this->myAccount.xp, this->myAccount.xp_cap,
+				this->myAccount.account_lvl,
+				this->myAccount.currency);
+
+			ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + 75.f));
 			WidgetPos = ImGui::GetCursorPos();
-			if (ImGui::Button("Play", ImVec2(200.f, 50.f)))
+			if (ImGui::Button("Play", ImVec2(300.f, 75.f)))
 				this->m_PlaySelected ? this->m_PlaySelected = false : this->m_PlaySelected = true;
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("Start playing the game RIGHT NOW!");
 
-			if (ImGui::Button("Characters", ImVec2(200.f, 50.f)))
+			ImGui::SetCursorPos(ImVec2(WidgetPos.x, WidgetPos.y + 125.f));
+			if (ImGui::Button("Characters", ImVec2(300.f, 75.f)))
 				this->m_State = state::Characters;
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("Unlocked characters and the character shop, etc...");
 
-			if (ImGui::Button("Settings", ImVec2(200.f, 50.f)))
+			ImGui::SetCursorPos(ImVec2(WidgetPos.x, WidgetPos.y + 250.f));
+			if (ImGui::Button("Settings", ImVec2(300.f, 75.f)))
 				this->m_State = state::Settings;
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("Opens the setting menu.");
 
-			if (ImGui::Button("Quit", ImVec2(200.f, 50.f)))
+			ImGui::SetCursorPos(ImVec2(WidgetPos.x, WidgetPos.y + 375.f));
+			if (ImGui::Button("Quit", ImVec2(300.f, 75.f)))
 				window.close();
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("Goodbye!");
 
 			if (this->m_PlaySelected)
 			{
-				ImGui::SetCursorPos(ImVec2(WidgetPos.x + 205.f, WidgetPos.y - 5.f));
-				if (ImGui::Button("Singleplayer", ImVec2(200.f, 25.f)))
+				ImGui::SetCursorPos(ImVec2(WidgetPos.x + 305.f, WidgetPos.y - 15.f));
+				if (ImGui::Button("Singleplayer", ImVec2(200.f, 50.f)))
 				{
 					this->m_PlaySelected = false;
 					this->m_State = state::Singleplayer;
@@ -165,8 +168,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Starts the game state.");
 
-				ImGui::SetCursorPos(ImVec2(WidgetPos.x + 205.f, WidgetPos.y + 30.f));
-				if (ImGui::Button("Multiplayer", ImVec2(200.f, 25.f)))
+				ImGui::SetCursorPos(ImVec2(WidgetPos.x + 305.f, WidgetPos.y + 45.f));
+				if (ImGui::Button("Multiplayer", ImVec2(200.f, 50.f)))
 				{
 					if (this->socket.connect(this->serverIP, this->serverPort, sf::seconds(3.f)) != sf::Socket::Done)
 					{
@@ -189,19 +192,26 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetWindowPos("Settings", ImVec2(25.f, 25.f));
 				ImGui::SetWindowFocus("Settings");
 
+				vMin = ImGui::GetWindowContentRegionMin();
+				vMax = ImGui::GetWindowContentRegionMax();
+				vMin.x += ImGui::GetWindowPos().x;
+				vMin.y += ImGui::GetWindowPos().y;
+				vMax.x += ImGui::GetWindowPos().x;
+				vMax.y += ImGui::GetWindowPos().y;
+
 				if (ImGui::BeginMenuBar())
 				{
 					if (ImGui::MenuItem("Graphics"))
-						this->SS = settingState::Graphics;
+						this->m_SettingState = settingState::Graphics;
 					if (ImGui::MenuItem("Game"))
-						this->SS = settingState::Game;
+						this->m_SettingState = settingState::Game;
 					if (ImGui::MenuItem("Mainmenu"))
-						this->SS = settingState::Mainmenu;
+						this->m_SettingState = settingState::Mainmenu;
 					if (ImGui::MenuItem("Audio"))
-						this->SS = settingState::Audio;
+						this->m_SettingState = settingState::Audio;
 					ImGui::EndMenuBar();
 				}
-				switch (this->SS)
+				switch (this->m_SettingState)
 				{
 				case settingState::Graphics:
 					if (ImGui::Checkbox("Fullscreen: ", &this->fullscreen))
@@ -240,10 +250,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					ImGui::SliderFloat("Sensivity: ", &this->sensivity, 0.f, 20.f);
 					break;
 				case settingState::Mainmenu:
-					if (ImGui::InputText("Account name: ", this->myAccount.account_name, MAX_CHAR_SIZE))
-					{
+					if (ImGui::InputText("Account name: ", this->myAccount.account_name, MAX_CHAR_SIZE, ImGuiInputTextFlags_EnterReturnsTrue))
 						std::cout << "New account name: " << this->myAccount.account_name << '\n';
-					}
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip("Set your account name here.\nYou can just type it and it will be automaticaly saved.\nMaximum characters that are allowed is 16.");
 
@@ -259,12 +267,11 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				default:
 					break;
 				}
-				ImGui::SetCursorPos(ImVec2(400.f, 400.f));
-				if(ImGui::Button("Back###Settings", ImVec2(200.f, 50.f)))
-					this->m_State = state::MainMenu;
 
-				ImGui::End();
-			}
+				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
+				if (ImGui::Button("Back###Settings", ImVec2(300.f, 75.f)))
+					this->m_State = state::MainMenu;
+			}ImGui::End();
 			break;
 		case state::Characters:
 			if (ImGui::Begin("Characters", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
@@ -273,86 +280,92 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetWindowPos("Characters", ImVec2(25.f, 25.f));
 				ImGui::SetWindowFocus("Characters");
 
-				int y = 0;
-				int x = 0;
-				for (std::size_t i = 0; i < this->characters.size(); ++i)
+				vMin = ImGui::GetWindowContentRegionMin();
+				vMax = ImGui::GetWindowContentRegionMax();
+				vMin.x += ImGui::GetWindowPos().x;
+				vMin.y += ImGui::GetWindowPos().y;
+				vMax.x += ImGui::GetWindowPos().x;
+				vMax.y += ImGui::GetWindowPos().y;
+
+				if (ImGui::BeginChild("###CharSet", ImVec2(0, ImGui::GetWindowContentRegionMax().y - 200.f), true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar))
 				{
-					if (i != 0 && i % 8 == 0)
+					int y = 0;
+					int x = 0;
+					for (std::size_t i = 0; i < this->characters.size(); ++i)
 					{
-						++x;
-						y = 0;
-					}
-					if (!this->characters[i].unlocked)
-					{
-						sf::Sprite temp;
-						temp.setTexture(this->m_window->getTexture(0));
-						temp.setTextureRect(sf::IntRect(64 * (int)i, 0, 64, 64));
-						ImGui::SetCursorPos(ImVec2(25.f + 250.f * (float)x, 40.f + 75.f * (float)y));
-						ImGui::Image(this->profilePicture, sf::Vector2f(50.f, 50.f));
-					}
-					else
-					{
-						sf::Sprite temp;
-						temp.setTexture(this->m_window->getTexture(1));
-						temp.setTextureRect(sf::IntRect(64 * (int)i, 0, 64, 64));
-						ImGui::SetCursorPos(ImVec2(25.f + 250.f * (float)x, 40.f + 75.f * (float)y));
-						ImGui::Image(this->profilePicture, sf::Vector2f(50.f, 50.f));
-					}
-
-					if (ImGui::IsItemHovered())
-					{
-						ImGui::BeginTooltip();
-						sf::Sprite temp;
-						temp.setTexture(this->m_window->getTexture(0));
-						temp.setTextureRect(sf::IntRect(128, 0, 64, 64));
-						ImGui::SetCursorPos(ImVec2(5.f, 5.f));
-						ImGui::Image(this->profilePicture, sf::Vector2f(50.f, 50.f));
-						ImGui::SameLine();
-						ImGui::TextColored(ImVec4(1.f, 0.0f, 0.1f, 1.f), "Can be an image of any ability or something like that.");
-						ImGui::TextColored(ImVec4(0.f, 0.8f, 0.1f, 1.f), "This will be updated later so it displays information\nabout the charater that is currently being hoverd.");
-						ImGui::EndTooltip();
-					}
-					ImGui::SameLine();
-					ImGui::Text("Some information\nabout the\ncharacter that is\nbeing displayed\ncan go here.");
-
-					if (!this->characters[i].unlocked)
-					{
-						ImGui::PushID((int)i);
-						ImGui::SetCursorPos(ImVec2(25.f + 250.f * (float)x, 92.5f + 75.f * (float)y));
-						if (ImGui::Button("Unlock", ImVec2(50.f, 20.f)))
+						if (i != 0 && i % 2 == 0)
 						{
-							if (this->myAccount.currency > 699)
-							{
-								this->myAccount.currency -= 699;
-								this->characters[i].unlocked = true;
-							}
+							++x;
+							y = 0;
 						}
+
+						sf::Sprite temp;
+						if (!this->characters[i].unlocked)
+							temp.setTexture(this->m_window->getTexture(0));
+						else
+							temp.setTexture(this->m_window->getTexture(1));
+
+						temp.setTextureRect(sf::IntRect(64 * (int)i, 0, 64, 64));
+						ImGui::SetCursorPos(ImVec2(100.f + 350.f * (float)x, 100.f + 300.f * (float)y));
+						WidgetPos = ImGui::GetCursorPos();
+						ImGui::Image(temp, sf::Vector2f(150.f, 150.f));
+
 						if (ImGui::IsItemHovered())
 						{
-							if (this->myAccount.currency < 699)
-							{
-								ImGui::BeginTooltip();
-								ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Not enough currency, come back later.\nAnd put some usefull information here later...");
-								ImGui::EndTooltip();
-							}
-							else
-							{
-								ImGui::BeginTooltip();
-								ImGui::TextColored(ImVec4(0.f, 1.f, 0.4f, 1.f), "This item costs 699c.");
-								ImGui::EndTooltip();
-							}
+							ImGui::BeginTooltip();
+							sf::Sprite ability;
+							ability.setTexture(this->m_window->getTexture(0));
+							ability.setTextureRect(sf::IntRect(128, 0, 64, 64));
+							ImGui::SetCursorPos(ImVec2(5.f, 5.f));
+							ImGui::Image(ability, sf::Vector2f(50.f, 50.f));
+							ImGui::SameLine();
+							ImGui::TextColored(ImVec4(1.f, 0.0f, 0.1f, 1.f), "Can be an image of any ability or something like that.");
+							ImGui::TextColored(ImVec4(0.f, 0.8f, 0.1f, 1.f), "This will be updated later so it displays information\nabout the charater that is currently being hoverd.");
+							ImGui::EndTooltip();
 						}
-						ImGui::PopID();
+						ImGui::SameLine();
+						ImGui::Text("Some information\nabout the\ncharacter that is\nbeing displayed\ncan go here.");
+
+						if (!this->characters[i].unlocked)
+						{
+							ImGui::PushID((int)i);
+							ImGui::SetCursorPos(ImVec2(WidgetPos.x - 25.f, WidgetPos.y + 175.f));
+							if (ImGui::Button("Unlock", ImVec2(200.f, 50.f)))
+							{
+								if (this->myAccount.currency > this->characters[i].price)
+								{
+									this->myAccount.currency -= this->characters[i].price;
+									this->characters[i].unlocked = true;
+								}
+							}
+							if (ImGui::IsItemHovered())
+							{
+								if (this->myAccount.currency < this->characters[i].price)
+								{
+									ImGui::BeginTooltip();
+									ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Not enough currency, come back later.\nAnd put some usefull information here later...");
+									ImGui::EndTooltip();
+								}
+								else
+								{
+									ImGui::BeginTooltip();
+									ImGui::TextColored(ImVec4(0.f, 1.f, 0.4f, 1.f), reinterpret_cast<const char*>(u8"This item costs 690$."));
+									ImGui::EndTooltip();
+								}
+							}
+							ImGui::PopID();
+						}
+						++y;
 					}
-					++y;
-				}
-				ImGui::SetCursorPos(ImVec2(25.f, 400.f));
-				if (ImGui::Button("Open loot box", ImVec2(200.f, 50.f)))
+				}ImGui::EndChild();
+
+				ImGui::SetCursorPos(ImVec2(vMin.x, vMax.y - 125.f));
+				if (ImGui::Button("Open loot box", ImVec2(300.f, 75.f)))
 				{
 					if (this->myAccount.currency >= 420)
 					{
 						this->myAccount.currency -= 420;
-						std::cout << "Will do it later... But this will cost less than stuff above...\n";
+						std::cout << "Will do it later... But this will cost lem_SettingState than stuff above...\n";
 					}
 				}
 				if (ImGui::IsItemHovered())
@@ -371,12 +384,10 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					}
 				}
 
-				ImGui::SetCursorPos(ImVec2(400.f, 400.f));
-				if (ImGui::Button("Back###Characters", ImVec2(200.f, 50.f)))
+				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
+				if (ImGui::Button("Back###Characters", ImVec2(300.f, 75.f)))
 					this->m_State = state::MainMenu;
-
-				ImGui::End();
-			}
+			}ImGui::End();
 			break;
 		case state::Multiplayer:
 			if (ImGui::Begin("Multiplayer", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
