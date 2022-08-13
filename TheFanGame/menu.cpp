@@ -72,9 +72,7 @@ const void menu::init(sf::RenderWindow& window)
 
 	//Load characters...
 	for (std::size_t i = 0; i < 5; ++i)
-	{
 		this->characters.emplace_back();
-	}
 }
 
 const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
@@ -242,7 +240,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					if (this->isFPSLimited)
 					{
 						ImGui::SameLine();
-						if (ImGui::SliderInt("###Limit: ", &this->fps_limit, 30, 180))
+						if (ImGui::SliderInt("##Limit: ", &this->fps_limit, 30, 180))
 							this->m_window->setFramerateLimit(this->fps_limit);
 					}
 					break;
@@ -269,7 +267,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 
 				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
-				if (ImGui::Button("Back###Settings", ImVec2(300.f, 75.f)))
+				if (ImGui::Button("Back##Settings", ImVec2(300.f, 75.f)))
 					this->m_State = state::MainMenu;
 			}ImGui::End();
 			break;
@@ -287,7 +285,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				vMax.x += ImGui::GetWindowPos().x;
 				vMax.y += ImGui::GetWindowPos().y;
 
-				if (ImGui::BeginChild("###CharSet", ImVec2(0, ImGui::GetWindowContentRegionMax().y - 200.f), true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar))
+				if (ImGui::BeginChild("##CharSet", ImVec2(0, ImGui::GetWindowContentRegionMax().y - 200.f), true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar))
 				{
 					int y = 0;
 					int x = 0;
@@ -328,7 +326,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 						if (!this->characters[i].unlocked)
 						{
-							ImGui::PushID((int)i);
+							ImGui::PushID("CharacterUnlock" + i);
 							ImGui::SetCursorPos(ImVec2(WidgetPos.x - 25.f, WidgetPos.y + 175.f));
 							if (ImGui::Button("Unlock", ImVec2(200.f, 50.f)))
 							{
@@ -385,7 +383,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 
 				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
-				if (ImGui::Button("Back###Characters", ImVec2(300.f, 75.f)))
+				if (ImGui::Button("Back##Characters", ImVec2(300.f, 75.f)))
 					this->m_State = state::MainMenu;
 			}ImGui::End();
 			break;
@@ -396,14 +394,21 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetWindowPos("Multiplayer", ImVec2(25.f, 25.f));
 				ImGui::SetWindowFocus("Multiplayer");
 
-				if (ImGui::BeginListBox("Servers", ImVec2(ImGui::GetWindowSize().x - 100.f, ImGui::GetWindowSize().y - 200.f)))
+				vMin = ImGui::GetWindowContentRegionMin();
+				vMax = ImGui::GetWindowContentRegionMax();
+				vMin.x += ImGui::GetWindowPos().x;
+				vMin.y += ImGui::GetWindowPos().y;
+				vMax.x += ImGui::GetWindowPos().x;
+				vMax.y += ImGui::GetWindowPos().y;
+
+				if (ImGui::BeginListBox("Servers", ImVec2(ImGui::GetWindowSize().x - 100.f, ImGui::GetWindowSize().y - 275.f)))
 				{
 					for (std::size_t i = 0; i < this->servers.size(); ++i)
 					{
 						std::string serverInfo = this->servers[i].first.toString() + ':' + std::to_string(this->servers[i].second);
 						ImGui::PushID("ServerInfo" + i);
 						if (ImGui::Selectable(serverInfo.c_str()))
-						{ 
+						{
 							std::cout << "connecting to the server... " << this->servers[i].first.toString() << ":" << this->servers[i].second << "\n";
 							this->socket.disconnect();
 							if (this->socket.connect(this->servers[i].first, this->servers[i].second) == sf::Socket::Done)
@@ -422,10 +427,34 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				if (ImGui::Button("Refress"))
 					this->refreshServerList();
 
-				ImGui::SetCursorPos(ImVec2(25.f, 400.f));
-				if (ImGui::Button("Host", ImVec2(200.f, 50.f)))
+				ImGui::SetCursorPos(ImVec2(vMin.x, vMax.y - 175.f));
+				ImGui::Text("Server IP: ");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(window.getSize().x / 5.f);
+				if (ImGui::InputTextWithHint("##ServerIP", "127.0.0.0", this->InputIp, 12, ImGuiInputTextFlags_EnterReturnsTrue))
+					std::cout << this->InputIp << "\n";
+				ImGui::SameLine();
+				ImGui::Text("Port: ");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(window.getSize().x / 8.f);
+				if (ImGui::InputTextWithHint("##Port", "52420", this->InputPort, 6, ImGuiInputTextFlags_EnterReturnsTrue))
+					std::cout << this->InputPort << "\n";
+				ImGui::SameLine();
+				WidgetPos = ImGui::GetCursorPos();
+				ImGui::SetCursorPos(ImVec2(WidgetPos.x, WidgetPos.y - 10.f));
+				if (ImGui::Button("Join", ImVec2(200.f, 50.f)))
 				{
-					if(this->serverThread == nullptr)
+					//this->socket.disconnect();
+					//this->socket.connect();
+					//if succesful 
+					// -> get data from lobbya
+					// -> load lobby
+				}
+
+				ImGui::SetCursorPos(ImVec2(vMin.x + 25.f, vMax.y - 125.f));
+				if (ImGui::Button("Host", ImVec2(300.f, 75.f)))
+				{
+					if (this->serverThread == nullptr)
 					{
 						std::cout << "Started hosting a server...\n";
 						this->serverThread = std::make_unique<sf::Thread>(&menu::startServer, this);
@@ -435,34 +464,15 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						std::cout << "You are already hosting a game...\n";
 				}
 
-				ImGui::SetCursorPos(ImVec2(25.f, ImGui::GetWindowSize().y - 125.f));
-				if (ImGui::InputTextWithHint("Server IP: ", "127.0.0.0", this->InputIp, 12, ImGuiInputTextFlags_EnterReturnsTrue))
-					std::cout << this->InputIp << "\n";
-				ImGui::SameLine();
-				if (ImGui::InputTextWithHint("Port: ", "52420", this->InputPort, 6, ImGuiInputTextFlags_EnterReturnsTrue))
-					std::cout << this->InputPort << "\n";
-
-				ImGui::SetCursorPos(ImVec2(175.f, 400.f));
-				if (ImGui::Button("Join", ImVec2(200.f, 50.f)))
-				{
-					this->socket.disconnect();
-					//this->socket.connect();
-					//if succesful 
-					// -> get data from lobbya
-					// -> load lobby
-				}
-
-				
-				ImGui::SetCursorPos(ImVec2(400.f, 400.f));
-				if (ImGui::Button("Back###Multiplayer", ImVec2(200.f, 50.f)))
+				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
+				if (ImGui::Button("Back##Multiplayer", ImVec2(300.f, 75.f)))
 				{
 					this->shutdownServer();
 					this->servers.clear();
 					this->socket.disconnect();
 					this->m_State = state::MainMenu;
 				}
-				ImGui::End();
-			}
+			}ImGui::End();
 			break;
 		case state::Singleplayer:
 			if (ImGui::Begin("Singleplayer", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
@@ -480,11 +490,20 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetWindowPos("Lobby", ImVec2(25.f, 25.f));
 				ImGui::SetWindowFocus("Lobby");
 
-				if (ImGui::BeginListBox("Connected players", ImVec2(ImGui::GetWindowSize().x - 100.f, ImGui::GetWindowSize().y - 200.f)))
+				vMin = ImGui::GetWindowContentRegionMin();
+				vMax = ImGui::GetWindowContentRegionMax();
+				vMin.x += ImGui::GetWindowPos().x;
+				vMin.y += ImGui::GetWindowPos().y;
+				vMax.x += ImGui::GetWindowPos().x;
+				vMax.y += ImGui::GetWindowPos().y;
+
+				ImGui::Text("Connected players: ");
+				ImGui::SameLine();
+				if (ImGui::BeginListBox("##PlayerList", ImVec2(ImGui::GetWindowSize().x - 500.f, ImGui::GetWindowSize().y - 200.f)))
 				{
 					for (std::size_t i = 0; i < 12; ++i)
 					{
-						ImGui::PushID((int)i);
+						ImGui::PushID("Player" + i);
 						if (ImGui::Selectable("Player"))
 						{
 							//Mute
@@ -494,22 +513,56 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						}
 						ImGui::PopID();
 					}
-
-					if (ImGui::Button("Start###Lobby"))
-					{
-						//Start lobby...
-					}
-					ImGui::SameLine();
-					if (ImGui::Button("Back###Lobby"))
-					{
-						this->shutdownServer();
-						this->refreshServerList();
-						this->m_State = state::Multiplayer;
-					}
 					ImGui::EndListBox();
 				}
-				ImGui::End();
-			}
+				ImGui::SameLine();
+				if (ImGui::BeginChild("Game settings", ImVec2(0, ImGui::GetWindowContentRegionMax().y - 200.f), true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+				{
+					bool teszt = false;
+					if (ImGui::Checkbox("Teszt option", &teszt))
+						std::cout << "Teszt\n";
+					if (ImGui::Checkbox("Even More Teszt option", &teszt))
+						std::cout << "Teszt\n";
+					if (ImGui::Checkbox("Teamdmg or something...", &teszt))
+						std::cout << "Teszt\n";
+					if (ImGui::BeginListBox("Game modes maybie?"))
+					{
+						for (std::size_t i = 0; i < 5; ++i)
+						{
+							ImGui::PushID("GameModes" + i);
+							if (ImGui::Selectable("Stuff"))
+								std::cout << "Ok!\n";
+							ImGui::PopID();
+						}
+					}ImGui::EndListBox();
+					//Switch case maybie??? idk...
+					ImGui::Text("GameModeTextGoesHere");
+					if (ImGui::BeginListBox("Map maybie?"))
+					{
+						for (std::size_t i = 0; i < 5; ++i)
+						{
+							ImGui::PushID("Maps" + i);
+							if (ImGui::Selectable("Stuff"))
+								std::cout << "Ok!\n";
+							ImGui::PopID();
+						}
+					}ImGui::EndListBox();
+					//Switch case maybie??? idk...
+					ImGui::Text("MapTextGoesHere");
+				}ImGui::EndChild();
+
+				ImGui::SetCursorPos(ImVec2(vMin.x + 25.f, vMax.y - 125.f));
+				if (ImGui::Button("Start##Lobby", ImVec2(300.f, 75.f)))
+					std::cout << "Staring lobby...\n";
+
+				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
+				if (ImGui::Button("Back##MultiLobby", ImVec2(300.f, 75.f)))
+				{
+					this->shutdownServer();
+					this->refreshServerList();
+					this->m_State = state::Multiplayer;
+				}
+			}ImGui::End();
 			break;
 		default:
 			ImGui::Text("You're not suposed to see this LOL...\nSomething went horibly wrong...");
@@ -604,6 +657,8 @@ void menu::startServer()
 			}
 		}
 	}
+	else
+		std::cout << "Error cannot start server...\n";
 }
 
 void menu::shutdownServer()
