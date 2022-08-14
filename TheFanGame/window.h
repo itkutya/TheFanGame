@@ -40,7 +40,11 @@ public:
 	//Delete current state.
 	const void popCurrent();
 	//Get the texture at the given index.
-	const sf::Texture& getTexture(const int& index) const;
+	const sf::Texture& getTexture(const std::uint8_t& index) const;
+	//Get the font at the given index.
+	const sf::Font& getFont(const std::uint8_t& index) const;
+	//Get the sound at the given index.
+	const sf::SoundBuffer& getSoundBuffer(const std::uint8_t& index) const;
 	//Set's the window size.
 	const void setSize(const sf::Vector2u& size) noexcept;
 	//Set's the window to fullscreen mode.

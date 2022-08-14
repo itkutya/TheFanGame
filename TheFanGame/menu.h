@@ -47,6 +47,7 @@ private:
 		Graphics = 0, Game, Audio, Mainmenu
 	};settingState m_SettingState = settingState::Graphics;
 
+	sf::Sound MainMusic;
 
 	/*Game settings -> different class... / maybie part of context?*/
 	std::vector<sf::VideoMode> m_videomodes;
@@ -59,10 +60,6 @@ private:
 
 	sf::Sprite profilePicture;
 	sf::Sprite frontPicture;
-
-	char InputIp[12] = "";
-	char InputPort[6] = "";
-
 	sf::RectangleShape backgroundImage;
 	int currProfilePicture = 0;
 	int currFrontPicture = 0;
@@ -71,9 +68,13 @@ private:
 	sf::RectangleShape xp_bar;
 	sf::RectangleShape curr_xp;
 	account myAccount;
+
 	sf::TcpSocket socket;
 	sf::IpAddress serverIP = sf::IpAddress::getLocalAddress();
 	sf::Uint16 serverPort = 52420;
+
+	char InputIp[12] = "";
+	char InputPort[6] = "";
 
 	std::vector<std::pair<sf::IpAddress, sf::Uint16>> servers;
 	std::uint32_t activeServerNum;
@@ -92,8 +93,7 @@ private:
 		bool unlocked = false;
 		std::uint32_t level = 1;
 		std::uint32_t price = 690;
-	};
-	std::vector<talents> characters;
+	};std::vector<talents> characters;
 
 	const void giveXP(const float& amount) noexcept;
 };

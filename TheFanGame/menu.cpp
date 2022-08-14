@@ -6,6 +6,7 @@ menu::~menu() noexcept
 {
 	this->shutdownServer();
 	ImGui::SFML::Shutdown(); 
+	this->MainMusic.stop();
 }
 
 const void menu::init(sf::RenderWindow& window)
@@ -73,11 +74,21 @@ const void menu::init(sf::RenderWindow& window)
 	//Load characters...
 	for (std::size_t i = 0; i < 5; ++i)
 		this->characters.emplace_back();
+
+	this->MainMusic.setBuffer(this->m_window->getSoundBuffer(3));
+	this->MainMusic.setLoop(true);
+	this->MainMusic.setVolume(this->music_volume);
+	this->MainMusic.play();
 }
 
 const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
 	ImGui::SFML::Update(window, dt);
+
+	if (this->music_volume == 0.f)
+		this->MainMusic.stop();
+	else if (this->music_volume > 0.f && this->MainMusic.getStatus() != sf::SoundSource::Playing)
+		this->MainMusic.play();
 
 	if (ImGui::Begin("Main Window", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground))
 	{
@@ -260,7 +271,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					break;
 				case settingState::Audio:
 					ImGui::SliderFloat("Game volume: ", &this->game_volume, 0.f, 100.f);
-					ImGui::SliderFloat("Music volume: ", &this->music_volume, 0.f, 100.f);
+					if (ImGui::SliderFloat("Music volume: ", &this->music_volume, 0.f, 100.f))
+						this->MainMusic.setVolume(this->music_volume);
 					break;
 				default:
 					break;

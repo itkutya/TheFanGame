@@ -71,7 +71,11 @@ const void window::processStateChange(sf::RenderWindow& window) noexcept { this-
 
 const void window::popCurrent() { this->m_context->m_states.popCurrent(); }
 
-const sf::Texture& window::getTexture(const int& index) const { return this->m_context->m_resources.getTexture(index); }
+const sf::Texture& window::getTexture(const std::uint8_t& index) const { return this->m_context->m_resources.getTexture(index); }
+
+const sf::Font& window::getFont(const std::uint8_t& index) const { return this->m_context->m_resources.getFont(index); }
+
+const sf::SoundBuffer& window::getSoundBuffer(const std::uint8_t& index) const { return this->m_context->m_resources.getSoundBuffer(index); }
 
 const void window::setSize(const sf::Vector2u& size) noexcept 
 {

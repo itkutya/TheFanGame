@@ -11,6 +11,8 @@ int main()
 		context m_context;
 		m_context.m_resources.addTexture(0, "res/wolftextures.png");
 		m_context.m_resources.addTexture(1, "res/char.png");
+		m_context.m_resources.addFont(2, "res/Gen Jyuu Gothic Monospace Bold.ttf");
+		m_context.m_resources.addSoundBuffer(3, "res/Sound.wav");
 
 		window mainWindow;
 		mainWindow.create(sf::VideoMode(1920, 1080), "Project stuff");
