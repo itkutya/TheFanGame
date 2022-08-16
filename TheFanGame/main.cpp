@@ -6,15 +6,15 @@ int main()
 {
 	//Uses the current time to generate random numbers.
 	std::srand((std::uint32_t)std::time(0));
+
+	resourceManager::addTexture("WallTexture", "res/wolftextures.png");
+	resourceManager::addTexture("CharacterTexture", "res/char.png");
+	resourceManager::addFont("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
+	resourceManager::addSoundBuffer("MainMusic", "res/Sound.wav");
+
 	try
 	{
-		context m_context;
-		m_context.m_resources.addTexture(0, "res/wolftextures.png");
-		m_context.m_resources.addTexture(1, "res/char.png");
-		m_context.m_resources.addFont(2, "res/Gen Jyuu Gothic Monospace Bold.ttf");
-		m_context.m_resources.addSoundBuffer(3, "res/Sound.wav");
-
-		window mainWindow = window(m_context);
+		window mainWindow;
 		mainWindow.create(sf::VideoMode(1920, 1080), "Project stuff");
 		mainWindow.addState<menu>();
 		mainWindow.setFramerateLimit(60);
@@ -39,6 +39,7 @@ int main()
 		std::cout << "\033[1;4;31m" << "Something went terribly wrong...\n" << "\033[0m";
 		return -2;
 	}
+	resourceManager::clear();
 	//Exit the program with a success.
 	return 0;
 }

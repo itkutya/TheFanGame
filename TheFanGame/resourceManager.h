@@ -19,18 +19,21 @@
 class resourceManager
 {
 public:
-	resourceManager() noexcept {};
-	virtual ~resourceManager() { this->m_textures.clear(); this->m_fonts.clear(); this->m_soundBuffers.clear(); };
+	resourceManager() = delete;
+	resourceManager(const resourceManager&) = delete;
+	virtual ~resourceManager() {};
 
-	const void addTexture(const std::uint8_t& id, const std::string& filePath, const bool& wantRepeated = false);
-	const void addFont(const std::uint8_t& id, const std::string& filePath);
-	const void addSoundBuffer(const std::uint8_t& id, const std::string& filePath);
+	static const void addTexture(const std::string& id, const std::string& filePath, const bool& wantRepeated = false);
+	static const void addFont(const std::string& id, const std::string& filePath);
+	static const void addSoundBuffer(const std::string& id, const std::string& filePath);
 
-	const sf::Texture& getTexture(const std::uint8_t& id) const;
-	const sf::Font& getFont(const std::uint8_t& id) const;
-	const sf::SoundBuffer& getSoundBuffer(const std::uint8_t& id) const;
+	static const sf::Texture& getTexture(const std::string& id);
+	static const sf::Font& getFont(const std::string& id);
+	static const sf::SoundBuffer& getSoundBuffer(const std::string& id);
+
+	static void clear();
 private:
-	std::unordered_map<std::uint8_t, std::unique_ptr<sf::Texture>> m_textures;
-	std::unordered_map<std::uint8_t, std::unique_ptr<sf::Font>> m_fonts;
-	std::unordered_map<std::uint8_t, std::unique_ptr<sf::SoundBuffer>> m_soundBuffers;
+	static std::unordered_map<std::string, sf::Texture> m_textures;
+	static std::unordered_map<std::string, sf::Font> m_fonts;
+	static std::unordered_map<std::string, sf::SoundBuffer> m_soundBuffers;
 };

@@ -1,33 +1,44 @@
 #include "resourceManager.h"
 
-const void resourceManager::addTexture(const std::uint8_t& id, const std::string& filePath, const bool& wantRepeated)
-{
-    this->m_textures[id] = std::make_unique<sf::Texture>();
+std::unordered_map<std::string, sf::Texture> resourceManager::m_textures;
+std::unordered_map<std::string, sf::Font> resourceManager::m_fonts;
+std::unordered_map<std::string, sf::SoundBuffer> resourceManager::m_soundBuffers;
 
-    if (!this->m_textures[id]->loadFromFile(filePath))
+const void resourceManager::addTexture(const std::string& id, const std::string& filePath, const bool& wantRepeated)
+{
+    m_textures[id] = sf::Texture();
+
+    if (!m_textures[id].loadFromFile(filePath))
         throw "Cannot load texture...\n";
         
-    this->m_textures[id]->setRepeated(wantRepeated);
+    m_textures[id].setRepeated(wantRepeated);
 }
 
-const void resourceManager::addFont(const std::uint8_t& id, const std::string& filePath)
+const void resourceManager::addFont(const std::string& id, const std::string& filePath)
 {
-    this->m_fonts[id] = std::make_unique<sf::Font>();
+    m_fonts[id] = sf::Font();
 
-    if (!this->m_fonts[id]->loadFromFile(filePath))
+    if (!m_fonts[id].loadFromFile(filePath))
         throw "Cannot load font...\n";
 }
 
-const void resourceManager::addSoundBuffer(const std::uint8_t& id, const std::string& filePath)
+const void resourceManager::addSoundBuffer(const std::string& id, const std::string& filePath)
 {
-    this->m_soundBuffers[id] = std::make_unique<sf::SoundBuffer>();
+    m_soundBuffers[id] = sf::SoundBuffer();
 
-    if (!this->m_soundBuffers[id]->loadFromFile(filePath))
+    if (!m_soundBuffers[id].loadFromFile(filePath))
         throw "Cannot load sound...\n";
 }
 
-const sf::Texture& resourceManager::getTexture(const std::uint8_t& id) const { return *(this->m_textures.at(id).get()); }
+const sf::Texture& resourceManager::getTexture(const std::string& id) { return m_textures.at(id); }
 
-const sf::Font& resourceManager::getFont(const std::uint8_t& id) const { return *(this->m_fonts.at(id).get()); }
+const sf::Font& resourceManager::getFont(const std::string& id) { return m_fonts.at(id); }
 
-const sf::SoundBuffer& resourceManager::getSoundBuffer(const std::uint8_t& id) const { return *(this->m_soundBuffers.at(id).get()); }
+const sf::SoundBuffer& resourceManager::getSoundBuffer(const std::string& id) { return m_soundBuffers.at(id); }
+
+void resourceManager::clear()
+{
+    m_textures.clear();
+    m_fonts.clear();
+    m_soundBuffers.clear();
+}
