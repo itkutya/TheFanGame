@@ -14,7 +14,7 @@ const void resourceManager::addFont(const std::uint8_t& id, const std::string& f
 {
     this->m_fonts[id] = std::make_unique<sf::Font>();
 
-    if (!m_fonts[id]->loadFromFile(filePath))
+    if (!this->m_fonts[id]->loadFromFile(filePath))
         throw "Cannot load font...\n";
 }
 

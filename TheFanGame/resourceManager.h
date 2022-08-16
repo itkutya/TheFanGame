@@ -1,6 +1,6 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <string>
 
@@ -30,7 +30,7 @@ public:
 	const sf::Font& getFont(const std::uint8_t& id) const;
 	const sf::SoundBuffer& getSoundBuffer(const std::uint8_t& id) const;
 private:
-	std::map<const std::uint8_t, std::unique_ptr<sf::Texture>> m_textures;
-	std::map<const std::uint8_t, std::unique_ptr<sf::Font>> m_fonts;
-	std::map<const std::uint8_t, std::unique_ptr<sf::SoundBuffer>> m_soundBuffers;
+	std::unordered_map<std::uint8_t, std::unique_ptr<sf::Texture>> m_textures;
+	std::unordered_map<std::uint8_t, std::unique_ptr<sf::Font>> m_fonts;
+	std::unordered_map<std::uint8_t, std::unique_ptr<sf::SoundBuffer>> m_soundBuffers;
 };

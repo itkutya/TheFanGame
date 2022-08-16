@@ -1,6 +1,6 @@
 #include "window.h"
 
-window::window() noexcept : m_context(nullptr), isFullscreen(false), FPSLimit(60) {}
+window::window(context& context) noexcept : m_context(&context), isFullscreen(false), FPSLimit(60) {}
 
 window::~window() noexcept
 {
@@ -64,8 +64,6 @@ const void window::setFramerateLimit(const std::uint32_t& limit) noexcept
 	this->FPSLimit = limit;
 	this->m_window.setFramerateLimit(limit);
 }
-
-const void window::setContext(context& context) noexcept { this->m_context = &context; }
 
 const void window::processStateChange(sf::RenderWindow& window) noexcept { this->m_context->m_states.processStateChange(window); }
 

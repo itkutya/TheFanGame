@@ -1,7 +1,5 @@
 #pragma once
 
-#include <functional>
-
 #if _WIN32 || _WIN64
 	#if _WIN64
 		#include "SFML64/System.hpp"
@@ -36,7 +34,7 @@ private:
 
 	enum class state
 	{
-		MainMenu = 0, Settings, Characters, Singleplayer, Multiplayer, MultiLobby
+		Login = -1, MainMenu = 0, Settings, Characters, Singleplayer, Multiplayer, MultiLobby
 	};
 	state m_State = state::MainMenu;
 	bool m_PlaySelected = false;
@@ -49,6 +47,9 @@ private:
 
 	sf::Sound MainMusic;
 
+	const bool saveSettings(const std::string& filePath) const noexcept;
+	const bool loadSettings(const std::string& filePath) noexcept;
+
 	/*Game settings -> different class... / maybie part of context?*/
 	std::vector<sf::VideoMode> m_videomodes;
 	bool fullscreen = false;
@@ -57,14 +58,14 @@ private:
 	float sensivity = 2.5f;
 	float game_volume = 100.f;
 	float music_volume = 100.f;
-
-	sf::Sprite profilePicture;
-	sf::Sprite frontPicture;
-	sf::RectangleShape backgroundImage;
 	int currProfilePicture = 0;
 	int currFrontPicture = 0;
 	int currBackgroundPicture = 0;
 
+	sf::Sprite profilePicture;
+	sf::Sprite frontPicture;
+	sf::RectangleShape backgroundImage;
+	
 	sf::RectangleShape xp_bar;
 	sf::RectangleShape curr_xp;
 	account myAccount;

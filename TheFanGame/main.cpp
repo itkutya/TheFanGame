@@ -14,9 +14,8 @@ int main()
 		m_context.m_resources.addFont(2, "res/Gen Jyuu Gothic Monospace Bold.ttf");
 		m_context.m_resources.addSoundBuffer(3, "res/Sound.wav");
 
-		window mainWindow;
+		window mainWindow = window(m_context);
 		mainWindow.create(sf::VideoMode(1920, 1080), "Project stuff");
-		mainWindow.setContext(m_context);
 		mainWindow.addState<menu>();
 		mainWindow.setFramerateLimit(60);
 

@@ -13,7 +13,7 @@ class window
 {
 public:
 	//Construct's the window class.
-	window() noexcept;
+	window(context& context) noexcept;
 	//Destruct's the window class.
 	virtual ~window() noexcept;
 	//Returns m_window.isOpen().
@@ -33,8 +33,6 @@ public:
 	}
 	//Set's the framerate of the m_window.
 	const void setFramerateLimit(const std::uint32_t& limit) noexcept;
-	//Set's the context for the main loop.
-	const void setContext(context& context) noexcept;
 	//Processes the state changes.
 	const void processStateChange(sf::RenderWindow& window) noexcept;
 	//Delete current state.

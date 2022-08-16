@@ -49,16 +49,10 @@ const void menu::init(sf::RenderWindow& window)
 	style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.50f, 0.69f, 0.99f, 0.68f);
 	style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.80f, 0.50f, 0.50f, 1.00f);
 
-	this->m_videomodes = sf::VideoMode::getFullscreenModes();
-
-	this->backgroundImage.setTexture(&this->m_window->getTexture(0));
-	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
-	this->backgroundImage.setTextureRect(sf::IntRect(64 * this->currBackgroundPicture, 0, 64, 64));
-	this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 125));
-
 	this->m_view.setSize(sf::Vector2f(window.getSize()));
 	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
 
+	//Load when he connect to the account...
 	this->xp_bar.setPosition(sf::Vector2f(300.f, 85.f));
 	this->xp_bar.setSize(sf::Vector2f(350.f, 15.f));
 	this->xp_bar.setFillColor(sf::Color::White);
@@ -70,15 +64,27 @@ const void menu::init(sf::RenderWindow& window)
 	this->curr_xp.setFillColor(sf::Color::Yellow);
 	this->curr_xp.setOutlineThickness(0.f);
 	this->curr_xp.setOutlineColor(sf::Color::Yellow);
-
 	//Load characters...
 	for (std::size_t i = 0; i < 5; ++i)
 		this->characters.emplace_back();
 
-	this->MainMusic.setBuffer(this->m_window->getSoundBuffer(3));
-	this->MainMusic.setLoop(true);
-	this->MainMusic.setVolume(this->music_volume);
-	this->MainMusic.play();
+	if (this->loadSettings("res/Settings.ini"))
+	{
+		this->m_videomodes = sf::VideoMode::getFullscreenModes();
+
+		this->backgroundImage.setTexture(&this->m_window->getTexture(0));
+		this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
+		this->backgroundImage.setTextureRect(sf::IntRect(64 * this->currBackgroundPicture, 0, 64, 64));
+		this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 125));
+
+		this->MainMusic.setBuffer(this->m_window->getSoundBuffer(3));
+		this->MainMusic.setLoop(true);
+		this->MainMusic.setVolume(this->music_volume);
+		if (this->music_volume > 0.f)
+			this->MainMusic.play();
+	}
+	else
+		throw "Cannot load save file...\n";
 }
 
 const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
@@ -280,7 +286,10 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
 				if (ImGui::Button("Back##Settings", ImVec2(300.f, 75.f)))
-					this->m_State = state::MainMenu;
+				{
+					if (this->saveSettings("res/Settings.ini"))
+						this->m_State = state::MainMenu;
+				}
 			}ImGui::End();
 			break;
 		case state::Characters:
@@ -607,6 +616,34 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 	window.draw(this->curr_xp);
 	window.setView(window.getDefaultView());
 	ImGui::SFML::Render(window);
+}
+
+const bool menu::saveSettings(const std::string& filePath) const noexcept
+{
+	std::ofstream saveFile;
+	saveFile.open(filePath, std::ios::out | std::ios::trunc);
+	if (saveFile.is_open())
+	{
+		saveFile << this->music_volume << '\n';
+	}
+	else
+		return false;
+	saveFile.close();
+	return true;
+}
+
+const bool menu::loadSettings(const std::string& filePath) noexcept
+{
+	std::ifstream loadFile;
+	loadFile.open(filePath, std::ios::in);
+	if (loadFile.is_open())
+	{
+		loadFile >> this->music_volume;
+	}
+	else
+		return false;
+	loadFile.close();
+	return true;
 }
 
 void menu::startServer()
