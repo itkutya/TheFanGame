@@ -178,6 +178,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				{
 					this->m_PlaySelected = false;
 					this->m_State = state::Singleplayer;
+					this->MainMusic.stop();
 					this->m_window->addState<game>();
 				}
 				if (ImGui::IsItemHovered())
