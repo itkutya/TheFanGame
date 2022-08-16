@@ -7,10 +7,10 @@ int main()
 	//Uses the current time to generate random numbers.
 	std::srand((std::uint32_t)std::time(0));
 
-	resourceManager::addTexture("WallTexture", "res/wolftextures.png");
-	resourceManager::addTexture("CharacterTexture", "res/char.png");
-	resourceManager::addFont("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
-	resourceManager::addSoundBuffer("MainMusic", "res/Sound.wav");
+	resourceManager::add<sf::Texture>("WallTexture", "res/wolftextures.png");
+	resourceManager::add<sf::Texture>("CharacterTexture", "res/char.png");
+	resourceManager::add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
+	resourceManager::add<sf::SoundBuffer>("MainMusic", "res/Sound.wav");
 
 	try
 	{

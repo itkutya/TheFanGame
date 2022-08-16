@@ -72,12 +72,12 @@ const void menu::init(sf::RenderWindow& window)
 	{
 		this->m_videomodes = sf::VideoMode::getFullscreenModes();
 
-		this->backgroundImage.setTexture(&resourceManager::getTexture("WallTexture"));
+		this->backgroundImage.setTexture(&resourceManager::get<sf::Texture>("WallTexture"));
 		this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
 		this->backgroundImage.setTextureRect(sf::IntRect(64 * this->currBackgroundPicture, 0, 64, 64));
 		this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 125));
 
-		this->MainMusic.setBuffer(resourceManager::getSoundBuffer("MainMusic"));
+		this->MainMusic.setBuffer(resourceManager::get<sf::SoundBuffer>("MainMusic"));
 		this->MainMusic.setLoop(true);
 		this->MainMusic.setVolume(this->music_volume);
 		if (this->music_volume > 0.f)
@@ -126,14 +126,14 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		switch (this->m_State)
 		{
 		case state::MainMenu:
-			this->frontPicture.setTexture(resourceManager::getTexture("WallTexture"));
+			this->frontPicture.setTexture(resourceManager::get<sf::Texture>("WallTexture"));
 			this->frontPicture.setTextureRect(sf::IntRect(64 * this->currFrontPicture, 0, 64, 64));
 			ImGui::SetCursorPos(ImVec2(ImGui::GetWindowContentRegionMin().x + 600.f, ImGui::GetWindowContentRegionMin().y + 100.f));
 			ImGui::Image(this->frontPicture, sf::Vector2f(ImGui::GetWindowContentRegionMax().x / 1.6f, ImGui::GetWindowContentRegionMax().y / 1.3f));
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("This is the front image!");
 
-			this->profilePicture.setTexture(resourceManager::getTexture("WallTexture"));
+			this->profilePicture.setTexture(resourceManager::get<sf::Texture>("WallTexture"));
 			this->profilePicture.setTextureRect(sf::IntRect(64 * this->currProfilePicture, 0, 64, 64));
 			ImGui::SetCursorPos(ImVec2(vMin.x + 25.f, vMin.y + 5.f));
 			ImGui::Image(this->profilePicture, sf::Vector2f(100.f, 100.f));
@@ -320,9 +320,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 						sf::Sprite temp;
 						if (!this->characters[i].unlocked)
-							temp.setTexture(resourceManager::getTexture("WallTexture"));
+							temp.setTexture(resourceManager::get<sf::Texture>("WallTexture"));
 						else
-							temp.setTexture(resourceManager::getTexture("CharacterTexture"));
+							temp.setTexture(resourceManager::get<sf::Texture>("CharacterTexture"));
 
 						temp.setTextureRect(sf::IntRect(64 * (int)i, 0, 64, 64));
 						ImGui::SetCursorPos(ImVec2(100.f + 350.f * (float)x, 100.f + 300.f * (float)y));
@@ -333,7 +333,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						{
 							ImGui::BeginTooltip();
 							sf::Sprite ability;
-							ability.setTexture(resourceManager::getTexture("WallTexture"));
+							ability.setTexture(resourceManager::get<sf::Texture>("WallTexture"));
 							ability.setTextureRect(sf::IntRect(128, 0, 64, 64));
 							ImGui::SetCursorPos(ImVec2(5.f, 5.f));
 							ImGui::Image(ability, sf::Vector2f(50.f, 50.f));

@@ -1,17 +1,15 @@
 #pragma once
 
 #include <unordered_map>
-#include <memory>
 #include <string>
+#include <variant>
 
 #if _WIN32 || _WIN64
 	#if _WIN64
-		#include "SFML64/Graphics/Font.hpp"
-		#include "SFML64/Graphics/Texture.hpp"
+		#include "SFML64/Graphics.hpp"
 		#include "SFML64/Audio.hpp"
 	#else
-		#include "SFML32/Graphics/Font.hpp"
-		#include "SFML32/Graphics/Texture.hpp"
+		#include "SFML32/Graphics.hpp"
 		#include "SFML32/Audio.hpp"
 	#endif
 #endif
@@ -21,19 +19,22 @@ class resourceManager
 public:
 	resourceManager() = delete;
 	resourceManager(const resourceManager&) = delete;
-	virtual ~resourceManager() {};
+	virtual ~resourceManager() { clear(); };
 
-	static const void addTexture(const std::string& id, const std::string& filePath, const bool& wantRepeated = false);
-	static const void addFont(const std::string& id, const std::string& filePath);
-	static const void addSoundBuffer(const std::string& id, const std::string& filePath);
+	template<class T>
+	static inline const void add(const std::string& id, const std::string& filePath)
+	{
+		m_resources.insert({ id, std::variant<sf::Texture, sf::Font, sf::SoundBuffer>() });
+		m_resources.at(id) = T();
 
-	static const sf::Texture& getTexture(const std::string& id);
-	static const sf::Font& getFont(const std::string& id);
-	static const sf::SoundBuffer& getSoundBuffer(const std::string& id);
+		if (!std::get<T>(m_resources.at(id)).loadFromFile(filePath))
+			throw "Cannot load texture...\n";
+	};
 
-	static void clear();
+	template<class T>
+	static inline const T& get(const std::string& id) { return std::get<T>(m_resources.at(id)); };
+
+	static inline void clear() { m_resources.clear(); };
 private:
-	static std::unordered_map<std::string, sf::Texture> m_textures;
-	static std::unordered_map<std::string, sf::Font> m_fonts;
-	static std::unordered_map<std::string, sf::SoundBuffer> m_soundBuffers;
+	static std::unordered_map<std::string, std::variant<sf::Texture, sf::Font, sf::SoundBuffer>> m_resources;
 };
