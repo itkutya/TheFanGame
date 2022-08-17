@@ -19,6 +19,7 @@ class resourceManager
 public:
 	resourceManager() = delete;
 	resourceManager(const resourceManager&) = delete;
+	resourceManager(const resourceManager&&) = delete;
 	virtual ~resourceManager() { clear(); };
 
 	template<class T>
@@ -32,7 +33,7 @@ public:
 	};
 
 	template<class T>
-	static inline const T& get(const std::string& id) { return std::get<T>(m_resources.at(id)); };
+	[[nodiscard]]static inline const T& get(const std::string& id) { return std::get<T>(m_resources.at(id)); };
 
 	static inline void clear() { m_resources.clear(); };
 private:

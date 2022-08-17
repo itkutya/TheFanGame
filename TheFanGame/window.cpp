@@ -1,6 +1,6 @@
 #include "window.h"
 
-window::window() noexcept : isFullscreen(false), FPSLimit(60) {}
+window::window() noexcept : isFullscreen(false), FPSLimit(60) { this->m_window.setKeyRepeatEnabled(false); }
 
 window::~window() noexcept
 {

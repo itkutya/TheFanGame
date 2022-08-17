@@ -2,6 +2,7 @@
 
 #include "stateSystem.h"
 #include "resourceManager.h"
+#include "inputManager.h"
 
 class window
 {
