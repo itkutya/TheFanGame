@@ -103,8 +103,11 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		vMax.x += ImGui::GetWindowPos().x;
 		vMax.y += ImGui::GetWindowPos().y;
 
-		ImGui::SetCursorPos(ImVec2(vMax.x - 100.f, vMin.y + 25.f));
-		ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
+		if (this->m_ShowFPS)
+		{
+			ImGui::SetCursorPos(ImVec2(vMax.x - 150.f, vMin.y));
+			ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
+		}
 
 		if (this->m_ServerError)
 		{
@@ -120,6 +123,23 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		switch (this->m_State)
 		{
 		case state::MainMenu:
+			ImGui::SetCursorPos(ImVec2(vMax.x - 700.f, vMin.y + 40.f));
+			ImGui::Text("Currently playing: ");
+			ImGui::SameLine();
+			WidgetPos = ImGui::GetCursorPos();
+			ImGui::SetNextItemWidth(500.f);
+			ImGui::SetCursorPos(ImVec2(WidgetPos.x - 15.f, WidgetPos.y));
+			if (ImGui::BeginCombo("###MusicSelector", "Music Name", ImGuiComboFlags_HeightSmall))
+			{
+				for (std::size_t i = 0; i < 10; ++i)
+				{
+					ImGui::PushID("MusicName" + i);
+					ImGui::Selectable("||||");
+					ImGui::PopID();
+				}
+				ImGui::EndCombo();
+			}
+
 			this->frontPicture.setTexture(this->m_window->getTexture(0));
 			this->frontPicture.setTextureRect(sf::IntRect(64 * this->currFrontPicture, 0, 64, 64));
 			ImGui::SetCursorPos(ImVec2(ImGui::GetWindowContentRegionMin().x + 600.f, ImGui::GetWindowContentRegionMin().y + 100.f));
@@ -135,7 +155,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetTooltip("This is the profile picture!");
 
 			ImGui::SameLine();
-			ImGui::Text("Account: %s\nXP: %0.f / %0.f\nLevel: %i\nCoverCoin: %i$", this->myAccount.account_name,
+			ImGui::Text("Account: %s\nXP: %0.f / %0.f\nLevel: %i\nCoverCoin: %i$",
+				this->myAccount.account_name,
 				this->myAccount.xp, this->myAccount.xp_cap,
 				this->myAccount.account_lvl,
 				this->myAccount.currency);
@@ -241,6 +262,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						}
 						ImGui::EndListBox();
 					}
+					if (ImGui::Checkbox("Show FPS", &this->m_ShowFPS))
+						std::cout << "FPS stuff...\n";
 					if (ImGui::Checkbox("FPS Limit: ", &this->isFPSLimited))
 					{
 						if (!this->isFPSLimited)
@@ -277,7 +300,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				default:
 					break;
 				}
-
 				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
 				if (ImGui::Button("Back##Settings", ImVec2(300.f, 75.f)))
 					this->m_State = state::MainMenu;
@@ -537,7 +559,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						std::cout << "Teszt\n";
 					if (ImGui::Checkbox("Teamdmg or something...", &teszt))
 						std::cout << "Teszt\n";
-					if (ImGui::BeginListBox("Game modes maybie?"))
+					if (ImGui::BeginCombo("Game modes maybie?", "First Game mode name"))
 					{
 						for (std::size_t i = 0; i < 5; ++i)
 						{

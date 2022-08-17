@@ -52,16 +52,16 @@ const void player::update(world& map, const sf::Vector2i& mousePos, const sf::Ve
     this->m_angle = std::clamp(this->m_angle, -400.f, 400.f);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        if (map.getMapTile(this->getPosition().x / map.mapSize.x + this->m_direction.x * moveSpeed, this->getPosition().y / map.mapSize.y + this->m_direction.y * moveSpeed) == 0)
+        if (map.getMapTile((int)(this->getPosition().x / map.mapSize.x + this->m_direction.x * moveSpeed), (int)(this->getPosition().y / map.mapSize.y + this->m_direction.y * moveSpeed)) == 0)
             this->move(sf::Vector2f(this->m_direction.x * moveSpeed, this->m_direction.y * moveSpeed));
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        if (map.getMapTile(this->getPosition().x / map.mapSize.x + -this->m_direction.x * moveSpeed, this->getPosition().y / map.mapSize.y + -this->m_direction.y * moveSpeed) == 0)
+        if (map.getMapTile((int)(this->getPosition().x / map.mapSize.x + -this->m_direction.x * moveSpeed), (int)(this->getPosition().y / map.mapSize.y + -this->m_direction.y * moveSpeed)) == 0)
             this->move(sf::Vector2f(-this->m_direction.x * moveSpeed, -this->m_direction.y * moveSpeed));
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        if (map.getMapTile(this->getPosition().x / map.mapSize.y + this->m_direction.x * moveSpeed, this->getPosition().y / map.mapSize.y + -this->m_direction.x * moveSpeed) == 0)
+        if (map.getMapTile((int)(this->getPosition().x / map.mapSize.y + this->m_direction.x * moveSpeed), (int)(this->getPosition().y / map.mapSize.y + -this->m_direction.x * moveSpeed)) == 0)
             this->move(sf::Vector2f(this->m_direction.y * moveSpeed, -this->m_direction.x * moveSpeed));
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        if (map.getMapTile(this->getPosition().x / map.mapSize.x + -this->m_direction.y * moveSpeed, this->getPosition().y / map.mapSize.y + this->m_direction.x * moveSpeed) == 0)
+        if (map.getMapTile((int)(this->getPosition().x / map.mapSize.x + -this->m_direction.y * moveSpeed), (int)(this->getPosition().y / map.mapSize.y + this->m_direction.x * moveSpeed)) == 0)
             this->move(sf::Vector2f(-this->m_direction.y * moveSpeed, this->m_direction.x * moveSpeed));
 
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left))

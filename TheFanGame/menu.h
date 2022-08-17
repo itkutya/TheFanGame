@@ -53,6 +53,7 @@ private:
 	std::vector<sf::VideoMode> m_videomodes;
 	bool fullscreen = false;
 	bool isFPSLimited = true;
+	bool m_ShowFPS = true;
 	int fps_limit = 60;
 	float sensivity = 2.5f;
 	float game_volume = 100.f;
