@@ -129,7 +129,24 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		switch (this->m_State)
 		{
 		case state::MainMenu:
-			this->frontPicture.setTexture(this->m_window->getTexture(0));
+			ImGui::SetCursorPos(ImVec2(vMax.x - 700.f, vMin.y + 40.f));
+			ImGui::Text("Currently playing: ");
+			ImGui::SameLine();
+			WidgetPos = ImGui::GetCursorPos();
+			ImGui::SetNextItemWidth(500.f);
+			ImGui::SetCursorPos(ImVec2(WidgetPos.x - 15.f, WidgetPos.y));
+			if (ImGui::BeginCombo("###MusicSelector", "Music Name", ImGuiComboFlags_HeightSmall))
+			{
+				for (std::size_t i = 0; i < 10; ++i)
+				{
+					ImGui::PushID("MusicName" + i);
+					ImGui::Selectable("||||");
+					ImGui::PopID();
+				}
+				ImGui::EndCombo();
+			}
+
+			this->frontPicture.setTexture(resourceManager::get<sf::Texture>("WallTexture"));
 			this->frontPicture.setTextureRect(sf::IntRect(64 * this->currFrontPicture, 0, 64, 64));
 			ImGui::SetCursorPos(ImVec2(ImGui::GetWindowContentRegionMin().x + 600.f, ImGui::GetWindowContentRegionMin().y + 100.f));
 			ImGui::Image(this->frontPicture, sf::Vector2f(ImGui::GetWindowContentRegionMax().x / 1.6f, ImGui::GetWindowContentRegionMax().y / 1.3f));
