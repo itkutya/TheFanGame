@@ -11,8 +11,8 @@ game::~game() noexcept {}
 
 const void game::init(sf::RenderWindow& window) 
 {
-    this->m_texture = &this->m_window->getTexture(0);
-    this->m_char = &this->m_window->getTexture(1);
+    this->m_texture = &resourceManager::get<sf::Texture>("WallTexture");
+    this->m_char = &resourceManager::get<sf::Texture>("CharacterTexture");
     
     this->m_player = std::make_unique<player>(sf::Vector2f((float)this->m_map.mapSize.x / 2.f, (float)this->m_map.mapSize.y / 2.f), sf::Vector2f(20.f, 20.f), sf::Color::Blue);
     this->m_ray = std::make_unique<ray>(window.getSize().x);

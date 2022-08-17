@@ -1,15 +1,12 @@
 #include "window.h"
 
-window::window() noexcept : m_context(nullptr), isFullscreen(false), FPSLimit(60) {}
+window::window() noexcept : isFullscreen(false), FPSLimit(60) {}
 
 window::~window() noexcept
 {
-	if (this->m_context != nullptr)
-	{
-		std::size_t maxSize = this->m_context->m_states.getSize();
-		for (std::size_t i = 0; i < maxSize; ++i)
-			this->m_context->m_states.popCurrent();
-	}
+	std::size_t maxSize = this->m_states.getSize();
+	for (std::size_t i = 0; i < maxSize; ++i)
+		this->m_states.popCurrent();
 }
 
 const void window::pollEvents() noexcept
@@ -17,8 +14,7 @@ const void window::pollEvents() noexcept
 	sf::Event event;
 	while (this->m_window.pollEvent(event))
 	{
-		if (this->m_context != nullptr)
-			this->m_context->m_states.getState()->processEvent(event);
+		this->m_states.getState()->processEvent(event);
 
 		if (event.type == sf::Event::Closed)
 			this->m_window.close();
@@ -31,16 +27,11 @@ const void window::pollEvents() noexcept
 const void window::draw() noexcept
 {
 	this->m_window.clear();
-	if (this->m_context != nullptr)
-		this->m_context->m_states.getState()->draw(this->m_window);
+	this->m_states.getState()->draw(this->m_window);
 	this->m_window.display();
 }
 
-const void window::update() noexcept
-{
-	if (this->m_context != nullptr)
-		this->m_context->m_states.getState()->update(this->m_window, this->deltaTime.restart());
-}
+const void window::update() noexcept { this->m_states.getState()->update(this->m_window, this->deltaTime.restart()); }
 
 const void window::onResize() noexcept 
 {
@@ -65,17 +56,9 @@ const void window::setFramerateLimit(const std::uint32_t& limit) noexcept
 	this->m_window.setFramerateLimit(limit);
 }
 
-const void window::setContext(context& context) noexcept { this->m_context = &context; }
+const void window::processStateChange(sf::RenderWindow& window) noexcept { this->m_states.processStateChange(window); }
 
-const void window::processStateChange(sf::RenderWindow& window) noexcept { this->m_context->m_states.processStateChange(window); }
-
-const void window::popCurrent() { this->m_context->m_states.popCurrent(); }
-
-const sf::Texture& window::getTexture(const std::uint8_t& index) const { return this->m_context->m_resources.getTexture(index); }
-
-const sf::Font& window::getFont(const std::uint8_t& index) const { return this->m_context->m_resources.getFont(index); }
-
-const sf::SoundBuffer& window::getSoundBuffer(const std::uint8_t& index) const { return this->m_context->m_resources.getSoundBuffer(index); }
+const void window::popCurrent() { this->m_states.popCurrent(); }
 
 const void window::setSize(const sf::Vector2u& size) noexcept 
 {

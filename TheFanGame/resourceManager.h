@@ -1,18 +1,15 @@
 #pragma once
 
-#include <map>
-#include <memory>
+#include <unordered_map>
 #include <string>
-#include <any>
+#include <variant>
 
 #if _WIN32 || _WIN64
 	#if _WIN64
-		#include "SFML64/Graphics/Font.hpp"
-		#include "SFML64/Graphics/Texture.hpp"
+		#include "SFML64/Graphics.hpp"
 		#include "SFML64/Audio.hpp"
 	#else
-		#include "SFML32/Graphics/Font.hpp"
-		#include "SFML32/Graphics/Texture.hpp"
+		#include "SFML32/Graphics.hpp"
 		#include "SFML32/Audio.hpp"
 	#endif
 #endif
@@ -20,18 +17,24 @@
 class resourceManager
 {
 public:
-	resourceManager() noexcept {};
-	virtual ~resourceManager() { this->m_textures.clear(); this->m_fonts.clear(); this->m_soundBuffers.clear(); };
+	resourceManager() = delete;
+	resourceManager(const resourceManager&) = delete;
+	virtual ~resourceManager() { clear(); };
 
-	const void addTexture(const std::uint8_t& id, const std::string& filePath, const bool& wantRepeated = false);
-	const void addFont(const std::uint8_t& id, const std::string& filePath);
-	const void addSoundBuffer(const std::uint8_t& id, const std::string& filePath);
+	template<class T>
+	static inline const void add(const std::string& id, const std::string& filePath)
+	{
+		m_resources.insert({ id, std::variant<sf::Texture, sf::Font, sf::SoundBuffer>() });
+		m_resources.at(id) = T();
 
-	const sf::Texture& getTexture(const std::uint8_t& id) const;
-	const sf::Font& getFont(const std::uint8_t& id) const;
-	const sf::SoundBuffer& getSoundBuffer(const std::uint8_t& id) const;
+		if (!std::get<T>(m_resources.at(id)).loadFromFile(filePath))
+			throw "Cannot load texture...\n";
+	};
+
+	template<class T>
+	static inline const T& get(const std::string& id) { return std::get<T>(m_resources.at(id)); };
+
+	static inline void clear() { m_resources.clear(); };
 private:
-	std::map<const std::uint8_t, std::unique_ptr<sf::Texture>> m_textures;
-	std::map<const std::uint8_t, std::unique_ptr<sf::Font>> m_fonts;
-	std::map<const std::uint8_t, std::unique_ptr<sf::SoundBuffer>> m_soundBuffers;
+	static std::unordered_map<std::string, std::variant<sf::Texture, sf::Font, sf::SoundBuffer>> m_resources;
 };
