@@ -42,7 +42,7 @@ private:
 
 	enum class settingState
 	{
-		Graphics = 0, Game, Audio, Mainmenu
+		Graphics = 0, Game, Audio, Mainmenu, Input
 	};settingState m_SettingState = settingState::Graphics;
 
 	sf::Sound MainMusic;

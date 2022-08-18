@@ -1,18 +1,13 @@
 #include "inputManager.h"
 
-std::unordered_map<std::string, m_Keys> inputManager::m_Action;
-std::vector<std::string> inputManager::keyboardInputText;
-std::vector<std::string> inputManager::mouseInputText;
-m_Keys inputManager::key;
+std::unordered_map<const char*, m_Keys> inputManager::m_Action;
 
 const void inputManager::init()
 {
-    keyboardInputText.push_back("Left");
-    keyboardInputText.push_back("Right");
-    keyboardInputText.push_back("Forward");
-    keyboardInputText.push_back("Backward");
-    
-    mouseInputText.push_back("Shoot");
+    constexpr std::array keyboardInputText = { "Left", "Right", "Forward", "Backward" };
+    constexpr std::array mouseInputText = { "Shoot" };
+
+    m_Keys key = m_Keys();
 
     std::ifstream inputSettings;
     inputSettings.open("res/inputSettings.ini", std::ios::in);
@@ -40,6 +35,7 @@ const void inputManager::init()
         }
 
         key.m_InputType = InputType::MouseInput;
+        key.m_KeyCode = sf::Keyboard::Unknown;
         for (std::size_t i = 0; i < mouseInputText.size(); ++i)
         {
             inputSettings >> temp >> pr;
@@ -54,7 +50,11 @@ const void inputManager::init()
             sf::Mouse::Button m_TempMouseButton = sf::Mouse::Left;
             m_TempMouseButton = static_cast<sf::Mouse::Button>(temp);
             key.m_MouseButton = m_TempMouseButton;
+
+#pragma warning( push )
+#pragma warning( disable : 28020)
             m_Action[mouseInputText[i]] = key;
+#pragma warning( pop ) 
         }
     }
     else
@@ -83,4 +83,35 @@ const bool inputManager::input(m_Keys& key, sf::Event* event) noexcept
             return true;
     }
     return false;
+}
+
+const char* inputManager::convert(const m_Keys& it)
+{
+    if (it.m_KeyCode != sf::Keyboard::Unknown)
+    {
+        switch (it.m_KeyCode)
+        {
+        case sf::Keyboard::A:
+            return "A";
+        case sf::Keyboard::W:
+            return "W";
+        case sf::Keyboard::D:
+            return "D";
+        case sf::Keyboard::S:
+            return "S";
+        default:
+            break;
+        }
+    }
+    else
+    {
+        switch (it.m_MouseButton)
+        {
+        case sf::Mouse::Left:
+            return "Mouse Left";
+        default:
+            break;
+        }
+    }
+    return "ERROR";
 }

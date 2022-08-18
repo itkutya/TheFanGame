@@ -96,7 +96,10 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 	else if (this->music_volume > 0.f && this->MainMusic.getStatus() != sf::SoundSource::Playing)
 		this->MainMusic.play();
 
-	if (ImGui::Begin("Main Window", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground))
+	//sf::Vector2f scaleFactor = sf::Vector2f(static_cast<float>(window.getSize().x) / static_cast<float>(this->m_videomodes[0].width),
+	//										  static_cast<float>(window.getSize().y) / static_cast<float>(this->m_videomodes[0].height));
+
+	if (ImGui::Begin("Main Window", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus))
 	{
 		ImGui::SetWindowSize("Main Window", ImVec2((float)window.getSize().x, (float)window.getSize().y));
 		ImGui::SetWindowPos("Main Window", ImVec2(0.f, 0.f));
@@ -227,7 +230,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			{
 				ImGui::SetWindowSize("Settings", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
 				ImGui::SetWindowPos("Settings", ImVec2(25.f, 25.f));
-				ImGui::SetWindowFocus("Settings");
 
 				vMin = ImGui::GetWindowContentRegionMin();
 				vMax = ImGui::GetWindowContentRegionMax();
@@ -238,18 +240,37 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 				if (ImGui::BeginMenuBar())
 				{
-					if (ImGui::MenuItem("Graphics"))
-						this->m_SettingState = settingState::Graphics;
-					if (ImGui::MenuItem("Game"))
-						this->m_SettingState = settingState::Game;
 					if (ImGui::MenuItem("Mainmenu"))
 						this->m_SettingState = settingState::Mainmenu;
+					if (ImGui::MenuItem("Game"))
+						this->m_SettingState = settingState::Game;
+					if (ImGui::MenuItem("Graphics"))
+						this->m_SettingState = settingState::Graphics;
+					if (ImGui::MenuItem("Input"))
+						this->m_SettingState = settingState::Input;
 					if (ImGui::MenuItem("Audio"))
 						this->m_SettingState = settingState::Audio;
 					ImGui::EndMenuBar();
 				}
 				switch (this->m_SettingState)
 				{
+				case settingState::Input:
+					for (auto& it : inputManager::m_Action)
+					{
+						ImGui::Text(it.first);
+						ImGui::SameLine();
+						if (ImGui::Button(inputManager::convert(it.second), ImVec2(300.f, 30.f)))
+							std::cout << "Ok\n";
+						ImGui::SameLine();
+						ImGui::SetNextItemWidth(200.f);
+						ImGui::PushID(it.first + static_cast<std::uint32_t>(it.second.m_InputType));
+						if (ImGui::BeginCombo("###PressOrRelease", "Press", ImGuiComboFlags_HeightSmall))
+						{
+							ImGui::EndCombo();
+						}
+						ImGui::PopID();
+					}
+					break;
 				case settingState::Graphics:
 					if (ImGui::Checkbox("Fullscreen: ", &this->fullscreen))
 						this->m_window->setFullscreen(this->fullscreen);
@@ -320,7 +341,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			{
 				ImGui::SetWindowSize("Characters", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
 				ImGui::SetWindowPos("Characters", ImVec2(25.f, 25.f));
-				ImGui::SetWindowFocus("Characters");
 
 				vMin = ImGui::GetWindowContentRegionMin();
 				vMax = ImGui::GetWindowContentRegionMax();
@@ -436,7 +456,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			{
 				ImGui::SetWindowSize("Multiplayer", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
 				ImGui::SetWindowPos("Multiplayer", ImVec2(25.f, 25.f));
-				ImGui::SetWindowFocus("Multiplayer");
 
 				vMin = ImGui::GetWindowContentRegionMin();
 				vMax = ImGui::GetWindowContentRegionMax();
@@ -523,7 +542,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			{
 				ImGui::SetWindowSize("Singleplayer", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
 				ImGui::SetWindowPos("Singleplayer", ImVec2(25.f, 25.f));
-				ImGui::SetWindowFocus("Singleplayer");
 				ImGui::End();
 			}
 			break;
@@ -532,7 +550,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			{
 				ImGui::SetWindowSize("Lobby", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
 				ImGui::SetWindowPos("Lobby", ImVec2(25.f, 25.f));
-				ImGui::SetWindowFocus("Lobby");
 
 				vMin = ImGui::GetWindowContentRegionMin();
 				vMax = ImGui::GetWindowContentRegionMax();

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <string>
+#include <array>
 #include <vector>
 
 #if _WIN32 || _WIN64
@@ -38,10 +39,8 @@ public:
 
 	static const void init();
 	static const bool input(m_Keys& key, sf::Event* e = nullptr) noexcept;
+	static const char* convert(const m_Keys& it);
 	
-	static std::unordered_map<std::string, m_Keys> m_Action;
+	static std::unordered_map<const char*, m_Keys> m_Action;
 private:
-    static std::vector<std::string> keyboardInputText;
-    static std::vector<std::string> mouseInputText;
-	static m_Keys key;
 };
