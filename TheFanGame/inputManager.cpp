@@ -99,6 +99,8 @@ const char* inputManager::convert(const m_Keys& it)
             return "D";
         case sf::Keyboard::S:
             return "S";
+        case sf::Keyboard::F12:
+            return "F12";
         default:
             break;
         }
