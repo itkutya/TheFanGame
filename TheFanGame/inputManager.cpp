@@ -4,8 +4,8 @@ std::unordered_map<const char*, m_Keys> inputManager::m_Action;
 
 const void inputManager::init()
 {
-    constexpr std::array keyboardInputText = { "Left", "Right", "Forward", "Backward" };
-    constexpr std::array mouseInputText = { "Shoot" };
+    constexpr std::array keyboardInputText = { "Left", "Right", "Forward", "Backward", "ScreenShot" };
+    constexpr std::array mouseInputText = { "Shot" };
 
     m_Keys key = m_Keys();
 
