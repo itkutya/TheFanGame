@@ -72,10 +72,10 @@ const void menu::init(sf::RenderWindow& window)
 	{
 		this->m_videomodes = sf::VideoMode::getFullscreenModes();
 
-		this->backgroundImage.setTexture(&resourceManager::get<sf::Texture>("WallTexture"));
+		this->backgroundImage.setTexture(&resourceManager::get<sf::Texture>("Background"));
 		this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
-		this->backgroundImage.setTextureRect(sf::IntRect(64 * this->currBackgroundPicture, 0, 64, 64));
-		this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 125));
+		this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
+		this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
 
 		this->MainMusic.setBuffer(resourceManager::get<sf::SoundBuffer>("MainMusic"));
 		this->MainMusic.setLoop(true);
@@ -317,8 +317,17 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 					ImGui::SliderInt("Front image: ", &this->currFrontPicture, 0, 5);
 					ImGui::SliderInt("Profile picture: ", &this->currProfilePicture, 0, 5);
-					if (ImGui::SliderInt("Background image: ", &this->currBackgroundPicture, 0, 5))
-						this->backgroundImage.setTextureRect(sf::IntRect(64 * this->currBackgroundPicture, 0, 64, 64));
+					if (ImGui::SliderInt("Background image: ", &this->currBackgroundPicture, 0, 3))
+						this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::BeginTooltip();
+						sf::Sprite background;
+						background.setTexture(*this->backgroundImage.getTexture());
+						background.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
+						ImGui::Image(background, ImVec2(300.f, 300.f));
+						ImGui::EndTooltip();
+					}
 					break;
 				case settingState::Audio:
 					ImGui::SliderFloat("Game volume: ", &this->game_volume, 0.f, 100.f);

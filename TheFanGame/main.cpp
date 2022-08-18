@@ -10,6 +10,7 @@ int main()
 	inputManager::init();
 
 	resourceManager::add<sf::Texture>("WallTexture", "res/wolftextures.png");
+	resourceManager::add<sf::Texture>("Background", "res/Background.png");
 	resourceManager::add<sf::Texture>("CharacterTexture", "res/char.png");
 	resourceManager::add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
 	resourceManager::add<sf::SoundBuffer>("MainMusic", "res/Sound.wav");
