@@ -26,7 +26,7 @@ public:
 	static inline const void add(const std::string& id, const std::string& filePath)
 	{
 		m_resources.insert({ id, std::variant<sf::Texture, sf::Font, sf::SoundBuffer>() });
-		m_resources.at(id) = T();
+		m_resources[id].emplace<T>();
 
 		if (!std::get<T>(m_resources.at(id)).loadFromFile(filePath))
 			throw "Cannot load texture...\n";

@@ -15,7 +15,8 @@ int main()
 	resourceManager::add<sf::Texture>("Icon", "res/MainMenu/Icons.png");
 	resourceManager::add<sf::Texture>("CharacterTexture", "res/char.png");
 	resourceManager::add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
-	resourceManager::add<sf::SoundBuffer>("MainMusic", "res/MainMenu/MainMusic.wav");
+	resourceManager::add<sf::SoundBuffer>("BlackBird", "res/MainMenu/BlackBird.wav");
+	resourceManager::add<sf::SoundBuffer>("KanokonOP", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
 
 	try
 	{

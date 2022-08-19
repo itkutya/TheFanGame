@@ -32,7 +32,7 @@ profile::~profile() noexcept
     if (profile.is_open())
     {
         profile << this->account_name << '\n' << this->xp << "\n" << this->xp_cap << '\n' << this->account_lvl << '\n' << this->currency;
-        std::cout << "Saved everything to the txt, and quiting.\n";
+        std::cout << "Saved profile stuff to the ini, and quiting.\n";
     }
     profile.close();
 }

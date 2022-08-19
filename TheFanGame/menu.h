@@ -46,6 +46,8 @@ private:
 	};settingState m_SettingState = settingState::Graphics;
 
 	sf::Sound MainMusic;
+	std::unordered_map<std::string, std::string> m_music;
+	std::string m_currentMusic;
 
 	const bool saveSettings(const std::string& filePath) const noexcept;
 	const bool loadSettings(const std::string& filePath) noexcept;
