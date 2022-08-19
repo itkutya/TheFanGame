@@ -50,11 +50,7 @@ const void inputManager::init()
             sf::Mouse::Button m_TempMouseButton = sf::Mouse::Left;
             m_TempMouseButton = static_cast<sf::Mouse::Button>(temp);
             key.m_MouseButton = m_TempMouseButton;
-
-#pragma warning( push )
-#pragma warning( disable : 28020)
             m_Action[mouseInputText[i]] = key;
-#pragma warning( pop ) 
         }
     }
     else

@@ -75,7 +75,7 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="account.cpp">
+    <ClCompile Include="profile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="inputManager.cpp">
@@ -146,7 +146,7 @@
     <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="account.h">
+    <ClInclude Include="profile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inputManager.h">

@@ -72,6 +72,12 @@ const void menu::init(sf::RenderWindow& window)
 	{
 		this->m_videomodes = sf::VideoMode::getFullscreenModes();
 
+		this->frontImage.setTexture(resourceManager::get<sf::Texture>("FrontImage"));
+		this->frontImage.setTextureRect(sf::IntRect(600 * this->currFrontPicture, 0, 600, 600));
+
+		this->icon.setTexture(resourceManager::get<sf::Texture>("Icon"));
+		this->icon.setTextureRect(sf::IntRect(100 * this->currProfilePicture, 0, 100, 100));
+
 		this->backgroundImage.setTexture(&resourceManager::get<sf::Texture>("Background"));
 		this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
 		this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
@@ -149,17 +155,13 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::EndCombo();
 			}
 
-			this->frontPicture.setTexture(resourceManager::get<sf::Texture>("WallTexture"));
-			this->frontPicture.setTextureRect(sf::IntRect(64 * this->currFrontPicture, 0, 64, 64));
 			ImGui::SetCursorPos(ImVec2(ImGui::GetWindowContentRegionMin().x + 600.f, ImGui::GetWindowContentRegionMin().y + 100.f));
-			ImGui::Image(this->frontPicture, sf::Vector2f(ImGui::GetWindowContentRegionMax().x / 1.6f, ImGui::GetWindowContentRegionMax().y / 1.3f));
+			ImGui::Image(this->frontImage, sf::Vector2f(ImGui::GetWindowContentRegionMax().x / 1.6f, ImGui::GetWindowContentRegionMax().y / 1.3f));
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("This is the front image!");
 
-			this->profilePicture.setTexture(resourceManager::get<sf::Texture>("WallTexture"));
-			this->profilePicture.setTextureRect(sf::IntRect(64 * this->currProfilePicture, 0, 64, 64));
 			ImGui::SetCursorPos(ImVec2(vMin.x + 25.f, vMin.y + 5.f));
-			ImGui::Image(this->profilePicture, sf::Vector2f(100.f, 100.f));
+			ImGui::Image(this->icon, sf::Vector2f(100.f, 100.f));
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("This is the profile picture!");
 
@@ -242,6 +244,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				{
 					if (ImGui::MenuItem("Mainmenu"))
 						this->m_SettingState = settingState::Mainmenu;
+					if (ImGui::MenuItem("Profile"))
+						this->m_SettingState = settingState::Profile;
 					if (ImGui::MenuItem("Game"))
 						this->m_SettingState = settingState::Game;
 					if (ImGui::MenuItem("Graphics"))
@@ -254,6 +258,12 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 				switch (this->m_SettingState)
 				{
+				case settingState::Profile:
+					if (ImGui::InputText("Account name: ", this->myAccount.account_name, MAX_CHAR_SIZE, ImGuiInputTextFlags_EnterReturnsTrue))
+						std::cout << "New account name: " << this->myAccount.account_name << '\n';
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Set your account name here.\nYou can just type it and it will be automaticaly saved.\nMaximum characters that are allowed is 16.");
+					break;
 				case settingState::Input:
 					for (auto& it : inputManager::m_Action)
 					{
@@ -310,13 +320,30 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					ImGui::SliderFloat("Sensivity: ", &this->sensivity, 0.f, 20.f);
 					break;
 				case settingState::Mainmenu:
-					if (ImGui::InputText("Account name: ", this->myAccount.account_name, MAX_CHAR_SIZE, ImGuiInputTextFlags_EnterReturnsTrue))
-						std::cout << "New account name: " << this->myAccount.account_name << '\n';
+					if(ImGui::SliderInt("Front image: ", &this->currFrontPicture, 0, 0))
+						this->frontImage.setTextureRect(sf::IntRect(600 * this->currFrontPicture, 0, 600, 600));
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("Set your account name here.\nYou can just type it and it will be automaticaly saved.\nMaximum characters that are allowed is 16.");
+					{
+						ImGui::BeginTooltip();
+						sf::Sprite background;
+						background.setTexture(*this->frontImage.getTexture());
+						background.setTextureRect(sf::IntRect(600 * this->currFrontPicture, 0, 600, 600));
+						ImGui::Image(background, ImVec2(300.f, 300.f));
+						ImGui::EndTooltip();
+					}
 
-					ImGui::SliderInt("Front image: ", &this->currFrontPicture, 0, 5);
-					ImGui::SliderInt("Profile picture: ", &this->currProfilePicture, 0, 5);
+					if(ImGui::SliderInt("Profile picture: ", &this->currProfilePicture, 0, 3))
+						this->icon.setTextureRect(sf::IntRect(100 * this->currProfilePicture, 0, 100, 100));
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::BeginTooltip();
+						sf::Sprite background;
+						background.setTexture(*this->icon.getTexture());
+						background.setTextureRect(sf::IntRect(100 * this->currProfilePicture, 0, 100, 100));
+						ImGui::Image(background, ImVec2(100.f, 100.f));
+						ImGui::EndTooltip();
+					}
+
 					if (ImGui::SliderInt("Background image: ", &this->currBackgroundPicture, 0, 3))
 						this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
 					if (ImGui::IsItemHovered())

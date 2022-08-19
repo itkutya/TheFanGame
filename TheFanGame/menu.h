@@ -11,7 +11,7 @@
 #endif
 
 #include "game.h"
-#include "account.h"
+#include "profile.h"
 
 class menu : public state
 {
@@ -42,7 +42,7 @@ private:
 
 	enum class settingState
 	{
-		Graphics = 0, Game, Audio, Mainmenu, Input
+		Graphics = 0, Game, Audio, Mainmenu, Input, Profile
 	};settingState m_SettingState = settingState::Graphics;
 
 	sf::Sound MainMusic;
@@ -63,13 +63,13 @@ private:
 	int currFrontPicture = 0;
 	int currBackgroundPicture = 0;
 
-	sf::Sprite profilePicture;
-	sf::Sprite frontPicture;
+	sf::Sprite icon;
+	sf::Sprite frontImage;
 	sf::RectangleShape backgroundImage;
 	
 	sf::RectangleShape xp_bar;
 	sf::RectangleShape curr_xp;
-	account myAccount;
+	profile myAccount;
 
 	sf::TcpSocket socket;
 	sf::IpAddress serverIP = sf::IpAddress::getLocalAddress();

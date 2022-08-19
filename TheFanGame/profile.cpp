@@ -1,6 +1,6 @@
-#include "account.h"
+#include "profile.h"
 
-account::account() noexcept
+profile::profile() noexcept
 {
 	//Log in and load values...
     std::ifstream profile("AccountInfo.ini");
@@ -25,7 +25,7 @@ account::account() noexcept
     profile.close();
 }
 
-account::~account() noexcept
+profile::~profile() noexcept
 {
     //When we quit the game save everything to the file.
     std::ofstream profile("AccountInfo.ini", std::ios::trunc);

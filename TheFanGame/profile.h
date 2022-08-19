@@ -7,11 +7,11 @@
 
 #define MAX_CHAR_SIZE 16
 
-class account
+class profile
 {
 public:
-	account() noexcept;
-	virtual ~account() noexcept;
+	profile() noexcept;
+	virtual ~profile() noexcept;
 
 	char account_name[MAX_CHAR_SIZE] = "Unkown";
 	float xp = 0.f;
