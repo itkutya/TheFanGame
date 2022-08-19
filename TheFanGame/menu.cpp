@@ -116,8 +116,8 @@ const void menu::init(sf::RenderWindow& window)
 		this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
 
 		constexpr std::array<std::pair<const char*, const char*>, 2> musicNames = {{
-																					{"Default", "BlackBird"},
-																					{"Default2","KanokonOP"}
+																					{"Blackbird - Cecile Corbel",    "BlackBird"},
+																					{"Sakakibara Yui - Koi no Honoo","KanokonOP"}
 																				  }};
 
 		for (auto it = musicNames.begin(); it != musicNames.end(); ++it)
@@ -746,7 +746,7 @@ const bool menu::saveSettings(const std::string& filePath) const noexcept
 	std::ofstream saveFile;
 	saveFile.open(filePath, std::ios::out | std::ios::trunc);
 	if (saveFile.is_open())
-		saveFile << this->music_volume << '\n' << this->m_currentMusic << '\n';
+		saveFile << this->m_currentMusic << '\n' << this->music_volume << '\n';
 	else
 		return false;
 	saveFile.close();
@@ -758,7 +758,10 @@ const bool menu::loadSettings(const std::string& filePath) noexcept
 	std::ifstream loadFile;
 	loadFile.open(filePath, std::ios::in);
 	if (loadFile.is_open())
-		loadFile >> this->music_volume >> this->m_currentMusic;
+	{
+		std::getline(loadFile, this->m_currentMusic);
+		loadFile >> this->music_volume;
+	}
 	else
 		return false;
 	loadFile.close();
