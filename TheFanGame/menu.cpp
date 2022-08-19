@@ -100,37 +100,42 @@ const void menu::init(sf::RenderWindow& window)
 	for (std::size_t i = 0; i < 5; ++i)
 		this->characters.emplace_back();
 
-	if (this->loadSettings("res/Settings.ini"))
-	{
-		this->m_videomodes = sf::VideoMode::getFullscreenModes();
-
-		this->frontImage.setTexture(resourceManager::get<sf::Texture>("FrontImage"));
-		this->frontImage.setTextureRect(sf::IntRect(600 * this->currFrontPicture, 0, 600, 600));
-
-		this->icon.setTexture(resourceManager::get<sf::Texture>("Icon"));
-		this->icon.setTextureRect(sf::IntRect(100 * this->currProfilePicture, 0, 100, 100));
-
-		this->backgroundImage.setTexture(&resourceManager::get<sf::Texture>("Background"));
-		this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
-		this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
-		this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
-
-		constexpr std::array<std::pair<const char*, const char*>, 2> musicNames = {{
-																					{"Blackbird - Cecile Corbel",    "BlackBird"},
-																					{"Sakakibara Yui - Koi no Honoo","KanokonOP"}
-																				  }};
-
-		for (auto it = musicNames.begin(); it != musicNames.end(); ++it)
-			this->m_music[it->first] = it->second;
-
-		this->MainMusic.setBuffer(resourceManager::get<sf::SoundBuffer>(this->m_music[this->m_currentMusic]));
-		this->MainMusic.setLoop(true);
-		this->MainMusic.setVolume(this->music_volume);
-		if (this->music_volume > 0.f)
-			this->MainMusic.play();
-	}
-	else
+	if (!this->loadSettings("res/Settings.ini"))
 		throw "Cannot load save file...\n";
+
+	this->m_videomodes = sf::VideoMode::getFullscreenModes();
+	this->m_window->setSize(sf::Vector2u(this->m_videomodes[this->m_currVideoMode].width, this->m_videomodes[this->m_currVideoMode].height));
+	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
+	this->m_view.setSize(sf::Vector2f(window.getSize()));
+	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
+
+	this->m_window->setFramerateLimit(this->fps_limit);
+	this->m_window->setFullscreen(this->fullscreen);
+
+	this->frontImage.setTexture(resourceManager::get<sf::Texture>("FrontImage"));
+	this->frontImage.setTextureRect(sf::IntRect(600 * this->currFrontPicture, 0, 600, 600));
+
+	this->icon.setTexture(resourceManager::get<sf::Texture>("Icon"));
+	this->icon.setTextureRect(sf::IntRect(100 * this->currProfilePicture, 0, 100, 100));
+
+	this->backgroundImage.setTexture(&resourceManager::get<sf::Texture>("Background"));
+	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
+	this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
+	this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
+
+	constexpr std::array<std::pair<const char*, const char*>, 2> musicNames = { {
+																				{"Blackbird - Cecile Corbel",    "BlackBird"},
+																				{"Sakakibara Yui - Koi no Honoo","KanokonOP"}
+																			  } };
+
+	for (auto it = musicNames.begin(); it != musicNames.end(); ++it)
+		this->m_music[it->first] = it->second;
+
+	this->MainMusic.setBuffer(resourceManager::get<sf::SoundBuffer>(this->m_music[this->m_currentMusic]));
+	this->MainMusic.setLoop(true);
+	this->MainMusic.setVolume(this->music_volume);
+	if (this->music_volume > 0.f)
+		this->MainMusic.play();
 }
 
 const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
@@ -157,6 +162,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		vMin.y += ImGui::GetWindowPos().y;
 		vMax.x += ImGui::GetWindowPos().x;
 		vMax.y += ImGui::GetWindowPos().y;
+
+		std::string preview = std::to_string(this->m_videomodes[this->m_currVideoMode].width) + "x" + std::to_string(this->m_videomodes[this->m_currVideoMode].height);
 
 		if (this->m_ShowFPS)
 		{
@@ -278,7 +285,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			if (ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_MenuBar))
 			{
 				ImGui::SetWindowSize("Settings", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
-				ImGui::SetWindowPos("Settings", ImVec2(25.f, 25.f));
+				ImGui::SetWindowPos("Settings", ImVec2(50.f, 50.f));
 
 				vMin = ImGui::GetWindowContentRegionMin();
 				vMax = ImGui::GetWindowContentRegionMax();
@@ -332,23 +339,25 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					if (ImGui::Checkbox("Fullscreen: ", &this->fullscreen))
 						this->m_window->setFullscreen(this->fullscreen);
 
-					if (ImGui::BeginListBox("Resolution: ", ImVec2(200, 200)))
+					ImGui::SetNextItemWidth(300.f);
+					if (ImGui::BeginCombo("Resolution: ", preview.c_str(), ImGuiComboFlags_HeightSmall))
 					{
 						for (std::size_t i = 0; i < this->m_videomodes.size(); ++i)
 						{
 							std::string text = std::to_string(this->m_videomodes[i].width) + "x" + std::to_string(this->m_videomodes[i].height);
 							if (ImGui::Selectable(text.c_str()))
 							{
+								this->m_currVideoMode = (int)i;
 								this->m_window->setSize(sf::Vector2u(this->m_videomodes[i].width, this->m_videomodes[i].height));
 								this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
 								this->m_view.setSize(sf::Vector2f(window.getSize()));
 								this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
 							}
 						}
-						ImGui::EndListBox();
+						ImGui::EndCombo();
 					}
 					if (ImGui::Checkbox("Show FPS", &this->m_ShowFPS))
-						std::cout << "FPS stuff...\n";
+						std::cout << "\n";
 					if (ImGui::Checkbox("FPS Limit: ", &this->isFPSLimited))
 					{
 						if (!this->isFPSLimited)
@@ -423,7 +432,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			if (ImGui::Begin("Characters", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Characters", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
-				ImGui::SetWindowPos("Characters", ImVec2(25.f, 25.f));
+				ImGui::SetWindowPos("Characters", ImVec2(50.f, 50.f));
 
 				vMin = ImGui::GetWindowContentRegionMin();
 				vMax = ImGui::GetWindowContentRegionMax();
@@ -538,7 +547,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			if (ImGui::Begin("Multiplayer", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Multiplayer", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
-				ImGui::SetWindowPos("Multiplayer", ImVec2(25.f, 25.f));
+				ImGui::SetWindowPos("Multiplayer", ImVec2(50.f, 50.f));
 
 				vMin = ImGui::GetWindowContentRegionMin();
 				vMax = ImGui::GetWindowContentRegionMax();
@@ -624,7 +633,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			if (ImGui::Begin("Singleplayer", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Singleplayer", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
-				ImGui::SetWindowPos("Singleplayer", ImVec2(25.f, 25.f));
+				ImGui::SetWindowPos("Singleplayer", ImVec2(50.f, 50.f));
 				ImGui::End();
 			}
 			break;
@@ -632,7 +641,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			if (ImGui::Begin("Lobby", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Lobby", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
-				ImGui::SetWindowPos("Lobby", ImVec2(25.f, 25.f));
+				ImGui::SetWindowPos("Lobby", ImVec2(50.f, 50.f));
 
 				vMin = ImGui::GetWindowContentRegionMin();
 				vMax = ImGui::GetWindowContentRegionMax();
@@ -746,9 +755,16 @@ const bool menu::saveSettings(const std::string& filePath) const noexcept
 	std::ofstream saveFile;
 	saveFile.open(filePath, std::ios::out | std::ios::trunc);
 	if (saveFile.is_open())
-		saveFile << this->m_currentMusic << '\n' << this->music_volume << '\n';
+	{
+		saveFile << this->m_currentMusic << '\n' << this->m_currVideoMode << '\n' << this->fullscreen << '\n' << this->isFPSLimited << '\n'
+			<< this->m_ShowFPS << '\n' << this->fps_limit << '\n' << this->sensivity << '\n' << this->game_volume << '\n' << this->music_volume << '\n'
+			<< this->currProfilePicture << '\n' << this->currFrontPicture << '\n' << this->currBackgroundPicture << '\n';
+	}
 	else
+	{
+		saveFile.close();
 		return false;
+	}
 	saveFile.close();
 	return true;
 }
@@ -760,10 +776,15 @@ const bool menu::loadSettings(const std::string& filePath) noexcept
 	if (loadFile.is_open())
 	{
 		std::getline(loadFile, this->m_currentMusic);
-		loadFile >> this->music_volume;
+		loadFile >> this->m_currVideoMode >> this->fullscreen >> this->isFPSLimited 
+				 >> this->m_ShowFPS >> this->fps_limit >> this->sensivity >> this->game_volume >> this->music_volume
+				 >> this->currProfilePicture >> this->currFrontPicture >> this->currBackgroundPicture;
 	}
 	else
+	{
+		loadFile.close();
 		return false;
+	}
 	loadFile.close();
 	return true;
 }

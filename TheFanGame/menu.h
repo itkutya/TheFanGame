@@ -52,8 +52,8 @@ private:
 	const bool saveSettings(const std::string& filePath) const noexcept;
 	const bool loadSettings(const std::string& filePath) noexcept;
 
-	/*Game settings -> different class... / maybie part of context?*/
 	std::vector<sf::VideoMode> m_videomodes;
+	int m_currVideoMode = 0;
 	bool fullscreen = false;
 	bool isFPSLimited = true;
 	bool m_ShowFPS = true;
