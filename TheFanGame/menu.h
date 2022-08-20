@@ -45,9 +45,9 @@ private:
 		Graphics = 0, Game, Audio, Mainmenu, Input, Profile
 	};settingState m_SettingState = settingState::Graphics;
 
-	sf::Sound MainMusic;
-	std::unordered_map<std::string, std::string> m_music;
+	sf::MyMusic* m_MainMusic;
 	std::string m_currentMusic;
+	std::array<const char*, 2> m_music;
 
 	const bool saveSettings(const std::string& filePath) const noexcept;
 	const bool loadSettings(const std::string& filePath) noexcept;

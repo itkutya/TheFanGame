@@ -50,6 +50,7 @@ const void inputManager::init()
             sf::Mouse::Button m_TempMouseButton = sf::Mouse::Left;
             m_TempMouseButton = static_cast<sf::Mouse::Button>(temp);
             key.m_MouseButton = m_TempMouseButton;
+            //The warning will go away if you assigne more than 1 const char* to the array....
             m_Action[mouseInputText[i]] = key;
         }
     }

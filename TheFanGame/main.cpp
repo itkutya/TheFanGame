@@ -15,8 +15,8 @@ int main()
 	resourceManager::add<sf::Texture>("Icon", "res/MainMenu/Icons.png");
 	resourceManager::add<sf::Texture>("CharacterTexture", "res/char.png");
 	resourceManager::add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
-	resourceManager::add<sf::SoundBuffer>("BlackBird", "res/MainMenu/Blackbird - Cecile Corbel.wav");
-	resourceManager::add<sf::SoundBuffer>("KanokonOP", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
+	resourceManager::add<sf::MyMusic>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
+	resourceManager::add<sf::MyMusic>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
 
 	try
 	{
@@ -45,6 +45,7 @@ int main()
 		std::cout << "\033[1;4;31m" << "Something went terribly wrong...\n" << "\033[0m";
 		return -2;
 	}
+	//Clear the resources.
 	resourceManager::clear();
 	//Exit the program with a success.
 	return 0;

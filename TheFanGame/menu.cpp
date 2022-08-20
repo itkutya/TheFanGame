@@ -7,7 +7,7 @@ menu::~menu() noexcept
 	if (!this->saveSettings("res/Settings.ini"))
 		std::cout << "Coud not save settings, quiting without it...\n";
 	this->shutdownServer();
-	this->MainMusic.stop();
+	this->m_MainMusic->stop();
 	ImGui::SFML::Shutdown();
 }
 
@@ -112,30 +112,25 @@ const void menu::init(sf::RenderWindow& window)
 	this->m_window->setFramerateLimit(this->fps_limit);
 	this->m_window->setFullscreen(this->fullscreen);
 
-	this->frontImage.setTexture(resourceManager::get<sf::Texture>("FrontImage"));
+	this->frontImage.setTexture(resourceManager::get_c<sf::Texture>("FrontImage"));
 	this->frontImage.setTextureRect(sf::IntRect(600 * this->currFrontPicture, 0, 600, 600));
 
-	this->icon.setTexture(resourceManager::get<sf::Texture>("Icon"));
+	this->icon.setTexture(resourceManager::get_c<sf::Texture>("Icon"));
 	this->icon.setTextureRect(sf::IntRect(100 * this->currProfilePicture, 0, 100, 100));
 
-	this->backgroundImage.setTexture(&resourceManager::get<sf::Texture>("Background"));
+	this->backgroundImage.setTexture(&resourceManager::get_c<sf::Texture>("Background"));
 	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
 	this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
 	this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
 
-	constexpr std::array<std::pair<const char*, const char*>, 2> musicNames = { {
-																				{"Blackbird - Cecile Corbel",    "BlackBird"},
-																				{"Sakakibara Yui - Koi no Honoo","KanokonOP"}
-																			  } };
-
-	for (auto it = musicNames.begin(); it != musicNames.end(); ++it)
-		this->m_music[it->first] = it->second;
-
-	this->MainMusic.setBuffer(resourceManager::get<sf::SoundBuffer>(this->m_music[this->m_currentMusic]));
-	this->MainMusic.setLoop(true);
-	this->MainMusic.setVolume(this->music_volume);
+	this->m_MainMusic = &resourceManager::get<sf::MyMusic>(this->m_currentMusic);
+	this->m_MainMusic->setLoop(true);
 	if (this->music_volume > 0.f)
-		this->MainMusic.play();
+		this->m_MainMusic->play();
+	this->m_MainMusic->setVolume(this->music_volume);
+
+	this->m_music.at(0) = "Blackbird - Cecile Corbel";
+	this->m_music.at(1) = "Sakakibara Yui - Koi no Honoo";
 }
 
 const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
@@ -143,9 +138,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 	ImGui::SFML::Update(window, dt);
 
 	if (this->music_volume == 0.f)
-		this->MainMusic.stop();
-	else if (this->music_volume > 0.f && this->MainMusic.getStatus() != sf::SoundSource::Playing)
-		this->MainMusic.play();
+		this->m_MainMusic->pause();
+	else if (this->music_volume > 0.f && this->m_MainMusic->getStatus() != sf::SoundSource::Playing)
+		this->m_MainMusic->play();
 
 	//sf::Vector2f scaleFactor = sf::Vector2f(static_cast<float>(window.getSize().x) / static_cast<float>(this->m_videomodes[0].width),
 	//										  static_cast<float>(window.getSize().y) / static_cast<float>(this->m_videomodes[0].height));
@@ -195,14 +190,16 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			{
 				for (auto& music : this->m_music)
 				{
-					if (ImGui::Selectable(music.first.c_str()))
+					if (ImGui::Selectable(music))
 					{
-						if (this->m_currentMusic != music.first)
+						if (this->m_currentMusic.c_str() != music)
 						{
-							this->m_currentMusic = music.first;
-							this->MainMusic.stop();
-							this->MainMusic.setBuffer(resourceManager::get<sf::SoundBuffer>(music.second));
-							this->MainMusic.play();
+							this->m_currentMusic = music;
+							this->m_MainMusic->stop();
+							this->m_MainMusic = &resourceManager::get<sf::MyMusic>(this->m_currentMusic);
+							if (this->music_volume > 0.f)
+								this->m_MainMusic->play();
+							this->m_MainMusic->setVolume(this->music_volume);
 						}
 					}
 				}
@@ -258,7 +255,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				{
 					this->m_PlaySelected = false;
 					this->m_State = state::Singleplayer;
-					this->MainMusic.stop();
+					this->m_MainMusic->stop();
 					this->m_window->addState<game>();
 				}
 				if (ImGui::IsItemHovered())
@@ -415,7 +412,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				case settingState::Audio:
 					ImGui::SliderFloat("Game volume: ", &this->game_volume, 0.f, 100.f);
 					if (ImGui::SliderFloat("Music volume: ", &this->music_volume, 0.f, 100.f))
-						this->MainMusic.setVolume(this->music_volume);
+						this->m_MainMusic->setVolume(this->music_volume);
 					break;
 				default:
 					break;
@@ -455,9 +452,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 						sf::Sprite temp;
 						if (!this->characters[i].unlocked)
-							temp.setTexture(resourceManager::get<sf::Texture>("WallTexture"));
+							temp.setTexture(resourceManager::get_c<sf::Texture>("WallTexture"));
 						else
-							temp.setTexture(resourceManager::get<sf::Texture>("CharacterTexture"));
+							temp.setTexture(resourceManager::get_c<sf::Texture>("CharacterTexture"));
 
 						temp.setTextureRect(sf::IntRect(64 * (int)i, 0, 64, 64));
 						ImGui::SetCursorPos(ImVec2(100.f + 350.f * (float)x, 100.f + 300.f * (float)y));
@@ -468,7 +465,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						{
 							ImGui::BeginTooltip();
 							sf::Sprite ability;
-							ability.setTexture(resourceManager::get<sf::Texture>("WallTexture"));
+							ability.setTexture(resourceManager::get_c<sf::Texture>("WallTexture"));
 							ability.setTextureRect(sf::IntRect(128, 0, 64, 64));
 							ImGui::SetCursorPos(ImVec2(5.f, 5.f));
 							ImGui::Image(ability, sf::Vector2f(50.f, 50.f));

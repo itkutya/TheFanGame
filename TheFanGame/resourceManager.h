@@ -14,6 +14,24 @@
 	#endif
 #endif
 
+namespace sf
+{
+	class MyMusic : public sf::Music
+	{
+	public:
+		MyMusic() {};
+		virtual ~MyMusic() {};
+
+		inline bool loadFromFile(const std::string& filePath)
+		{
+			if (!this->openFromFile(filePath))
+				return false;
+			return true;
+		}
+	private:
+	};
+}
+
 class resourceManager
 {
 public:
@@ -25,7 +43,6 @@ public:
 	template<class T>
 	static inline const void add(const std::string& id, const std::string& filePath)
 	{
-		m_resources.insert({ id, std::variant<sf::Texture, sf::Font, sf::SoundBuffer>() });
 		m_resources[id].emplace<T>();
 
 		if (!std::get<T>(m_resources.at(id)).loadFromFile(filePath))
@@ -33,9 +50,12 @@ public:
 	};
 
 	template<class T>
-	[[nodiscard]]static inline const T& get(const std::string& id) { return std::get<T>(m_resources.at(id)); };
+	[[nodiscard]]static inline const T& get_c(const std::string& id) { return std::get<T>(m_resources.at(id)); };
+
+	template<class T>
+	[[nodiscard]] static inline T& get(const std::string& id) { return std::get<T>(m_resources.at(id)); };
 
 	static inline void clear() { m_resources.clear(); };
 private:
-	static std::unordered_map<std::string, std::variant<sf::Texture, sf::Font, sf::SoundBuffer>> m_resources;
+	static std::unordered_map<std::string, std::variant<sf::Texture, sf::Font, sf::SoundBuffer, sf::MyMusic>> m_resources;
 };
