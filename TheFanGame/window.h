@@ -5,8 +5,9 @@
 #include <sstream>
 
 #include "stateSystem.h"
-#include "resourceManager.h"
-#include "inputManager.h"
+#include "resourceSystem.h"
+#include "inputSystem.h"
+#include "setting.h"
 
 class window
 {
@@ -37,7 +38,6 @@ public:
 	const void update() noexcept;
 private:
 	sf::RenderWindow m_window;
-
 	sf::Clock deltaTime;
 
 	sf::VideoMode m_videomode;
@@ -45,8 +45,6 @@ private:
 	bool isFullscreen;
 	int FPSLimit;
 
-	//On the m_window resize this function will triger.
-	const void onResize() noexcept;
 	//Takes a screenshot in any given state.
 	const void ScreenShot() noexcept;
 };

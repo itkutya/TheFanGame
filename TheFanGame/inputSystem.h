@@ -29,17 +29,18 @@ struct m_Keys
 	sf::Mouse::Button m_MouseButton;
 };
 
-class inputManager
+class inputSystem
 {
 public:
-	inputManager() = delete;
-	inputManager(const inputManager&) = delete;
-	inputManager(const inputManager&&) = delete;
-	virtual ~inputManager() {};
+	inputSystem() = delete;
+	inputSystem(const inputSystem&) = delete;
+	inputSystem(const inputSystem&&) = delete;
+	virtual ~inputSystem() {};
 
 	static const void init();
 	static const bool input(m_Keys& key, sf::Event* e = nullptr) noexcept;
 	static const char* convert(const m_Keys& it);
+	static const void clear() noexcept;
 	
 	static std::unordered_map<const char*, m_Keys> m_Action;
 private:

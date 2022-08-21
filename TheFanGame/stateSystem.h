@@ -1,7 +1,5 @@
 #pragma once
 
-#include "window.h"
-
 #include <iostream>
 #include <stack>
 #include <memory>
@@ -14,6 +12,8 @@
         #include "SFML32/Graphics.hpp"
     #endif
 #endif
+
+#include "window.h"
 
 class window;
 

@@ -112,18 +112,18 @@ const void menu::init(sf::RenderWindow& window)
 	this->m_window->setFramerateLimit(this->fps_limit);
 	this->m_window->setFullscreen(this->fullscreen);
 
-	this->frontImage.setTexture(resourceManager::get_c<sf::Texture>("FrontImage"));
+	this->frontImage.setTexture(resourceSystem::get_c<sf::Texture>("FrontImage"));
 	this->frontImage.setTextureRect(sf::IntRect(600 * this->currFrontPicture, 0, 600, 600));
 
-	this->icon.setTexture(resourceManager::get_c<sf::Texture>("Icon"));
+	this->icon.setTexture(resourceSystem::get_c<sf::Texture>("Icon"));
 	this->icon.setTextureRect(sf::IntRect(100 * this->currProfilePicture, 0, 100, 100));
 
-	this->backgroundImage.setTexture(&resourceManager::get_c<sf::Texture>("Background"));
+	this->backgroundImage.setTexture(&resourceSystem::get_c<sf::Texture>("Background"));
 	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
 	this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
 	this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
 
-	this->m_MainMusic = &resourceManager::get<sf::MyMusic>(this->m_currentMusic);
+	this->m_MainMusic = &resourceSystem::get<sf::MyMusic>(this->m_currentMusic);
 	this->m_MainMusic->setLoop(true);
 	if (this->music_volume > 0.f)
 		this->m_MainMusic->play();
@@ -196,7 +196,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						{
 							this->m_currentMusic = music;
 							this->m_MainMusic->stop();
-							this->m_MainMusic = &resourceManager::get<sf::MyMusic>(this->m_currentMusic);
+							this->m_MainMusic = &resourceSystem::get<sf::MyMusic>(this->m_currentMusic);
 							if (this->music_volume > 0.f)
 								this->m_MainMusic->play();
 							this->m_MainMusic->setVolume(this->music_volume);
@@ -316,11 +316,11 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						ImGui::SetTooltip("Set your account name here.\nYou can just type it and it will be automaticaly saved.\nMaximum characters that are allowed is 16.");
 					break;
 				case settingState::Input:
-					for (auto& it : inputManager::m_Action)
+					for (auto& it : inputSystem::m_Action)
 					{
 						ImGui::Text(it.first);
 						ImGui::SameLine();
-						if (ImGui::Button(inputManager::convert(it.second), ImVec2(300.f, 30.f)))
+						if (ImGui::Button(inputSystem::convert(it.second), ImVec2(300.f, 30.f)))
 							std::cout << "Ok\n";
 						ImGui::SameLine();
 						ImGui::SetNextItemWidth(200.f);
@@ -452,9 +452,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 						sf::Sprite temp;
 						if (!this->characters[i].unlocked)
-							temp.setTexture(resourceManager::get_c<sf::Texture>("WallTexture"));
+							temp.setTexture(resourceSystem::get_c<sf::Texture>("WallTexture"));
 						else
-							temp.setTexture(resourceManager::get_c<sf::Texture>("CharacterTexture"));
+							temp.setTexture(resourceSystem::get_c<sf::Texture>("CharacterTexture"));
 
 						temp.setTextureRect(sf::IntRect(64 * (int)i, 0, 64, 64));
 						ImGui::SetCursorPos(ImVec2(100.f + 350.f * (float)x, 100.f + 300.f * (float)y));
@@ -465,7 +465,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						{
 							ImGui::BeginTooltip();
 							sf::Sprite ability;
-							ability.setTexture(resourceManager::get_c<sf::Texture>("WallTexture"));
+							ability.setTexture(resourceSystem::get_c<sf::Texture>("WallTexture"));
 							ability.setTextureRect(sf::IntRect(128, 0, 64, 64));
 							ImGui::SetCursorPos(ImVec2(5.f, 5.f));
 							ImGui::Image(ability, sf::Vector2f(50.f, 50.f));

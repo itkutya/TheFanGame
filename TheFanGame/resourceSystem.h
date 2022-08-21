@@ -32,13 +32,13 @@ namespace sf
 	};
 }
 
-class resourceManager
+class resourceSystem
 {
 public:
-	resourceManager() = delete;
-	resourceManager(const resourceManager&) = delete;
-	resourceManager(const resourceManager&&) = delete;
-	virtual ~resourceManager() { clear(); };
+	resourceSystem() = delete;
+	resourceSystem(const resourceSystem&) = delete;
+	resourceSystem(const resourceSystem&&) = delete;
+	virtual ~resourceSystem() { clear(); };
 
 	template<class T>
 	static inline const void add(const std::string& id, const std::string& filePath)

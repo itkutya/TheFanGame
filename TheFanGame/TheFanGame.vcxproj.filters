@@ -48,7 +48,7 @@
     <ClCompile Include="animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="resourceManager.cpp">
+    <ClCompile Include="resourceSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stateSystem.cpp">
@@ -78,7 +78,10 @@
     <ClCompile Include="profile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="inputManager.cpp">
+    <ClCompile Include="inputSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -122,7 +125,7 @@
     <ClInclude Include="stateSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resourceManager.h">
+    <ClInclude Include="resourceSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="menu.h">
@@ -149,7 +152,10 @@
     <ClInclude Include="profile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inputManager.h">
+    <ClInclude Include="inputSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="setting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

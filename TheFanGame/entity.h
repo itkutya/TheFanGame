@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-#include "resourceManager.h"
+#include "resourceSystem.h"
 #include "animation.h"
 #include "world.h"
 

@@ -14,10 +14,7 @@ const void window::pollEvents() noexcept
 		if (event.type == sf::Event::Closed)
 			this->m_window.close();
 
-		if (event.type == sf::Event::Resized)
-			this->onResize();
-
-		if (inputManager::input(inputManager::m_Action["ScreenShot"], &event))
+		if (inputSystem::input(inputSystem::m_Action["ScreenShot"], &event))
 			this->ScreenShot();
 	}
 }
@@ -30,11 +27,6 @@ const void window::draw() noexcept
 }
 
 const void window::update() noexcept { stateSystem::getState()->update(this->m_window, this->deltaTime.restart()); }
-
-const void window::onResize() noexcept 
-{
-	std::cout << "Window resized, new size is: " << this->m_window.getSize().x << "x" << this->m_window.getSize().y << '\n';
-}
 
 const void window::ScreenShot() noexcept
 {

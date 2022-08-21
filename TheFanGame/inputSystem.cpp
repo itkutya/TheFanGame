@@ -1,8 +1,8 @@
-#include "inputManager.h"
+#include "inputSystem.h"
 
-std::unordered_map<const char*, m_Keys> inputManager::m_Action;
+std::unordered_map<const char*, m_Keys> inputSystem::m_Action;
 
-const void inputManager::init()
+const void inputSystem::init()
 {
     constexpr std::array keyboardInputText = { "Left", "Right", "Forward", "Backward", "ScreenShot" };
     constexpr std::array mouseInputText = { "Shot" };
@@ -59,7 +59,7 @@ const void inputManager::init()
     inputSettings.close();
 }
 
-const bool inputManager::input(m_Keys& key, sf::Event* event) noexcept
+const bool inputSystem::input(m_Keys& key, sf::Event* event) noexcept
 {
     if (event == nullptr)
     {
@@ -82,7 +82,7 @@ const bool inputManager::input(m_Keys& key, sf::Event* event) noexcept
     return false;
 }
 
-const char* inputManager::convert(const m_Keys& it)
+const char* inputSystem::convert(const m_Keys& it)
 {
     if (it.m_KeyCode != sf::Keyboard::Unknown)
     {
@@ -114,3 +114,5 @@ const char* inputManager::convert(const m_Keys& it)
     }
     return "ERROR";
 }
+
+const void inputSystem::clear() noexcept { m_Action.clear(); }
