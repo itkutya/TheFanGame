@@ -256,7 +256,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					this->m_PlaySelected = false;
 					this->m_State = state::Singleplayer;
 					this->m_MainMusic->stop();
-					this->m_window->addState<game>();
+					stateSystem::add<game>(*m_window);
 				}
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Starts the game state.");

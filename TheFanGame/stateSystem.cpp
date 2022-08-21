@@ -1,41 +1,44 @@
 #include "stateSystem.h"
 
-stateSystem::stateSystem() noexcept : m_add(false), m_replace(false), m_remove(false) {}
+std::stack<std::unique_ptr<state>> stateSystem::m_stateStack;
+std::unique_ptr<state> stateSystem::m_newState;
 
-stateSystem::~stateSystem() noexcept {}
-
-const void stateSystem::add(sf::RenderWindow& window, std::unique_ptr<state> toAdd, const bool& replace) noexcept
-{
-    this->m_add = true;
-    this->m_newState = std::move(toAdd);
-
-    this->m_replace = replace;
-}
+bool stateSystem::m_add = false;
+bool stateSystem::m_replace = false;
+bool stateSystem::m_remove = false;
 
 const void stateSystem::popCurrent() noexcept { m_remove = true; }
 
 const void stateSystem::processStateChange(sf::RenderWindow& window) noexcept
 {
-    if (this->m_remove && (!this->m_stateStack.empty()))
+    if (m_remove && (!m_stateStack.empty()))
     {
-        this->m_stateStack.pop();
-        this->m_remove = false;
+        m_stateStack.pop();
+        m_remove = false;
     }
 
-    if (this->m_add)
+    if (m_add)
     {
-        if (this->m_replace && (!this->m_stateStack.empty()))
+        if (m_replace && (!m_stateStack.empty()))
         {
-            this->m_stateStack.pop();
-            this->m_replace = false;
+            m_stateStack.pop();
+            m_replace = false;
         }
 
-        this->m_stateStack.push(std::move(this->m_newState));
-        this->m_stateStack.top()->init(window);
-        this->m_add = false;
+        m_stateStack.push(std::move(m_newState));
+        m_stateStack.top()->init(window);
+        m_add = false;
     }
 }
 
-const std::unique_ptr<state>& stateSystem::getState() const noexcept { return this->m_stateStack.top(); }
+const std::unique_ptr<state>& stateSystem::getState() noexcept { return m_stateStack.top(); }
 
-const std::size_t stateSystem::getSize() const noexcept { return this->m_stateStack.size(); }
+const std::size_t stateSystem::getSize() noexcept { return m_stateStack.size(); }
+
+const void stateSystem::clear()
+{
+    std::size_t maxSize = getSize();
+    for (std::size_t i = 0; i < maxSize; ++i)
+        if ((!m_stateStack.empty()))
+            m_stateStack.pop();
+}

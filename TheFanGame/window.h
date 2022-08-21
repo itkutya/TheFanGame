@@ -21,15 +21,8 @@ public:
 	operator sf::RenderWindow&() noexcept;
 	//Creates the renderwindow with the given size and name.
 	const void create(const sf::VideoMode& size, const char* name) noexcept;
-	//Add's a state to the state pool.
-	template<typename T>
-	inline const void addState(const bool& replace = false) { this->m_states.add(this->m_window, std::make_unique<T>(*this), replace); }
 	//Set's the framerate of the m_window.
 	const void setFramerateLimit(const std::uint32_t& limit) noexcept;
-	//Processes the state changes.
-	const void processStateChange(sf::RenderWindow& window) noexcept;
-	//Delete current state.
-	const void popCurrent();
 	//Set's the window size.
 	const void setSize(const sf::Vector2u& size) noexcept;
 	//Set's the window to fullscreen mode.
@@ -44,7 +37,6 @@ public:
 	const void update() noexcept;
 private:
 	sf::RenderWindow m_window;
-	stateSystem m_states;
 
 	sf::Clock deltaTime;
 

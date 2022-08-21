@@ -32,7 +32,7 @@ const void game::processEvent(const sf::Event& event) noexcept
     ImGui::SFML::ProcessEvent(event);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-        this->m_window->popCurrent();
+        stateSystem::popCurrent();
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::G))
     {

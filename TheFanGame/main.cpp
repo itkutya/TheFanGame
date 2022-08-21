@@ -22,12 +22,12 @@ int main()
 	{
 		window mainWindow;
 		mainWindow.create(sf::VideoMode(1920, 1080), "Project stuff");
-		mainWindow.addState<menu>();
 		mainWindow.setFramerateLimit(60);
 
+		stateSystem::add<menu>(mainWindow);
 		while (mainWindow)
 		{
-			mainWindow.processStateChange(mainWindow);
+			stateSystem::processStateChange(mainWindow);
 			mainWindow.pollEvents();
 			mainWindow.update();
 			mainWindow.draw();
@@ -46,6 +46,7 @@ int main()
 		return -2;
 	}
 	//Clear the resources.
+	stateSystem::clear();
 	resourceManager::clear();
 	//Exit the program with a success.
 	return 0;

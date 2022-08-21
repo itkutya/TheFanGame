@@ -1,5 +1,7 @@
 #pragma once
 
+#include "window.h"
+
 #include <iostream>
 #include <stack>
 #include <memory>
@@ -12,6 +14,8 @@
         #include "SFML32/Graphics.hpp"
     #endif
 #endif
+
+class window;
 
 class state
 {
@@ -34,26 +38,34 @@ public:
 class stateSystem
 {
 public:
-    //Construct's the state system with everything set to false.
-	stateSystem() noexcept;
-    //Default destructor.
-	virtual ~stateSystem() noexcept;
+	stateSystem() = delete;
+	stateSystem(const stateSystem&) = delete;
+	stateSystem(const stateSystem&&) = delete;
+	virtual ~stateSystem() noexcept {};
 
     //Add a new state and either replace it or add it to the top of the stack.
-    const void add(sf::RenderWindow& window, std::unique_ptr<state> toAdd, const bool& replace = false) noexcept;
+    template<typename T>
+    inline static const void add(window& window, const bool& replace = false) noexcept
+    {
+        m_add = true;
+        m_newState = std::move(std::make_unique<T>(window));
+        m_replace = replace;
+    };
     //Delete the top state.
-    const void popCurrent() noexcept;
+    static const void popCurrent() noexcept;
     //Process the change's made in the state system in the begining of the main loop to prevent undifend error's.
-    const void processStateChange(sf::RenderWindow& window) noexcept;
+    static const void processStateChange(sf::RenderWindow& window) noexcept;
     //Get the address of the current state.
-    const std::unique_ptr<state>& getState() const noexcept;
+    static const std::unique_ptr<state>& getState() noexcept;
     //Get the size of the stack.
-    const std::size_t getSize() const noexcept;
+    static const std::size_t getSize() noexcept;
+    //Clears stack states.
+    static const void clear();
 private:
-    std::stack<std::unique_ptr<state>> m_stateStack;
-    std::unique_ptr<state> m_newState;
+    static std::stack<std::unique_ptr<state>> m_stateStack;
+    static std::unique_ptr<state> m_newState;
 
-    bool m_add;
-    bool m_replace;
-    bool m_remove;
+    static bool m_add;
+    static bool m_replace;
+    static bool m_remove;
 };
