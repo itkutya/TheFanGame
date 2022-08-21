@@ -6,20 +6,19 @@ int main()
 {
 	//Uses the current time to generate random numbers.
 	std::srand((std::uint32_t)std::time(0));
-
-	inputSystem::init();
-
-	resourceSystem::add<sf::Texture>("WallTexture", "res/wolftextures.png");
-	resourceSystem::add<sf::Texture>("Background", "res/MainMenu/Backgrounds.png");
-	resourceSystem::add<sf::Texture>("FrontImage", "res/MainMenu/FontImages.png");
-	resourceSystem::add<sf::Texture>("Icon", "res/MainMenu/Icons.png");
-	resourceSystem::add<sf::Texture>("CharacterTexture", "res/char.png");
-	resourceSystem::add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
-	resourceSystem::add<sf::MyMusic>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
-	resourceSystem::add<sf::MyMusic>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
-
 	try
 	{
+		resourceSystem::add<sf::Texture>("WallTexture", "res/wolftextures.png");
+		resourceSystem::add<sf::Texture>("Background", "res/MainMenu/Backgrounds.png");
+		resourceSystem::add<sf::Texture>("FrontImage", "res/MainMenu/FontImages.png");
+		resourceSystem::add<sf::Texture>("Icon", "res/MainMenu/Icons.png");
+		resourceSystem::add<sf::Texture>("CharacterTexture", "res/char.png");
+		resourceSystem::add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
+		resourceSystem::add<sf::MyMusic>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
+		resourceSystem::add<sf::MyMusic>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
+		
+		inputSystem::init();
+
 		window mainWindow = window("Game!");
 		stateSystem::add<menu>(mainWindow);
 
@@ -43,7 +42,7 @@ int main()
 		std::cout << "\033[1;4;31m" << "Something went terribly wrong...\n" << "\033[0m";
 		return -2;
 	}
-	//Clear the resources.
+	//Clear everything.
 	inputSystem::clear();
 	stateSystem::clear();
 	resourceSystem::clear();
