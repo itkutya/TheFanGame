@@ -7,27 +7,23 @@
 #include "stateSystem.h"
 #include "resourceSystem.h"
 #include "inputSystem.h"
-#include "setting.h"
+#include "settings.h"
 
 class window
 {
 public:
 	//Construct's the window class.
-	window() noexcept;
+	window(const char* name) noexcept;
 	//Destruct's the window class.
 	virtual ~window() noexcept;
 	//Returns m_window.isOpen().
 	explicit operator const bool() noexcept;
 	//Returns the address of m_window.
 	operator sf::RenderWindow&() noexcept;
-	//Creates the renderwindow with the given size and name.
-	const void create(const sf::VideoMode& size, const char* name) noexcept;
-	//Set's the framerate of the m_window.
-	const void setFramerateLimit(const std::uint32_t& limit) noexcept;
-	//Set's the window size.
-	const void setSize(const sf::Vector2u& size) noexcept;
-	//Set's the window to fullscreen mode.
-	const void setFullscreen(const bool& active) noexcept;
+	//Set FPS limit.
+	const void setFramerateLimit() noexcept;
+	//Set VSync to true.
+	const void setVSync() noexcept;
 	//Recreate's the window.
 	const void recreate() noexcept;
 	//Poll events in the main loop.
@@ -39,12 +35,7 @@ public:
 private:
 	sf::RenderWindow m_window;
 	sf::Clock deltaTime;
-
-	sf::VideoMode m_videomode;
-	std::string title;
-	bool isFullscreen;
-	int FPSLimit;
-
+	const char* title;
 	//Takes a screenshot in any given state.
 	const void ScreenShot() noexcept;
 };

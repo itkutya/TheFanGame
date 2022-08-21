@@ -46,25 +46,7 @@ private:
 	};settingState m_SettingState = settingState::Graphics;
 
 	sf::MyMusic* m_MainMusic;
-	std::string m_currentMusic;
-	std::array<const char*, 2> m_music;
-
-	const bool saveSettings(const std::string& filePath) const noexcept;
-	const bool loadSettings(const std::string& filePath) noexcept;
-
-	std::vector<sf::VideoMode> m_videomodes;
-	int m_currVideoMode = 0;
-	bool fullscreen = false;
-	bool isFPSLimited = true;
-	bool m_ShowFPS = true;
-	int fps_limit = 60;
-	float sensivity = 2.5f;
-	float game_volume = 100.f;
-	float music_volume = 100.f;
-	int currProfilePicture = 0;
-	int currFrontPicture = 0;
-	int currBackgroundPicture = 0;
-
+	
 	sf::Sprite icon;
 	sf::Sprite frontImage;
 	sf::RectangleShape backgroundImage;

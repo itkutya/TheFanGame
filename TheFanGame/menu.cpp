@@ -4,8 +4,6 @@ menu::menu(window& window) noexcept { this->m_window = &window; }
 
 menu::~menu() noexcept 
 {
-	if (!this->saveSettings("res/Settings.ini"))
-		std::cout << "Coud not save settings, quiting without it...\n";
 	this->shutdownServer();
 	this->m_MainMusic->stop();
 	ImGui::SFML::Shutdown();
@@ -100,46 +98,35 @@ const void menu::init(sf::RenderWindow& window)
 	for (std::size_t i = 0; i < 5; ++i)
 		this->characters.emplace_back();
 
-	if (!this->loadSettings("res/Settings.ini"))
-		throw "Cannot load save file...\n";
-
-	this->m_videomodes = sf::VideoMode::getFullscreenModes();
-	this->m_window->setSize(sf::Vector2u(this->m_videomodes[this->m_currVideoMode].width, this->m_videomodes[this->m_currVideoMode].height));
 	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
 	this->m_view.setSize(sf::Vector2f(window.getSize()));
 	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
 
-	this->m_window->setFramerateLimit(this->fps_limit);
-	this->m_window->setFullscreen(this->fullscreen);
-
 	this->frontImage.setTexture(resourceSystem::get_c<sf::Texture>("FrontImage"));
-	this->frontImage.setTextureRect(sf::IntRect(600 * this->currFrontPicture, 0, 600, 600));
+	this->frontImage.setTextureRect(sf::IntRect(600 * settings::m_currFrontPicture, 0, 600, 600));
 
 	this->icon.setTexture(resourceSystem::get_c<sf::Texture>("Icon"));
-	this->icon.setTextureRect(sf::IntRect(100 * this->currProfilePicture, 0, 100, 100));
+	this->icon.setTextureRect(sf::IntRect(100 * settings::m_currProfilePicture, 0, 100, 100));
 
 	this->backgroundImage.setTexture(&resourceSystem::get_c<sf::Texture>("Background"));
 	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
-	this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
+	this->backgroundImage.setTextureRect(sf::IntRect(1920 * settings::m_currBackgroundPicture, 0, 1920, 1080));
 	this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
 
-	this->m_MainMusic = &resourceSystem::get<sf::MyMusic>(this->m_currentMusic);
+	this->m_MainMusic = &resourceSystem::get<sf::MyMusic>(settings::m_currMusic);
 	this->m_MainMusic->setLoop(true);
-	if (this->music_volume > 0.f)
+	if (settings::m_MusicVolume > 0.f)
 		this->m_MainMusic->play();
-	this->m_MainMusic->setVolume(this->music_volume);
-
-	this->m_music.at(0) = "Blackbird - Cecile Corbel";
-	this->m_music.at(1) = "Sakakibara Yui - Koi no Honoo";
+	this->m_MainMusic->setVolume(settings::m_MusicVolume);
 }
 
 const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
 	ImGui::SFML::Update(window, dt);
 
-	if (this->music_volume == 0.f)
+	if (settings::m_MusicVolume == 0.f)
 		this->m_MainMusic->pause();
-	else if (this->music_volume > 0.f && this->m_MainMusic->getStatus() != sf::SoundSource::Playing)
+	else if (settings::m_MusicVolume > 0.f && this->m_MainMusic->getStatus() != sf::SoundSource::Playing)
 		this->m_MainMusic->play();
 
 	//sf::Vector2f scaleFactor = sf::Vector2f(static_cast<float>(window.getSize().x) / static_cast<float>(this->m_videomodes[0].width),
@@ -158,9 +145,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		vMax.x += ImGui::GetWindowPos().x;
 		vMax.y += ImGui::GetWindowPos().y;
 
-		std::string preview = std::to_string(this->m_videomodes[this->m_currVideoMode].width) + "x" + std::to_string(this->m_videomodes[this->m_currVideoMode].height);
+		std::string preview = std::to_string(settings::m_Videomodes[settings::m_currVideomode].width) + "x" + std::to_string(settings::m_Videomodes[settings::m_currVideomode].height);
 
-		if (this->m_ShowFPS)
+		if (settings::m_ShowFPS)
 		{
 			ImGui::SetCursorPos(ImVec2(vMax.x - 150.f, vMin.y));
 			ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
@@ -186,20 +173,20 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			WidgetPos = ImGui::GetCursorPos();
 			ImGui::SetNextItemWidth(500.f);
 			ImGui::SetCursorPos(ImVec2(WidgetPos.x - 15.f, WidgetPos.y));
-			if (ImGui::BeginCombo("###MusicSelector", this->m_currentMusic.c_str(), ImGuiComboFlags_HeightSmall))
+			if (ImGui::BeginCombo("###MusicSelector", settings::m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
 			{
-				for (auto& music : this->m_music)
+				for (auto& music : settings::m_Music)
 				{
 					if (ImGui::Selectable(music))
 					{
-						if (this->m_currentMusic.c_str() != music)
+						if (settings::m_currMusic.c_str() != music)
 						{
-							this->m_currentMusic = music;
+							settings::m_currMusic = music;
 							this->m_MainMusic->stop();
-							this->m_MainMusic = &resourceSystem::get<sf::MyMusic>(this->m_currentMusic);
-							if (this->music_volume > 0.f)
+							this->m_MainMusic = &resourceSystem::get<sf::MyMusic>(settings::m_currMusic);
+							if (settings::m_MusicVolume > 0.f)
 								this->m_MainMusic->play();
-							this->m_MainMusic->setVolume(this->music_volume);
+							this->m_MainMusic->setVolume(settings::m_MusicVolume);
 						}
 					}
 				}
@@ -333,19 +320,19 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					}
 					break;
 				case settingState::Graphics:
-					if (ImGui::Checkbox("Fullscreen: ", &this->fullscreen))
-						this->m_window->setFullscreen(this->fullscreen);
+					if (ImGui::Checkbox("Fullscreen: ", &settings::m_Fullscreen))
+						this->m_window->recreate();
 
 					ImGui::SetNextItemWidth(300.f);
 					if (ImGui::BeginCombo("Resolution: ", preview.c_str(), ImGuiComboFlags_HeightSmall))
 					{
-						for (std::size_t i = 0; i < this->m_videomodes.size(); ++i)
+						for (std::size_t i = 0; i < settings::m_Videomodes.size(); ++i)
 						{
-							std::string text = std::to_string(this->m_videomodes[i].width) + "x" + std::to_string(this->m_videomodes[i].height);
+							std::string text = std::to_string(settings::m_Videomodes[i].width) + "x" + std::to_string(settings::m_Videomodes[i].height);
 							if (ImGui::Selectable(text.c_str()))
 							{
-								this->m_currVideoMode = (int)i;
-								this->m_window->setSize(sf::Vector2u(this->m_videomodes[i].width, this->m_videomodes[i].height));
+								settings::m_currVideomode = (int)i;
+								this->m_window->recreate();
 								this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
 								this->m_view.setSize(sf::Vector2f(window.getSize()));
 								this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
@@ -353,66 +340,70 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						}
 						ImGui::EndCombo();
 					}
-					if (ImGui::Checkbox("Show FPS", &this->m_ShowFPS))
+					if (ImGui::Checkbox("Show FPS", &settings::m_ShowFPS))
 						std::cout << "\n";
-					if (ImGui::Checkbox("FPS Limit: ", &this->isFPSLimited))
+
+					if (!settings::m_isFPSLimited)
+						if (ImGui::Checkbox("VSync: ", &settings::m_Vsync))
+							this->m_window->setVSync();
+
+					if (!settings::m_Vsync)
 					{
-						if (!this->isFPSLimited)
-							this->m_window->setFramerateLimit(0);
-						else
-							this->m_window->setFramerateLimit(this->fps_limit);
-					}
-					if (this->isFPSLimited)
-					{
-						ImGui::SameLine();
-						if (ImGui::SliderInt("##Limit: ", &this->fps_limit, 30, 180))
-							this->m_window->setFramerateLimit(this->fps_limit);
+						if (ImGui::Checkbox("FPS Limit: ", &settings::m_isFPSLimited))
+							this->m_window->setFramerateLimit();
+						if (settings::m_isFPSLimited)
+						{
+							ImGui::SameLine();
+							if (ImGui::SliderInt("##Limit: ", &settings::m_FpsLimit, 30, 240))
+								this->m_window->setFramerateLimit();
+						}
 					}
 					break;
 				case settingState::Game:
-					ImGui::SliderFloat("Sensivity: ", &this->sensivity, 0.f, 20.f);
+					ImGui::SliderFloat("Vertical Sensivity: ", &settings::m_VerticalSensivity, 0.f, 20.f);
+					ImGui::SliderFloat("Horizontal Sensivity: ", &settings::m_HorizontalSensivity, 0.f, 20.f);
 					break;
 				case settingState::Mainmenu:
-					if(ImGui::SliderInt("Front image: ", &this->currFrontPicture, 0, 0))
-						this->frontImage.setTextureRect(sf::IntRect(600 * this->currFrontPicture, 0, 600, 600));
+					if(ImGui::SliderInt("Front image: ", &settings::m_currFrontPicture, 0, 0))
+						this->frontImage.setTextureRect(sf::IntRect(600 * settings::m_currFrontPicture, 0, 600, 600));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->frontImage.getTexture());
-						background.setTextureRect(sf::IntRect(600 * this->currFrontPicture, 0, 600, 600));
+						background.setTextureRect(sf::IntRect(600 * settings::m_currFrontPicture, 0, 600, 600));
 						ImGui::Image(background, ImVec2(300.f, 300.f));
 						ImGui::EndTooltip();
 					}
 
-					if(ImGui::SliderInt("Profile picture: ", &this->currProfilePicture, 0, 3))
-						this->icon.setTextureRect(sf::IntRect(100 * this->currProfilePicture, 0, 100, 100));
+					if(ImGui::SliderInt("Profile picture: ", &settings::m_currProfilePicture, 0, 3))
+						this->icon.setTextureRect(sf::IntRect(100 * settings::m_currProfilePicture, 0, 100, 100));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->icon.getTexture());
-						background.setTextureRect(sf::IntRect(100 * this->currProfilePicture, 0, 100, 100));
+						background.setTextureRect(sf::IntRect(100 * settings::m_currProfilePicture, 0, 100, 100));
 						ImGui::Image(background, ImVec2(100.f, 100.f));
 						ImGui::EndTooltip();
 					}
 
-					if (ImGui::SliderInt("Background image: ", &this->currBackgroundPicture, 0, 3))
-						this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
+					if (ImGui::SliderInt("Background image: ", &settings::m_currBackgroundPicture, 0, 3))
+						this->backgroundImage.setTextureRect(sf::IntRect(1920 * settings::m_currBackgroundPicture, 0, 1920, 1080));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->backgroundImage.getTexture());
-						background.setTextureRect(sf::IntRect(1920 * this->currBackgroundPicture, 0, 1920, 1080));
+						background.setTextureRect(sf::IntRect(1920 * settings::m_currBackgroundPicture, 0, 1920, 1080));
 						ImGui::Image(background, ImVec2(300.f, 300.f));
 						ImGui::EndTooltip();
 					}
 					break;
 				case settingState::Audio:
-					ImGui::SliderFloat("Game volume: ", &this->game_volume, 0.f, 100.f);
-					if (ImGui::SliderFloat("Music volume: ", &this->music_volume, 0.f, 100.f))
-						this->m_MainMusic->setVolume(this->music_volume);
+					ImGui::SliderFloat("Game volume: ", &settings::m_GameVolume, 0.f, 100.f);
+					if (ImGui::SliderFloat("Music volume: ", &settings::m_MusicVolume, 0.f, 100.f))
+						this->m_MainMusic->setVolume(settings::m_MusicVolume);
 					break;
 				default:
 					break;
@@ -420,7 +411,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
 				if (ImGui::Button("Back##Settings", ImVec2(300.f, 75.f)))
 				{
-					if (this->saveSettings("res/Settings.ini"))
+					if (settings::saveSettings("res/Settings.ini"))
 						this->m_State = state::MainMenu;
 				}
 			}ImGui::End();
@@ -745,45 +736,6 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 	window.draw(this->curr_xp);
 	window.setView(window.getDefaultView());
 	ImGui::SFML::Render(window);
-}
-
-const bool menu::saveSettings(const std::string& filePath) const noexcept
-{
-	std::ofstream saveFile;
-	saveFile.open(filePath, std::ios::out | std::ios::trunc);
-	if (saveFile.is_open())
-	{
-		saveFile << this->m_currentMusic << '\n' << this->m_currVideoMode << '\n' << this->fullscreen << '\n' << this->isFPSLimited << '\n'
-			<< this->m_ShowFPS << '\n' << this->fps_limit << '\n' << this->sensivity << '\n' << this->game_volume << '\n' << this->music_volume << '\n'
-			<< this->currProfilePicture << '\n' << this->currFrontPicture << '\n' << this->currBackgroundPicture << '\n';
-	}
-	else
-	{
-		saveFile.close();
-		return false;
-	}
-	saveFile.close();
-	return true;
-}
-
-const bool menu::loadSettings(const std::string& filePath) noexcept
-{
-	std::ifstream loadFile;
-	loadFile.open(filePath, std::ios::in);
-	if (loadFile.is_open())
-	{
-		std::getline(loadFile, this->m_currentMusic);
-		loadFile >> this->m_currVideoMode >> this->fullscreen >> this->isFPSLimited 
-				 >> this->m_ShowFPS >> this->fps_limit >> this->sensivity >> this->game_volume >> this->music_volume
-				 >> this->currProfilePicture >> this->currFrontPicture >> this->currBackgroundPicture;
-	}
-	else
-	{
-		loadFile.close();
-		return false;
-	}
-	loadFile.close();
-	return true;
 }
 
 void menu::startServer()

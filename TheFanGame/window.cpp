@@ -1,8 +1,19 @@
 #include "window.h"
 
-window::window() noexcept : isFullscreen(false), FPSLimit(60) {}
+window::window(const char* name) noexcept : title(name)
+{
+	if (!settings::loadSettings("res/Settings.ini"))
+		std::cout << "NOT_OK!\n";
 
-window::~window() noexcept {}
+	this->recreate();
+	this->deltaTime.restart();
+}
+
+window::~window() noexcept 
+{
+	if (!settings::saveSettings("res/Settings.ini"))
+		std::cout << "NOT_OK!\n";
+}
 
 const void window::pollEvents() noexcept
 {
@@ -49,41 +60,40 @@ window::operator const bool() noexcept { return this->m_window.isOpen(); }
 
 window::operator sf::RenderWindow&() noexcept { return this->m_window; }
 
-const void window::create(const sf::VideoMode& size, const char* name) noexcept
+const void window::setFramerateLimit() noexcept
 {
-	this->m_videomode = size;
-	this->title = name;
-	this->m_window.create(size, name);
-	this->m_window.setKeyRepeatEnabled(false);
-	this->deltaTime.restart();
+	if (!settings::m_Vsync)
+		if (!settings::m_isFPSLimited)
+			this->m_window.setFramerateLimit(0);
+		else
+			this->m_window.setFramerateLimit(settings::m_FpsLimit);
 }
 
-const void window::setFramerateLimit(const std::uint32_t& limit) noexcept 
+const void window::setVSync() noexcept
 {
-	this->FPSLimit = limit;
-	this->m_window.setFramerateLimit(limit);
-}
-
-const void window::setSize(const sf::Vector2u& size) noexcept 
-{
-	this->m_videomode = sf::VideoMode(size.x, size.y);
-	this->recreate();
-}
-
-const void window::setFullscreen(const bool& active) noexcept
-{
-	this->isFullscreen = active;
-	this->recreate();
+	if (!settings::m_isFPSLimited)
+		this->m_window.setVerticalSyncEnabled(settings::m_Vsync);
 }
 
 const void window::recreate() noexcept
 {
+	if (settings::m_Fullscreen)
+		this->m_window.create(settings::m_Videomodes[settings::m_currVideomode], this->title, sf::Style::Fullscreen);
+	else
+		this->m_window.create(settings::m_Videomodes[settings::m_currVideomode], this->title);
+
 	this->m_window.setKeyRepeatEnabled(false);
 
-	if (this->isFullscreen)
-		this->m_window.create(this->m_videomode, this->title, sf::Style::Fullscreen);
+	if (!settings::m_Vsync)
+		if (!settings::m_isFPSLimited)
+			this->m_window.setFramerateLimit(0);
+		else
+			this->m_window.setFramerateLimit(settings::m_FpsLimit);
 	else
-		this->m_window.create(this->m_videomode, this->title);
+		std::cout << "Disable Vsync before settings a FPS limit...\n";
 
-	this->setFramerateLimit(this->FPSLimit);
+	if (!settings::m_isFPSLimited)
+		this->m_window.setVerticalSyncEnabled(true);
+	else
+		this->m_window.setVerticalSyncEnabled(false);
 }

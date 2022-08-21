@@ -183,7 +183,7 @@
     <ClCompile Include="player.cpp" />
     <ClCompile Include="ray.cpp" />
     <ClCompile Include="resourceSystem.cpp" />
-    <ClCompile Include="setting.cpp" />
+    <ClCompile Include="settings.cpp" />
     <ClCompile Include="stateSystem.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="weapon.cpp" />
@@ -209,7 +209,7 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="resourceSystem.h" />
-    <ClInclude Include="setting.h" />
+    <ClInclude Include="settings.h" />
     <ClInclude Include="stateSystem.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="weapon.h" />

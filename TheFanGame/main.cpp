@@ -20,11 +20,9 @@ int main()
 
 	try
 	{
-		window mainWindow;
-		mainWindow.create(sf::VideoMode(1920, 1080), "Project stuff");
-		mainWindow.setFramerateLimit(60);
-
+		window mainWindow = window("Game!");
 		stateSystem::add<menu>(mainWindow);
+
 		while (mainWindow)
 		{
 			stateSystem::processStateChange(mainWindow);

@@ -81,7 +81,7 @@
     <ClCompile Include="inputSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setting.cpp">
+    <ClCompile Include="settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -155,7 +155,7 @@
     <ClInclude Include="inputSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="setting.h">
+    <ClInclude Include="settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
