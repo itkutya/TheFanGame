@@ -443,6 +443,12 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				default:
 					break;
 				}
+				ImGui::SetCursorPos(ImVec2(vMax.x - 750.f, vMax.y - 125.f));
+				if (ImGui::Button("Save##Settings", ImVec2(300.f, 75.f)))
+				{
+					if (settings::saveSettings("res/Settings.ini"))
+						std::cout << "Saved the settings...\n";
+				}
 				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
 				if (ImGui::Button("Back##Settings", ImVec2(300.f, 75.f)))
 				{
