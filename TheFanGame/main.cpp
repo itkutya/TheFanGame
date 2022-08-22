@@ -12,6 +12,8 @@ int main()
 		resourceSystem::add<sf::Texture>("Background", "res/MainMenu/Backgrounds.png");
 		resourceSystem::add<sf::Texture>("FrontImage", "res/MainMenu/FontImages.png");
 		resourceSystem::add<sf::Texture>("Icon", "res/MainMenu/Icons.png");
+		resourceSystem::add<sf::Texture>("Pause", "res/MainMenu/Pause.png");
+		resourceSystem::add<sf::Texture>("Resume", "res/MainMenu/Resume.png");
 		resourceSystem::add<sf::Texture>("CharacterTexture", "res/char.png");
 		resourceSystem::add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
 		resourceSystem::add<sf::MyMusic>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");

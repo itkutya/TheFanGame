@@ -45,7 +45,7 @@ public:
 	{
 		m_resources[id].emplace<T>();
 
-		if (!std::get<T>(m_resources.at(id)).loadFromFile(filePath))
+		if (!std::get<T>(m_resources[id]).loadFromFile(filePath))
 			throw "Cannot load texture...\n";
 	};
 

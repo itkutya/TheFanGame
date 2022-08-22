@@ -126,7 +126,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 	if (settings::m_MusicVolume == 0.f)
 		this->m_MainMusic->pause();
-	else if (settings::m_MusicVolume > 0.f && this->m_MainMusic->getStatus() != sf::SoundSource::Playing)
+	else if (settings::m_MusicVolume > 0.f && this->m_MainMusic->getStatus() == sf::SoundSource::Stopped)
 		this->m_MainMusic->play();
 
 	//sf::Vector2f scaleFactor = sf::Vector2f(static_cast<float>(window.getSize().x) / static_cast<float>(this->m_videomodes[0].width),
@@ -163,16 +163,27 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::End();
 			}
 		}
-		
+
 		switch (this->m_State)
 		{
 		case state::MainMenu:
-			ImGui::SetCursorPos(ImVec2(vMax.x - 700.f, vMin.y + 40.f));
+			ImGui::SetCursorPos(ImVec2(vMax.x - 750.f, vMin.y + 40.f));
+			if (this->m_MainMusic->getStatus() == sf::SoundSource::Playing)
+			{
+				if (ImGui::ImageButton(resourceSystem::get_c<sf::Texture>("Pause"), sf::Vector2f(35.f, 35.f)))
+					this->m_MainMusic->pause();
+			}
+			else
+				if (ImGui::ImageButton(resourceSystem::get_c<sf::Texture>("Resume"), sf::Vector2f(35.f, 35.f)))
+					this->m_MainMusic->play();
+			ImGui::SameLine();
+			WidgetPos = ImGui::GetCursorPos();
+			ImGui::SetCursorPos(ImVec2(WidgetPos.x, WidgetPos.y + 5.f));
 			ImGui::Text("Currently playing: ");
 			ImGui::SameLine();
 			WidgetPos = ImGui::GetCursorPos();
 			ImGui::SetNextItemWidth(500.f);
-			ImGui::SetCursorPos(ImVec2(WidgetPos.x - 15.f, WidgetPos.y));
+			ImGui::SetCursorPos(ImVec2(WidgetPos.x - 15.f, WidgetPos.y + 5.f));
 			if (ImGui::BeginCombo("###MusicSelector", settings::m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
 			{
 				for (auto& music : settings::m_Music)
@@ -401,6 +412,30 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					}
 					break;
 				case settingState::Audio:
+					ImGui::Text("Currently playing: ");
+					ImGui::SameLine();
+					WidgetPos = ImGui::GetCursorPos();
+					ImGui::SetNextItemWidth(500.f);
+					ImGui::SetCursorPos(ImVec2(WidgetPos.x - 15.f, WidgetPos.y));
+					if (ImGui::BeginCombo("###MusicSelector", settings::m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
+					{
+						for (auto& music : settings::m_Music)
+						{
+							if (ImGui::Selectable(music))
+							{
+								if (settings::m_currMusic.c_str() != music)
+								{
+									settings::m_currMusic = music;
+									this->m_MainMusic->stop();
+									this->m_MainMusic = &resourceSystem::get<sf::MyMusic>(settings::m_currMusic);
+									if (settings::m_MusicVolume > 0.f)
+										this->m_MainMusic->play();
+									this->m_MainMusic->setVolume(settings::m_MusicVolume);
+								}
+							}
+						}
+						ImGui::EndCombo();
+					}
 					ImGui::SliderFloat("Game volume: ", &settings::m_GameVolume, 0.f, 100.f);
 					if (ImGui::SliderFloat("Music volume: ", &settings::m_MusicVolume, 0.f, 100.f))
 						this->m_MainMusic->setVolume(settings::m_MusicVolume);
