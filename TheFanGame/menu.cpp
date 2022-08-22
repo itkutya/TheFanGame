@@ -602,6 +602,11 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 								//Load them
 								this->m_State = state::MultiLobby;
 							}
+							else
+							{
+								this->socket.connect(this->serverIP, this->serverPort);
+								this->m_ServerError = true;
+							}
 						}
 						ImGui::PopID();
 					}
@@ -628,11 +633,20 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetCursorPos(ImVec2(WidgetPos.x, WidgetPos.y - 10.f));
 				if (ImGui::Button("Join", ImVec2(200.f, 50.f)))
 				{
-					//this->socket.disconnect();
-					//this->socket.connect();
-					//if succesful 
-					// -> get data from lobbya
-					// -> load lobby
+					std::cout << "connecting to the server... " << this->InputIp << ":" << this->InputPort << "\n";
+					this->socket.disconnect();
+					if (this->socket.connect(sf::IpAddress(this->InputIp), std::uint16_t(this->InputPort)) == sf::Socket::Done)
+					{
+						std::cout << "Succesfuly connected to the server...\n";
+						//Get lobby data from server
+						//Load them
+						this->m_State = state::MultiLobby;
+					}
+					else
+					{
+						this->socket.connect(this->serverIP, this->serverPort);
+						this->m_ServerError = true;
+					}
 				}
 
 				ImGui::SetCursorPos(ImVec2(vMin.x + 25.f, vMax.y - 125.f));
@@ -716,10 +730,11 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 								std::cout << "Ok!\n";
 							ImGui::PopID();
 						}
-					}ImGui::EndListBox();
+						ImGui::EndCombo();
+					}
 					//Switch case maybie??? idk...
 					ImGui::Text("GameModeTextGoesHere");
-					if (ImGui::BeginListBox("Map maybie?"))
+					if (ImGui::BeginCombo("Map maybie?", "MapID"))
 					{
 						for (std::size_t i = 0; i < 5; ++i)
 						{
@@ -728,7 +743,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 								std::cout << "Ok!\n";
 							ImGui::PopID();
 						}
-					}ImGui::EndListBox();
+						ImGui::EndCombo();
+					}
 					//Switch case maybie??? idk...
 					ImGui::Text("MapTextGoesHere");
 				}ImGui::EndChild();
@@ -795,7 +811,7 @@ void menu::startServer()
 
 		while (this->m_window)
 		{
-			if (this->selector.wait())
+			if (this->selector.wait(sf::seconds(1.f)))
 			{
 				if (this->selector.isReady(this->hosting))
 				{
@@ -819,6 +835,7 @@ void menu::startServer()
 						if (this->selector.isReady(client))
 						{
 							sf::Packet packet;
+							/*
 							if (client.receive(packet) == sf::Socket::Disconnected)
 							{
 								this->selector.remove(client);
@@ -826,6 +843,7 @@ void menu::startServer()
 								this->clients.erase(it);
 								break;
 							}
+							*/
 							if (client.receive(packet) == sf::Socket::Done)
 							{
 								char msg[255] = { "" };
