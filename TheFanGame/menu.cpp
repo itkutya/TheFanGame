@@ -4,7 +4,14 @@ menu::menu(window& window) noexcept { this->m_window = &window; }
 
 menu::~menu() noexcept 
 {
-	this->shutdownServer();
+	if (!this->shutdownServer())
+	{
+		if (this->handleLocalPlayerNum != nullptr)
+		{
+			this->handleLocalPlayerNum->terminate();
+			this->handleLocalPlayerNum.release();
+		}
+	}
 	this->m_MainMusic->stop();
 	ImGui::SFML::Shutdown();
 }
@@ -590,17 +597,34 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					for (std::size_t i = 0; i < this->servers.size(); ++i)
 					{
 						std::string serverInfo = this->servers[i].first.toString() + ':' + std::to_string(this->servers[i].second);
-						ImGui::PushID("ServerInfo" + i);
 						if (ImGui::Selectable(serverInfo.c_str()))
 						{
 							std::cout << "connecting to the server... " << this->servers[i].first.toString() << ":" << this->servers[i].second << "\n";
 							this->socket.disconnect();
 							if (this->socket.connect(this->servers[i].first, this->servers[i].second) == sf::Socket::Done)
 							{
-								std::cout << "Succesfuly connected to the server...\n";
-								//Get lobby data from server
-								//Load them
-								this->m_State = state::MultiLobby;
+								sf::Packet packet;
+								if (this->socket.receive(packet) == sf::Socket::Done)
+								{
+									packet >> this->LocalHostPlayerNum;
+									packet.clear();
+									for (std::size_t i = 0; i < this->LocalHostPlayerNum; ++i)
+									{
+										if (this->socket.receive(packet) == sf::Socket::Done)
+										{
+											std::string ip;
+											sf::Uint16 g_port;
+											packet >> ip >> g_port;
+											this->localHostPlayers.push_back(std::pair<sf::IpAddress, sf::Uint16>(sf::IpAddress(ip), g_port));
+											std::cout << this->localHostPlayers[i].first.toString() << ":" << this->localHostPlayers[i].second << '\n';
+										}
+										packet.clear();
+									}
+									std::cout << "Succesfuly connected to the server...\n";
+									this->m_State = state::MultiLobby;
+									this->handleLocalPlayerNum = std::make_unique<sf::Thread>(&menu::updateLocalServerNum, this);
+									this->handleLocalPlayerNum->launch();
+								}
 							}
 							else
 							{
@@ -608,7 +632,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 								this->m_ServerError = true;
 							}
 						}
-						ImGui::PopID();
 					}
 					ImGui::EndListBox();
 				}
@@ -637,10 +660,26 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					this->socket.disconnect();
 					if (this->socket.connect(sf::IpAddress(this->InputIp), std::uint16_t(this->InputPort)) == sf::Socket::Done)
 					{
-						std::cout << "Succesfuly connected to the server...\n";
-						//Get lobby data from server
-						//Load them
-						this->m_State = state::MultiLobby;
+						sf::Packet packet;
+						if (this->socket.receive(packet) == sf::Socket::Done)
+						{
+							packet >> this->LocalHostPlayerNum;
+							packet.clear();
+							for (std::size_t i = 0; i < this->LocalHostPlayerNum; ++i)
+							{
+								if (this->socket.receive(packet) == sf::Socket::Done)
+								{
+									std::string ip;
+									sf::Uint16 g_port;
+									packet >> ip >> g_port;
+									this->localHostPlayers.push_back(std::pair<sf::IpAddress, sf::Uint16>(sf::IpAddress(ip), g_port));
+									std::cout << this->localHostPlayers[i].first.toString() << ":" << this->localHostPlayers[i].second << '\n';
+								}
+								packet.clear();
+							}
+							std::cout << "Succesfuly connected to the server...\n";
+							this->m_State = state::MultiLobby;
+						}
 					}
 					else
 					{
@@ -697,17 +736,17 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SameLine();
 				if (ImGui::BeginListBox("##PlayerList", ImVec2(ImGui::GetWindowSize().x - 500.f, ImGui::GetWindowSize().y - 200.f)))
 				{
-					for (std::size_t i = 0; i < 12; ++i)
+					sf::Lock lock(this->mutex);
+					for (std::size_t i = 0; i < this->localHostPlayers.size(); ++i)
 					{
-						ImGui::PushID("Player" + i);
-						if (ImGui::Selectable("Player"))
+						std::string clientInfo = this->localHostPlayers[i].first.toString() + ":" + std::to_string(this->localHostPlayers[i].second);
+						if (ImGui::Selectable(clientInfo.c_str()))
 						{
 							//Mute
 							// if admin...
 							//	Kick
 							//	Ban
 						}
-						ImGui::PopID();
 					}
 					ImGui::EndListBox();
 				}
@@ -756,7 +795,25 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
 				if (ImGui::Button("Back##MultiLobby", ImVec2(300.f, 75.f)))
 				{
-					this->shutdownServer();
+					if (this->shutdownServer())
+						std::cout << "Server succesfully shut down...\n";
+					else
+					{
+						//Client disconnects since there is no server thread...
+						this->handleLocalPlayerNum->terminate();
+						this->handleLocalPlayerNum.release();
+
+						sf::Packet packet;
+						packet << std::uint8_t(52);
+						if (this->socket.send(packet) != sf::Socket::Done)
+							std::cout << "Error! Cannot send quit msg to the server...\n";
+						packet.clear();
+
+						this->socket.disconnect();
+						this->socket.connect(this->serverIP, this->serverPort);
+					}
+					this->localHostPlayers.clear();
+					this->LocalHostPlayerNum = 0;
 					this->refreshServerList();
 					this->m_State = state::Multiplayer;
 				}
@@ -800,6 +857,7 @@ void menu::startServer()
 	if (this->hosting.listen(sf::TcpListener::AnyPort, sf::IpAddress::getLocalAddress()) == sf::Socket::Done)
 	{
 		this->m_State = state::MultiLobby;
+		this->localHostPlayers.push_back(std::pair<sf::IpAddress, sf::Uint16>(sf::IpAddress(sf::IpAddress().getLocalAddress()), this->hosting.getLocalPort()));
 
 		sf::Packet packet;
 		packet << sf::IpAddress::getLocalAddress().toString() << this->hosting.getLocalPort();
@@ -821,6 +879,26 @@ void menu::startServer()
 						this->clients.push_back(client);
 						this->selector.add(*client);
 						std::cout << "A client has connected: " << client->getRemoteAddress() << ":" << client->getRemotePort() << '\n';
+
+						sf::Lock lock(this->mutex);
+						this->localHostPlayers.push_back(std::pair<sf::IpAddress, sf::Uint16>(sf::IpAddress(client->getRemoteAddress()), client->getRemotePort()));
+						for (std::size_t i = 0; i < this->clients.size(); ++i)
+						{
+							packet.clear();
+							packet << std::uint32_t(this->localHostPlayers.size());
+							if (this->clients[i]->send(packet) == sf::Socket::Done)
+							{
+								packet.clear();
+								for (std::size_t j = 0; j < this->localHostPlayers.size(); ++j)
+								{
+									packet << this->localHostPlayers[j].first.toString() << this->localHostPlayers[j].second;
+									if (this->clients[i]->send(packet) != sf::Socket::Done)
+										std::cout << "Error! Cannot reach the client...\n";
+									packet.clear();
+								}
+							}
+							packet.clear();
+						}
 					}
 					else
 					{
@@ -834,21 +912,69 @@ void menu::startServer()
 						sf::TcpSocket& client = **it;
 						if (this->selector.isReady(client))
 						{
-							sf::Packet packet;
-							/*
-							if (client.receive(packet) == sf::Socket::Disconnected)
+							sf::Lock lock(this->mutex);
+							if (client.receive(packet) == sf::Socket::Done)
 							{
+								if (packet.getDataSize() == sizeof(std::uint8_t))
+								{
+									std::uint8_t data;
+									packet >> data;
+									packet.clear();
+
+									switch (data)
+									{
+									case 52:
+										for (auto it2 = this->localHostPlayers.begin(); it2 != this->localHostPlayers.end(); ++it2)
+										{
+											if (client.getRemoteAddress() == it2->first)
+											{
+												this->localHostPlayers.erase(it2);
+												this->localHostPlayers.shrink_to_fit();
+												break;
+											}
+										}
+										break;
+									default:
+										std::cout << "Client sent an unknown command...\n";
+										break;
+									}
+								}
+							}
+							else
+							{
+								//std::cout << "Error! while receeving the packet...\n";
+								std::cout << "Player disconnected: " << client.getRemoteAddress().toString() << ":" << client.getRemotePort() << '\n';
 								this->selector.remove(client);
 								client.disconnect();
 								this->clients.erase(it);
+								this->clients.shrink_to_fit();
+								for (auto it2 = this->localHostPlayers.begin(); it2 != this->localHostPlayers.end(); ++it2)
+								{
+									if (client.getRemoteAddress() == it2->first)
+									{
+										this->localHostPlayers.erase(it2);
+										this->localHostPlayers.shrink_to_fit();
+										break;
+									}
+								}
+								for (std::size_t i = 0; i < this->clients.size(); ++i)
+								{
+									packet.clear();
+									packet << std::uint32_t(this->localHostPlayers.size());
+									if (this->clients[i]->send(packet) == sf::Socket::Done)
+									{
+										packet.clear();
+										for (std::size_t j = 0; j < this->localHostPlayers.size(); ++j)
+										{
+											packet << this->localHostPlayers[j].first.toString() << this->localHostPlayers[j].second;
+											if (this->clients[i]->send(packet) != sf::Socket::Done)
+												std::cout << "Error! Cannot reach the client...\n";
+											packet.clear();
+										}
+									}
+									packet.clear();
+								}
 								break;
-							}
-							*/
-							if (client.receive(packet) == sf::Socket::Done)
-							{
-								char msg[255] = { "" };
-								packet >> msg;
-								std::cout << "Client " << client.getRemoteAddress() << " sent us a msg: " << msg << '\n';
 							}
 							packet.clear();
 						}
@@ -861,7 +987,7 @@ void menu::startServer()
 		std::cout << "Error cannot start server...\n";
 }
 
-void menu::shutdownServer()
+const bool menu::shutdownServer()
 {
 	if (this->serverThread != nullptr)
 	{
@@ -872,10 +998,17 @@ void menu::shutdownServer()
 
 		sf::Packet packet;
 		packet << std::uint8_t(52);
+		for (std::size_t i = 0; i < this->clients.size(); ++i)
+		{
+			if (this->clients[i]->send(packet) != sf::Socket::Done)
+				std::cout << "Error! Cannot reach the client...\n";
+		}
 		if (this->socket.send(packet) != sf::Socket::Done)
 			std::cout << "Error! Cannot send quit msg to the server...\n";
 		packet.clear();
+		return true;
 	}
+	return false;
 }
 
 void menu::refreshServerList()
@@ -903,6 +1036,62 @@ void menu::refreshServerList()
 				std::cout << this->servers[i].first.toString() << ":" << this->servers[i].second << '\n';
 			}
 			packet.clear();
+		}
+	}
+}
+
+void menu::updateLocalServerNum()
+{
+	if (this->serverThread == nullptr)
+	{
+		while (this->m_window)
+		{
+			sf::Packet packet;
+			if (this->socket.receive(packet) == sf::Socket::Done)
+			{
+				if (packet.getDataSize() == sizeof(std::uint8_t))
+				{
+					std::uint8_t data;
+					packet >> data;
+					packet.clear();
+
+					switch (data)
+					{
+					case 52:
+						std::cout << "Host disconnected...\n";
+						this->socket.disconnect();
+						this->socket.connect(this->serverIP, this->serverPort);
+						this->localHostPlayers.clear();
+						this->LocalHostPlayerNum = 0;
+						this->refreshServerList();
+						this->m_State = state::Multiplayer;
+						this->m_ServerError = true;
+						return;
+					default:
+						std::cout << "Client sent an unknown command...\n";
+						break;
+					}
+				}
+				else
+				{
+					sf::Lock lock(this->mutex);
+					this->LocalHostPlayerNum = 0;
+					this->localHostPlayers.clear();
+					packet >> this->LocalHostPlayerNum;
+					packet.clear();
+					for (std::size_t i = 0; i < this->LocalHostPlayerNum; ++i)
+					{
+						if (this->socket.receive(packet) == sf::Socket::Done)
+						{
+							std::string ip;
+							sf::Uint16 g_port;
+							packet >> ip >> g_port;
+							this->localHostPlayers.push_back(std::pair<sf::IpAddress, sf::Uint16>(sf::IpAddress(ip), g_port));
+						}
+						packet.clear();
+					}
+				}
+			}
 		}
 	}
 }

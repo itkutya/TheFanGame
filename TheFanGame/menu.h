@@ -66,12 +66,18 @@ private:
 	std::uint32_t activeServerNum;
 
 	void startServer();
-	void shutdownServer();
+	const bool shutdownServer();
 	void refreshServerList();
 	std::unique_ptr<sf::Thread> serverThread;
 	sf::TcpListener hosting;
-	std::vector<sf::TcpSocket*> clients;
 	sf::SocketSelector selector;
+	std::vector<sf::TcpSocket*> clients;
+
+	std::uint32_t LocalHostPlayerNum = 0;
+	std::vector<std::pair<sf::IpAddress, sf::Uint16>> localHostPlayers;
+	sf::Mutex mutex;
+	void updateLocalServerNum();
+	std::unique_ptr<sf::Thread> handleLocalPlayerNum;
 
 	struct talents
 	{
