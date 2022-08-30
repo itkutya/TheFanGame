@@ -700,7 +700,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				{
 					std::cout << "connecting to the server... " << this->InputIp << ":" << this->InputPort << "\n";
 					this->socket.disconnect();
-					if (this->socket.connect(sf::IpAddress(this->InputIp), std::uint16_t(this->InputPort)) == sf::Socket::Done)
+					if (this->socket.connect(sf::IpAddress(this->InputIp), std::uint16_t(std::atoi(this->InputPort))) == sf::Socket::Done)
 					{
 						sf::Packet packet;
 						if (this->socket.receive(packet) == sf::Socket::Done)

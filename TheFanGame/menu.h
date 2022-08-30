@@ -1,5 +1,8 @@
 #pragma once
 
+#include <stdlib.h>
+#include <stdio.h>
+
 #if _WIN32 || _WIN64
 	#if _WIN64
 		#include "SFML64/System.hpp"
