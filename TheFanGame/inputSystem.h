@@ -27,6 +27,8 @@ struct m_Keys
 	sf::Event::EventType m_EventType;
 	sf::Keyboard::Key m_KeyCode;
 	sf::Mouse::Button m_MouseButton;
+	sf::Joystick::Axis m_JoystickAxis;
+	std::uint32_t m_joystickButton;
 };
 
 class inputSystem
@@ -44,4 +46,5 @@ public:
 	
 	static std::unordered_map<const char*, m_Keys> m_Action;
 private:
+	static bool isJoystickConnected;
 };
