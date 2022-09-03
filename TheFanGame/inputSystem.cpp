@@ -1,96 +1,91 @@
 #include "inputSystem.h"
 
-std::unordered_map<const char*, m_Keys> inputSystem::m_Action;
+std::unordered_map<std::string, m_Keys> inputSystem::m_Action;
 bool inputSystem::isJoystickConnected = false;
 
 const void inputSystem::init()
 {
-    constexpr std::array keyboardInputText = { "Left", "Right", "Forward", "Backward", "ScreenShot" };
-    constexpr std::array mouseInputText = { "Fire", "Scoop" };
-
     m_Keys key = m_Keys();
+    
+    enum class InputText
+    {
+        Unknown, Keyboard, Mouse, Joystick
+    };
 
-    std::ifstream inputSettings;
-    inputSettings.open("res/inputSettings.ini", std::ios::in);
+    std::ifstream inputSettings("res/inputSettings.ini");
     if (inputSettings.is_open())
     {
+        std::uint32_t type;
+        std::string action;
         std::uint32_t temp;
         std::string pr;
 
-        key.m_InputType = InputType::KeyboardInput;
-        for (std::size_t i = 0; i < keyboardInputText.size(); ++i)
+        while (inputSettings >> type >> action >> temp >> pr)
         {
-            inputSettings >> temp >> pr;
+            InputText tempType = static_cast<InputText>(type);
 
-            if (pr == "P")
-                key.m_EventType = sf::Event::KeyPressed;
-            else if (pr == "R")
-                key.m_EventType = sf::Event::KeyReleased;
-            else
-                throw "Error while loading from the input settings file...\n";
-
-            sf::Keyboard::Key m_TempKey = sf::Keyboard::Unknown;
-            m_TempKey = static_cast<sf::Keyboard::Key>(temp);
-            key.m_KeyCode = m_TempKey;
-            m_Action[keyboardInputText[i]] = key;
-        }
-
-        key.m_InputType = InputType::MouseInput;
-        key.m_KeyCode = sf::Keyboard::Unknown;
-        for (std::size_t i = 0; i < mouseInputText.size(); ++i)
-        {
-            inputSettings >> temp >> pr;
-
-            if (pr == "P")
-                key.m_EventType = sf::Event::MouseButtonPressed;
-            else if (pr == "R")
-                key.m_EventType = sf::Event::MouseButtonReleased;
-            else
-                throw "Error while loading from the input settings file...\n";
-
-            sf::Mouse::Button m_TempMouseButton = sf::Mouse::ButtonCount;
-            m_TempMouseButton = static_cast<sf::Mouse::Button>(temp);
-            key.m_MouseButton = m_TempMouseButton;
-            //The warning will go away if you assigne more than 1 const char* to the array....
-            m_Action[mouseInputText[i]] = key;
-        }
-
-        key.m_InputType = InputType::JoystickInput;
-        key.m_MouseButton = sf::Mouse::ButtonCount;
-        bool isAxis = false;
-        for (std::uint32_t i = 0; i < sf::Joystick::Count; ++i)
-        {
-            if (sf::Joystick::isConnected(i))
+            switch (tempType)
             {
-                isJoystickConnected = true;
-                //Write default joystick data to the file so it wont crash / throw...
-                constexpr std::array joystickInputText = { "Left", "Right", "Forward", "Backward", "ScreenShot", "Fire" };
-                for (std::size_t i = 0; i < joystickInputText.size(); ++i)
+            case InputText::Keyboard:
+            {
+                key.m_InputType = InputType::KeyboardInput;
+
+                if (pr == "P")
+                    key.m_EventType = sf::Event::KeyPressed;
+                else if (pr == "R")
+                    key.m_EventType = sf::Event::KeyReleased;
+                else
+                    std::cout << "Error! Unknown input type.\n";
+
+                key.m_KeyCode = static_cast<sf::Keyboard::Key>(temp);
+                m_Action[action] = key;
+                break;
+            }
+            case InputText::Mouse:
+            {
+                key.m_InputType = InputType::MouseInput;
+
+                if (pr == "P")
+                    key.m_EventType = sf::Event::MouseButtonPressed;
+                else if (pr == "R")
+                    key.m_EventType = sf::Event::MouseButtonReleased;
+                else
+                    std::cout << "Error! Unknown input type.\n";
+
+                key.m_MouseButton = static_cast<sf::Mouse::Button>(temp);
+                m_Action[action] = key;
+                break;
+            }
+            case InputText::Joystick:
+            {
+                bool isAxis = false;
+                inputSettings >> isAxis;
+
+                key.m_InputType = InputType::JoystickInput;
+
+                if (pr == "P")
+                    key.m_EventType = sf::Event::JoystickButtonPressed;
+                else if (pr == "R")
+                    key.m_EventType = sf::Event::JoystickButtonReleased;
+                else if (pr == "M")
+                    key.m_EventType = sf::Event::JoystickMoved;
+                else
+                    throw "Error while loading from the input settings file...\n";
+
+                if (isAxis)
                 {
-                    inputSettings >> isAxis >> temp >> pr;
-
-                    if (pr == "P")
-                        key.m_EventType = sf::Event::JoystickButtonPressed;
-                    else if (pr == "R")
-                        key.m_EventType = sf::Event::JoystickButtonReleased;
-                    else if (pr == "M")
-                        key.m_EventType = sf::Event::JoystickMoved;
-                    else
-                        throw "Error while loading from the input settings file...\n";
-
-                    if (isAxis)
-                    {
-                        sf::Joystick::Axis m_TempJoystickAxis = sf::Joystick::Axis::V;
-                        m_TempJoystickAxis = static_cast<sf::Joystick::Axis>(temp);
-                        key.m_JoystickAxis = m_TempJoystickAxis;
-                        m_Action[joystickInputText[i]] = key;
-                    }
-                    else
-                    {
-                        key.m_joystickButton = temp;
-                        m_Action[joystickInputText[i]] = key;
-                    }
+                    key.m_JoystickAxis = static_cast<sf::Joystick::Axis>(temp);
+                    m_Action[action] = key;
                 }
+                else
+                {
+                    key.m_joystickButton = temp;
+                    m_Action[action] = key;
+                }
+                break;
+            }
+            default:
+                break;
             }
         }
     }
@@ -136,7 +131,7 @@ const bool inputSystem::input(m_Keys& key, sf::Event* event) noexcept
 
 const char* inputSystem::convert(const m_Keys& it)
 {
-    if (it.m_KeyCode != sf::Keyboard::Unknown)
+    if (it.m_InputType == InputType::KeyboardInput)
     {
         switch (it.m_KeyCode)
         {
@@ -154,17 +149,34 @@ const char* inputSystem::convert(const m_Keys& it)
             break;
         }
     }
-    else
+    else if(it.m_InputType == InputType::MouseInput)
     {
         switch (it.m_MouseButton)
         {
         case sf::Mouse::Left:
             return "Mouse Left";
+        case sf::Mouse::Right:
+            return "Mouse Right";
         default:
             break;
         }
     }
+    else if (it.m_InputType == InputType::JoystickInput)
+    {
+        return "SoonTM";
+    }
     return "ERROR";
+}
+
+const char* inputSystem::PressOrRelease(const m_Keys& it)
+{
+    if (it.m_EventType == sf::Event::KeyPressed || it.m_EventType == sf::Event::MouseButtonPressed || it.m_EventType == sf::Event::JoystickButtonPressed)
+        return "Press";
+    else if (it.m_EventType == sf::Event::KeyReleased || it.m_EventType == sf::Event::MouseButtonReleased || it.m_EventType == sf::Event::JoystickButtonReleased)
+        return "Release";
+    else if (it.m_EventType == sf::Event::JoystickMoved)
+        return "Move";
+    return "ERROR!";
 }
 
 const void inputSystem::clear() noexcept { m_Action.clear(); }

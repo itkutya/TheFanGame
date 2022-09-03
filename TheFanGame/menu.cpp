@@ -323,60 +323,22 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				case settingState::Input:
 					for (auto& it : inputSystem::m_Action)
 					{
-						ImGui::Text(it.first);
+						ImGui::Text(it.first.c_str());
 						ImGui::SameLine();
 						if (ImGui::Button(inputSystem::convert(it.second), ImVec2(300.f, 30.f)))
 							std::cout << "Ok\n";
 						ImGui::SameLine();
 						ImGui::SetNextItemWidth(200.f);
-						ImGui::PushID(it.first + static_cast<std::uint32_t>(it.second.m_InputType));
-						if (ImGui::BeginCombo("###PressOrRelease", "Press", ImGuiComboFlags_HeightSmall))
+						ImGui::PushID(it.first.c_str() + static_cast<std::uint32_t>(it.second.m_InputType));
+						if (ImGui::BeginCombo("###PressOrRelease", inputSystem::PressOrRelease(it.second), ImGuiComboFlags_HeightSmall))
 						{
+							if (ImGui::Selectable("Press"))
+								std::cout << "Later...\n";
+							if (ImGui::Selectable("Release"))
+								std::cout << "Later...\n";
 							ImGui::EndCombo();
 						}
 						ImGui::PopID();
-					}
-					if (ImGui::BeginChild("##ControlerInput", ImVec2(0, ImGui::GetWindowContentRegionMax().y - 600.f), true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar))
-					{
-						for (std::uint32_t i = 0; i < sf::Joystick::Count; ++i)
-							if (sf::Joystick::isConnected(i))
-							{
-								std::string name = sf::Joystick::getIdentification(i).name;
-								std::uint32_t pID = sf::Joystick::getIdentification(i).productId;
-								std::uint32_t vID = sf::Joystick::getIdentification(i).vendorId;
-								std::uint16_t buttonCount = sf::Joystick::getButtonCount(i);
-								float X = sf::Joystick::getAxisPosition(i, sf::Joystick::X);
-								float Y = sf::Joystick::getAxisPosition(i, sf::Joystick::Y);
-								float povX = sf::Joystick::getAxisPosition(i, sf::Joystick::PovX);
-								float povY = sf::Joystick::getAxisPosition(i, sf::Joystick::PovY);
-								float Z = sf::Joystick::getAxisPosition(i, sf::Joystick::Z);
-								float R = sf::Joystick::getAxisPosition(i, sf::Joystick::R);
-								ImGui::Text("Name: %s", name.c_str());
-								ImGui::Text("production: %u", pID);
-								ImGui::Text("Vendor: %u", vID);
-								ImGui::Text("Button Count: %u", buttonCount);
-								ImGui::Text("X Axis: %f", X);
-								ImGui::SameLine();
-								ImGui::Text("Y Axis: %f", Y);
-								ImGui::SameLine();
-								ImGui::Text("Z Axis: %f", Z);
-								ImGui::SameLine();
-								ImGui::Text("R Axis: %f", R);
-								ImGui::SameLine();
-								ImGui::Text("povX Axis: %f", povX);
-								ImGui::SameLine();
-								ImGui::Text("povY Axis: %f", povY);
-								ImGui::SameLine();
-								for (std::uint32_t j = 0; j < buttonCount; ++j)
-								{
-									if (sf::Joystick::isButtonPressed(i, j))
-									{
-										ImGui::Text("%u joystic is pressing: %u Button.", i, j);
-										ImGui::SameLine();
-									}
-								}
-							}
-						ImGui::EndChild();
 					}
 					break;
 				case settingState::Graphics:

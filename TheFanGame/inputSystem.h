@@ -44,9 +44,10 @@ public:
 	static const void init();
 	static const bool input(m_Keys& key, sf::Event* e = nullptr) noexcept;
 	static const char* convert(const m_Keys& it);
+	static const char* PressOrRelease(const m_Keys& it);
 	static const void clear() noexcept;
 	
-	static std::unordered_map<const char*, m_Keys> m_Action;
+	static std::unordered_map<std::string, m_Keys> m_Action;
 private:
 	static bool isJoystickConnected;
 };
