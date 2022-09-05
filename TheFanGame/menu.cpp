@@ -109,13 +109,13 @@ const void menu::init(sf::RenderWindow& window)
 	this->m_view.setSize(sf::Vector2f(window.getSize()));
 	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
 
-	this->frontImage.setTexture(resourceSystem::get_c<sf::Texture>("FrontImage"));
+	this->frontImage.setTexture(resourceSystem::c_get<sf::Texture>("FrontImage"));
 	this->frontImage.setTextureRect(sf::IntRect(600 * settings::m_currFrontPicture, 0, 600, 600));
 
-	this->icon.setTexture(resourceSystem::get_c<sf::Texture>("Icon"));
+	this->icon.setTexture(resourceSystem::c_get<sf::Texture>("Icon"));
 	this->icon.setTextureRect(sf::IntRect(100 * settings::m_currProfilePicture, 0, 100, 100));
 
-	this->backgroundImage.setTexture(&resourceSystem::get_c<sf::Texture>("Background"));
+	this->backgroundImage.setTexture(&resourceSystem::c_get<sf::Texture>("Background"));
 	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
 	this->backgroundImage.setTextureRect(sf::IntRect(1920 * settings::m_currBackgroundPicture, 0, 1920, 1080));
 	this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
@@ -177,11 +177,11 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			ImGui::SetCursorPos(ImVec2(vMax.x - 750.f, vMin.y + 40.f));
 			if (this->m_MainMusic->getStatus() == sf::SoundSource::Playing)
 			{
-				if (ImGui::ImageButton(resourceSystem::get_c<sf::Texture>("Pause"), sf::Vector2f(35.f, 35.f)))
+				if (ImGui::ImageButton(resourceSystem::c_get<sf::Texture>("Pause"), sf::Vector2f(35.f, 35.f)))
 					this->m_MainMusic->pause();
 			}
 			else
-				if (ImGui::ImageButton(resourceSystem::get_c<sf::Texture>("Resume"), sf::Vector2f(35.f, 35.f)))
+				if (ImGui::ImageButton(resourceSystem::c_get<sf::Texture>("Resume"), sf::Vector2f(35.f, 35.f)))
 					this->m_MainMusic->play();
 			ImGui::SameLine();
 			WidgetPos = ImGui::GetCursorPos();
@@ -289,6 +289,61 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetWindowSize("Settings", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
 				ImGui::SetWindowPos("Settings", ImVec2(50.f, 50.f));
 
+				if (this->m_ChangeKeybindigs)
+				{
+					if (ImGui::Begin("Change Keybindigs", &this->m_ChangeKeybindigs, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+					{
+						ImGui::SetWindowFocus("Change Keybindigs");
+						ImGui::SetWindowSize("Change Keybindigs", ImVec2(300.f, 200.f));
+
+						vMin = ImGui::GetWindowContentRegionMin();
+						vMax = ImGui::GetWindowContentRegionMax();
+
+						std::string text = "Change [" + std::string(inputSystem::convert(*this->m_ToChange.second)) + "] to [" + std::string(inputSystem::convert(this->key)) + "]";
+						ImGui::TextColored(ImVec4(1, 0, 0, 1), text.c_str());
+						for (std::size_t i = 0; i < sf::Keyboard::KeyCount; ++i)
+						{
+							if (sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(i)) && !(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)))
+							{
+								this->key.m_InputType = InputType::KeyboardInput;
+								this->key.m_KeyCode = static_cast<sf::Keyboard::Key>(i);
+							}
+						}
+						for (std::size_t i = 0; i < sf::Mouse::ButtonCount; ++i)
+						{
+							if (sf::Mouse::isButtonPressed(static_cast<sf::Mouse::Button>(i)) && !sf::Mouse::isButtonPressed(sf::Mouse::Left))
+							{
+								this->key.m_InputType = InputType::MouseInput;
+								this->key.m_MouseButton = static_cast<sf::Mouse::Button>(i);
+							}
+						}
+						for (std::uint32_t i = 0; i < sf::Joystick::Count; ++i)
+						{
+							if (sf::Joystick::isConnected(i))
+								for (std::uint32_t j = 0; j < sf::Joystick::ButtonCount; ++j)
+								{
+									if (sf::Joystick::isButtonPressed(i, j))
+									{
+										this->key.m_InputType = InputType::JoystickInput;
+										this->key.m_joystickButton = j;
+									}
+								}
+						}
+
+						ImGui::SetCursorPos(ImVec2(vMin.x, vMax.y - 30.f));
+						if (ImGui::Button("Cancle##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+							this->m_ChangeKeybindigs = false;
+						ImGui::SetCursorPos(ImVec2(vMax.x - 100.f, vMax.y - 30.f));
+						if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+						{
+							this->m_ChangeKeybindigs = false;
+							this->key.m_EventType = this->m_ToChange.second->m_EventType;
+							inputSystem::saveInput({ *this->m_ToChange.first, this->key });
+						}
+						ImGui::End();
+					}
+				}
+
 				vMin = ImGui::GetWindowContentRegionMin();
 				vMax = ImGui::GetWindowContentRegionMax();
 				vMin.x += ImGui::GetWindowPos().x;
@@ -325,8 +380,14 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					{
 						ImGui::Text(it.first.c_str());
 						ImGui::SameLine();
+						ImGui::PushID(std::string(it.first + std::string(inputSystem::convert(it.second))).c_str());
 						if (ImGui::Button(inputSystem::convert(it.second), ImVec2(300.f, 30.f)))
-							std::cout << "Ok\n";
+						{
+							this->m_ToChange.first = &it.first;
+							this->m_ToChange.second = &it.second;
+							this->m_ChangeKeybindigs = true;
+						}
+						ImGui::PopID();
 						ImGui::SameLine();
 						ImGui::SetNextItemWidth(200.f);
 						ImGui::PushID(it.first.c_str() + static_cast<std::uint32_t>(it.second.m_InputType));
@@ -386,7 +447,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					ImGui::SliderFloat("Horizontal Sensivity: ", &settings::m_HorizontalSensivity, 0.f, 20.f);
 					break;
 				case settingState::Mainmenu:
-					if(ImGui::SliderInt("Front image: ", &settings::m_currFrontPicture, 0, 0))
+					if (ImGui::SliderInt("Front image: ", &settings::m_currFrontPicture, 0, 0))
 						this->frontImage.setTextureRect(sf::IntRect(600 * settings::m_currFrontPicture, 0, 600, 600));
 					if (ImGui::IsItemHovered())
 					{
@@ -398,7 +459,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						ImGui::EndTooltip();
 					}
 
-					if(ImGui::SliderInt("Profile picture: ", &settings::m_currProfilePicture, 0, 3))
+					if (ImGui::SliderInt("Profile picture: ", &settings::m_currProfilePicture, 0, 3))
 						this->icon.setTextureRect(sf::IntRect(100 * settings::m_currProfilePicture, 0, 100, 100));
 					if (ImGui::IsItemHovered())
 					{
@@ -454,14 +515,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				default:
 					break;
 				}
-				ImGui::SetCursorPos(ImVec2(vMax.x - 750.f, vMax.y - 125.f));
-				if (ImGui::Button("Save##Settings", ImVec2(300.f, 75.f)))
-				{
-					if (settings::saveSettings("res/Settings.ini"))
-						std::cout << "Saved the settings...\n";
-				}
 				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
-				if (ImGui::Button("Back##Settings", ImVec2(300.f, 75.f)))
+				if (ImGui::Button("Back & Save##Settings", ImVec2(300.f, 75.f)))
 				{
 					if (settings::saveSettings("res/Settings.ini"))
 						this->m_State = state::MainMenu;
@@ -483,32 +538,27 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 				if (ImGui::BeginChild("##CharSet", ImVec2(0, ImGui::GetWindowContentRegionMax().y - 200.f), true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar))
 				{
-					int y = 0;
-					int x = 0;
+					ImGui::Columns(static_cast<int>(this->characters.size() / 2) + 1, "Characters");
 					for (std::size_t i = 0; i < this->characters.size(); ++i)
 					{
-						if (i != 0 && i % 2 == 0)
-						{
-							++x;
-							y = 0;
-						}
+						if (i != 0 && !(i % 2))
+							ImGui::NextColumn();
 
 						sf::Sprite temp;
 						if (!this->characters[i].unlocked)
-							temp.setTexture(resourceSystem::get_c<sf::Texture>("WallTexture"));
+							temp.setTexture(resourceSystem::c_get<sf::Texture>("WallTexture"));
 						else
-							temp.setTexture(resourceSystem::get_c<sf::Texture>("CharacterTexture"));
+							temp.setTexture(resourceSystem::c_get<sf::Texture>("CharacterTexture"));
 
 						temp.setTextureRect(sf::IntRect(64 * (int)i, 0, 64, 64));
-						ImGui::SetCursorPos(ImVec2(100.f + 350.f * (float)x, 100.f + 300.f * (float)y));
-						WidgetPos = ImGui::GetCursorPos();
+						ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + 25.f, ImGui::GetCursorPos().y));
 						ImGui::Image(temp, sf::Vector2f(150.f, 150.f));
 
 						if (ImGui::IsItemHovered())
 						{
 							ImGui::BeginTooltip();
 							sf::Sprite ability;
-							ability.setTexture(resourceSystem::get_c<sf::Texture>("WallTexture"));
+							ability.setTexture(resourceSystem::c_get<sf::Texture>("WallTexture"));
 							ability.setTextureRect(sf::IntRect(128, 0, 64, 64));
 							ImGui::SetCursorPos(ImVec2(5.f, 5.f));
 							ImGui::Image(ability, sf::Vector2f(50.f, 50.f));
@@ -523,7 +573,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						if (!this->characters[i].unlocked)
 						{
 							ImGui::PushID("CharacterUnlock" + i);
-							ImGui::SetCursorPos(ImVec2(WidgetPos.x - 25.f, WidgetPos.y + 175.f));
 							if (ImGui::Button("Unlock", ImVec2(200.f, 50.f)))
 							{
 								if (this->myAccount.currency > this->characters[i].price)
@@ -549,7 +598,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 							}
 							ImGui::PopID();
 						}
-						++y;
 					}
 				}ImGui::EndChild();
 

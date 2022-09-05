@@ -179,4 +179,9 @@ const char* inputSystem::PressOrRelease(const m_Keys& it)
     return "ERROR!";
 }
 
+const void inputSystem::saveInput(const std::pair<std::string, m_Keys>& temp) noexcept
+{
+    m_Action.at(temp.first) = temp.second;
+}
+
 const void inputSystem::clear() noexcept { m_Action.clear(); }

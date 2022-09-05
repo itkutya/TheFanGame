@@ -50,7 +50,7 @@ public:
 	};
 
 	template<class T>
-	[[nodiscard]]static inline const T& get_c(const std::string& id) { return std::get<T>(m_resources.at(id)); };
+	[[nodiscard]]static inline const T& c_get(const std::string& id) { return std::get<T>(m_resources.at(id)); };
 
 	template<class T>
 	[[nodiscard]] static inline T& get(const std::string& id) { return std::get<T>(m_resources.at(id)); };

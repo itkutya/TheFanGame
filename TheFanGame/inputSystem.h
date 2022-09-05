@@ -45,6 +45,7 @@ public:
 	static const bool input(m_Keys& key, sf::Event* e = nullptr) noexcept;
 	static const char* convert(const m_Keys& it);
 	static const char* PressOrRelease(const m_Keys& it);
+	static const void saveInput(const std::pair<std::string, m_Keys>& temp) noexcept;
 	static const void clear() noexcept;
 	
 	static std::unordered_map<std::string, m_Keys> m_Action;

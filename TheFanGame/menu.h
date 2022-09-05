@@ -42,6 +42,9 @@ private:
 	state m_State = state::MainMenu;
 	bool m_PlaySelected = false;
 	bool m_ServerError = false;
+	bool m_ChangeKeybindigs = false;
+	std::pair<const std::string*, const m_Keys*> m_ToChange;
+	m_Keys key = m_Keys();
 
 	enum class settingState
 	{

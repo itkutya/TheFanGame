@@ -25,7 +25,7 @@ const void window::pollEvents() noexcept
 		if (event.type == sf::Event::Closed)
 			this->m_window.close();
 
-		if (inputSystem::input(inputSystem::m_Action["ScreenShot"], &event))
+		if (inputSystem::input(inputSystem::m_Action.at("ScreenShot"), &event))
 			this->ScreenShot();
 	}
 }
