@@ -6,11 +6,6 @@ bool inputSystem::isJoystickConnected = false;
 const void inputSystem::init()
 {
     m_Keys key = m_Keys();
-    
-    enum class InputText
-    {
-        Unknown, Keyboard, Mouse, Joystick
-    };
 
     std::ifstream inputSettings("res/inputSettings.ini");
     if (inputSettings.is_open())
@@ -22,11 +17,11 @@ const void inputSystem::init()
 
         while (inputSettings >> type >> action >> temp >> pr)
         {
-            InputText tempType = static_cast<InputText>(type);
+            InputType tempType = static_cast<InputType>(type);
 
             switch (tempType)
             {
-            case InputText::Keyboard:
+            case InputType::KeyboardInput:
             {
                 key.m_InputType = InputType::KeyboardInput;
 
@@ -41,7 +36,7 @@ const void inputSystem::init()
                 m_Action[action] = key;
                 break;
             }
-            case InputText::Mouse:
+            case InputType::MouseInput:
             {
                 key.m_InputType = InputType::MouseInput;
 
@@ -56,12 +51,9 @@ const void inputSystem::init()
                 m_Action[action] = key;
                 break;
             }
-            case InputText::Joystick:
+            case InputType::JoystickButtonInput:
             {
-                bool isAxis = false;
-                inputSettings >> isAxis;
-
-                key.m_InputType = InputType::JoystickInput;
+                key.m_InputType = InputType::JoystickButtonInput;
 
                 if (pr == "P")
                     key.m_EventType = sf::Event::JoystickButtonPressed;
@@ -72,16 +64,26 @@ const void inputSystem::init()
                 else
                     throw "Error while loading from the input settings file...\n";
 
-                if (isAxis)
-                {
-                    key.m_JoystickAxis = static_cast<sf::Joystick::Axis>(temp);
-                    m_Action[action] = key;
-                }
+                key.m_joystickButton = temp;
+                m_Action[action] = key;
+                break;
+            }
+            case InputType::JoystickAxisInput:
+            {
+
+                key.m_InputType = InputType::JoystickAxisInput;
+
+                if (pr == "P")
+                    key.m_EventType = sf::Event::JoystickButtonPressed;
+                else if (pr == "R")
+                    key.m_EventType = sf::Event::JoystickButtonReleased;
+                else if (pr == "M")
+                    key.m_EventType = sf::Event::JoystickMoved;
                 else
-                {
-                    key.m_joystickButton = temp;
-                    m_Action[action] = key;
-                }
+                    throw "Error while loading from the input settings file...\n";
+
+                key.m_JoystickAxis = static_cast<sf::Joystick::Axis>(temp);
+                m_Action[action] = key;
                 break;
             }
             default:
@@ -121,7 +123,7 @@ const bool inputSystem::input(m_Keys& key, sf::Event* event) noexcept
             key.m_EventType == event->type &&
             key.m_KeyCode == event->key.code)
             return true;
-        if (key.m_InputType == InputType::JoystickInput &&
+        if (key.m_InputType == InputType::JoystickButtonInput &&
             key.m_EventType == event->type &&
             key.m_KeyCode == event->key.code)
             return true;
@@ -161,9 +163,13 @@ const char* inputSystem::convert(const m_Keys& it)
             break;
         }
     }
-    else if (it.m_InputType == InputType::JoystickInput)
+    else if (it.m_InputType == InputType::JoystickButtonInput)
     {
         return "SoonTM";
+    }
+    else if (it.m_InputType == InputType::JoystickAxisInput)
+    {
+        return "SoonTM2";
     }
     return "ERROR";
 }

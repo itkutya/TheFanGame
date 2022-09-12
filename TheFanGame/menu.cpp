@@ -324,7 +324,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 								{
 									if (sf::Joystick::isButtonPressed(i, j))
 									{
-										this->key.m_InputType = InputType::JoystickInput;
+										this->key.m_InputType = InputType::JoystickButtonInput;
 										this->key.m_joystickButton = j;
 									}
 								}

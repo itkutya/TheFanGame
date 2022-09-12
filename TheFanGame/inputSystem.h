@@ -21,7 +21,8 @@ enum class InputType
 {
 	KeyboardInput,
 	MouseInput,
-	JoystickInput
+	JoystickButtonInput,
+	JoystickAxisInput
 };
 struct m_Keys
 {
