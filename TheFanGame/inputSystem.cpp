@@ -98,10 +98,86 @@ const void inputSystem::init()
 const void inputSystem::saveInput(const std::pair<std::string, m_Keys>& temp) noexcept
 {
     m_Action.at(temp.first) = temp.second;
-    for (std::size_t i = 0; i < m_Action.size(); ++i)
+    std::ofstream inputSettings("res/inputSettings.ini", std::ios::trunc);
+    if (inputSettings.is_open())
     {
-
+        for (auto& it : m_Action)
+        {
+            switch (it.second.m_InputType)
+            {
+            case InputType::KeyboardInput:
+                switch (it.second.m_EventType)
+                {
+                case sf::Event::KeyPressed:
+                    inputSettings << 0 << " " << it.first << " " << it.second.m_KeyCode << " P" << '\n';
+                    break;
+                case sf::Event::KeyReleased:
+                    inputSettings << 0 << " " << it.first << " " << it.second.m_KeyCode << " R" << '\n';
+                    break;
+                default:
+                    inputSettings << 0 << " " << it.first << " " << it.second.m_KeyCode << " P" << '\n';
+                    std::cout << "Error! While saveing input settings!\n";
+                    break;
+                }
+                break;
+            case InputType::MouseInput:
+                switch (it.second.m_EventType)
+                {
+                case sf::Event::MouseButtonPressed:
+                    inputSettings << 1 << " " << it.first << " " << it.second.m_MouseButton << " P" << '\n';
+                    break;
+                case sf::Event::MouseButtonReleased:
+                    inputSettings << 1 << " " << it.first << " " << it.second.m_MouseButton << " R" << '\n';
+                    break;
+                case sf::Event::MouseMoved:
+                    inputSettings << 1 << " " << it.first << " " << it.second.m_MouseButton << " M" << '\n';
+                    break;
+                default:
+                    std::cout << "Error! While saveing input settings!\n";
+                    break;
+                }
+                break;
+            case InputType::JoystickButtonInput:
+                switch (it.second.m_EventType)
+                {
+                case sf::Event::JoystickButtonPressed:
+                    inputSettings << 2 << " " << it.first << " " << it.second.m_joystickButton << " P" << '\n';
+                    break;
+                case sf::Event::JoystickButtonReleased:
+                    inputSettings << 2 << " " << it.first << " " << it.second.m_joystickButton << " R" << '\n';
+                    break;
+                case sf::Event::JoystickMoved:
+                    inputSettings << 2 << " " << it.first << " " << it.second.m_joystickButton << " M" << '\n';
+                    break;
+                default:
+                    std::cout << "Error! While saveing input settings!\n";
+                    break;
+                }
+                break;
+            case InputType::JoystickAxisInput:
+                switch (it.second.m_EventType)
+                {
+                case sf::Event::JoystickButtonPressed:
+                    inputSettings << 3 << " " << it.first << " " << it.second.m_JoystickAxis << " P" << '\n';
+                    break;
+                case sf::Event::JoystickButtonReleased:
+                    inputSettings << 3 << " " << it.first << " " << it.second.m_JoystickAxis << " R" << '\n';
+                    break;
+                case sf::Event::JoystickMoved:
+                    inputSettings << 3 << " " << it.first << " " << it.second.m_JoystickAxis << " M" << '\n';
+                    break;
+                default:
+                    std::cout << "Error! While saveing input settings!\n";
+                    break;
+                }
+                break;
+            default:
+                std::cout << "Error! While saveing input settings!\n";
+                break;
+            }
+        }
     }
+    inputSettings.close();
 }
 
 const void inputSystem::clear() noexcept { m_Action.clear(); }

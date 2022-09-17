@@ -38,7 +38,7 @@ private:
 	enum class state
 	{
 		Login = -1, MainMenu = 0, Settings, Characters, Singleplayer, Multiplayer, MultiLobby
-	};state m_State = state::Login;
+	};state m_State = state::MainMenu;
 	bool m_PlaySelected = false;
 	bool m_ServerError = false;
 	bool m_ChangeKeybindigs = false;

@@ -350,6 +350,12 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 							{
 								this->key.m_InputType = InputType::KeyboardInput;
 								this->key.m_KeyCode = static_cast<sf::Keyboard::Key>(i);
+								if (is.eventToString(this->m_ToChange.second) == "Press")
+									this->key.m_EventType = sf::Event::KeyPressed;
+								else if (is.eventToString(this->m_ToChange.second) == "Release")
+									this->key.m_EventType = sf::Event::KeyReleased;
+								else
+									ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
 							}
 						}
 						for (std::size_t i = 0; i < sf::Mouse::ButtonCount; ++i)
@@ -358,19 +364,57 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 							{
 								this->key.m_InputType = InputType::MouseInput;
 								this->key.m_MouseButton = static_cast<sf::Mouse::Button>(i);
+								if (is.eventToString(this->m_ToChange.second) == "Press")
+									this->key.m_EventType = sf::Event::MouseButtonPressed;
+								else if (is.eventToString(this->m_ToChange.second) == "Release")
+									this->key.m_EventType = sf::Event::MouseButtonReleased;
+								else if (is.eventToString(this->m_ToChange.second) == "Move")
+									this->key.m_EventType = sf::Event::MouseMoved;
+								else
+									ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
 							}
 						}
 						for (std::uint32_t i = 0; i < sf::Joystick::Count; ++i)
 						{
 							if (sf::Joystick::isConnected(i))
+							{
 								for (std::uint32_t j = 0; j < sf::Joystick::ButtonCount; ++j)
 								{
 									if (sf::Joystick::isButtonPressed(i, j))
 									{
-										this->key.m_InputType = InputType::JoystickButtonInput;
-										this->key.m_joystickButton = j;
+										if (this->m_ToChange.second.m_InputType == InputType::JoystickButtonInput)
+										{
+											this->key.m_InputType = InputType::JoystickButtonInput;
+											this->key.m_joystickButton = j;
+											if (is.eventToString(this->m_ToChange.second) == "Press")
+												this->key.m_EventType = sf::Event::JoystickButtonPressed;
+											else if (is.eventToString(this->m_ToChange.second) == "Release")
+												this->key.m_EventType = sf::Event::JoystickButtonReleased;
+											else if (is.eventToString(this->m_ToChange.second) == "Move")
+												this->key.m_EventType = sf::Event::JoystickMoved;
+											else
+												ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
+										}
 									}
 								}
+								for (std::size_t j = 0; j < sf::Joystick::AxisCount; ++j)
+								{
+									sf::Joystick::Axis tempAxis = static_cast<sf::Joystick::Axis>(j);
+									if (sf::Joystick::getAxisPosition(i, tempAxis) > 0.f)
+									{
+										this->key.m_InputType = InputType::JoystickAxisInput;
+										this->key.m_JoystickAxis = tempAxis;
+										if (is.eventToString(this->m_ToChange.second) == "Press")
+											this->key.m_EventType = sf::Event::JoystickButtonPressed;
+										else if (is.eventToString(this->m_ToChange.second) == "Release")
+											this->key.m_EventType = sf::Event::JoystickButtonReleased;
+										else if (is.eventToString(this->m_ToChange.second) == "Move")
+											this->key.m_EventType = sf::Event::JoystickMoved;
+										else
+											ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
+									}
+								}
+							}
 						}
 
 						ImGui::SetCursorPos(ImVec2(vMin.x, vMax.y - 30.f));
@@ -380,7 +424,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 						{
 							this->m_ChangeKeybindigs = false;
-							this->key.m_EventType = this->m_ToChange.second.m_EventType;
 							inputSystem::saveInput({ this->m_ToChange.first, this->key });
 						}
 						ImGui::End();
