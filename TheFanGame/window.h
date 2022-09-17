@@ -4,6 +4,12 @@
 #include <iomanip>
 #include <sstream>
 
+#include "ImGUI/imgui.h"
+#include "ImGUI/imgui-SFML.h"
+
+#include "ImGUI/imgui_notify.h"
+#include "ImGUI/tahoma.h"
+
 #include "stateSystem.h"
 #include "resourceSystem.h"
 #include "inputSystem.h"

@@ -191,6 +191,10 @@
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ImGUI\fa_solid_900.h" />
+    <ClInclude Include="ImGUI\font_awesome_5.h" />
+    <ClInclude Include="ImGUI\imgui_notify.h" />
+    <ClInclude Include="ImGUI\tahoma.h" />
     <ClInclude Include="profile.h" />
     <ClInclude Include="animation.h" />
     <ClInclude Include="entity.h" />

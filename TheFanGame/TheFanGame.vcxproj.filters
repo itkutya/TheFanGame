@@ -16,6 +16,9 @@
     <Filter Include="ImGUI">
       <UniqueIdentifier>{036377a5-d4a8-4847-8670-b58d531ec231}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ImGUI\Notify">
+      <UniqueIdentifier>{4b8e0762-8e83-4bec-9dbb-55f0867e8949}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -157,6 +160,18 @@
     </ClInclude>
     <ClInclude Include="settings.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\fa_solid_900.h">
+      <Filter>ImGUI\Notify</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\font_awesome_5.h">
+      <Filter>ImGUI\Notify</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imgui_notify.h">
+      <Filter>ImGUI\Notify</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\tahoma.h">
+      <Filter>ImGUI\Notify</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

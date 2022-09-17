@@ -18,8 +18,12 @@
 class settings
 {
 public:
-	settings() {};
-	virtual ~settings() {};
+	settings() = delete;
+	settings(const settings&) = delete;
+	settings(const settings&&) = delete;
+	settings& operator=(settings& other) = delete;
+	settings& operator=(const settings& other) = delete;
+	virtual ~settings() = default;
 
 	static const bool saveSettings(const std::string& filePath) noexcept;
 	static const bool loadSettings(const std::string& filePath) noexcept;
@@ -40,5 +44,5 @@ public:
 	static int m_currProfilePicture;
 	static int m_currFrontPicture;
 	static int m_currBackgroundPicture;
-public:
+private:
 };

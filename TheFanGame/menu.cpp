@@ -23,7 +23,11 @@ const void menu::init(sf::RenderWindow& window)
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->Clear();
-	io.Fonts->AddFontFromFileTTF("res/Gen Jyuu Gothic Monospace Bold.ttf", 25.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+	ImFontConfig font_cfg;
+	font_cfg.FontDataOwnedByAtlas = false;
+	io.Fonts->AddFontFromMemoryTTF((void*)tahoma, sizeof(tahoma), 17.f, &font_cfg);
+	ImGui::MergeIconsWithLatestFont(16.f, false);
+	this->font = io.Fonts->AddFontFromFileTTF("res/Gen Jyuu Gothic Monospace Bold.ttf", 25.0f, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
 	ImGui::SFML::UpdateFontTexture();
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -125,11 +129,43 @@ const void menu::init(sf::RenderWindow& window)
 	if (settings::m_MusicVolume > 0.f)
 		this->m_MainMusic->play();
 	this->m_MainMusic->setVolume(settings::m_MusicVolume);
+
+	if (this->rememberToStayLogedIn)
+		this->m_State = state::MainMenu;
 }
+
+/*
+#define min(x,y) ((x)<(y)?x:y)
+#define wh(a) ImColor(1.f,1.f,1.f,a)
+void FX(ImDrawList* d, ImVec2 a, ImVec2 b, ImVec2 sz, ImVec2, float t)
+{
+	static float fl;
+	if ((rand() % 500) == 0) fl = t;
+	if ((t - fl) > 0)
+	{
+		auto ft = 0.25f;
+		d->AddRectFilled(a, b, wh((ft - (t - fl)) / ft));
+	}
+
+	for (int i = 0; i < 2000; ++i) {
+		unsigned h = ImGui::GetID(d + i + int(t / 4));
+		auto f = fmodf(t + fmodf(h / 777.f, 99), 99);
+		auto tx = h % (int)sz.x;
+		auto ty = h % (int)sz.y;
+		if (f < 1) {
+			auto py = ty - 1000 * (1 - f);
+			d->AddLine({ a.x + tx, a.y + py }, { a.x + tx, a.y + min(py + 10,ty) }, (ImU32)-1);
+		}
+		else if (f < 1.2f)
+			d->AddCircle({ a.x + tx, a.y + ty }, (f - 1) * 10 + h % 5, wh(1 - (f - 1) * 5.f));
+	}
+}
+*/
 
 const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
 	ImGui::SFML::Update(window, dt);
+	ImGui::PushFont(this->font);
 
 	if (settings::m_MusicVolume == 0.f)
 		this->m_MainMusic->pause();
@@ -152,11 +188,13 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		vMax.x += ImGui::GetWindowPos().x;
 		vMax.y += ImGui::GetWindowPos().y;
 
-		std::string preview = std::to_string(settings::m_Videomodes[settings::m_currVideomode].width) + "x" + std::to_string(settings::m_Videomodes[settings::m_currVideomode].height);
+		ImDrawList* draw_list = ImGui::GetWindowDrawList();
+		ImGuiViewport* viewPort = ImGui::GetMainViewport();
+		draw_list->AddRectFilled(vMin, ImVec2(vMax.x, vMax.y * 0.75f), ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 255, 255)));
 
 		if (settings::m_ShowFPS)
 		{
-			ImGui::SetCursorPos(ImVec2(vMax.x - 150.f, vMin.y));
+			ImGui::SetCursorPos(ImVec2(vMax.x * 0.9f, vMin.y));
 			ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
 		}
 
@@ -174,6 +212,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		switch (this->m_State)
 		{
 		case state::MainMenu:
+		{
 			ImGui::SetCursorPos(ImVec2(vMax.x - 750.f, vMin.y + 40.f));
 			if (this->m_MainMusic->getStatus() == sf::SoundSource::Playing)
 			{
@@ -283,11 +322,15 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 			}
 			break;
+		}
 		case state::Settings:
+		{
 			if (ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_MenuBar))
 			{
 				ImGui::SetWindowSize("Settings", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
 				ImGui::SetWindowPos("Settings", ImVec2(50.f, 50.f));
+
+				inputSystem is;
 
 				if (this->m_ChangeKeybindigs)
 				{
@@ -299,7 +342,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						vMin = ImGui::GetWindowContentRegionMin();
 						vMax = ImGui::GetWindowContentRegionMax();
 
-						std::string text = "Change [" + std::string(inputSystem::convert(*this->m_ToChange.second)) + "] to [" + std::string(inputSystem::convert(this->key)) + "]";
+						std::string text = "Change [" + is.keyToString(this->m_ToChange.second) + "] to [" + is.keyToString(this->key) + "]";
 						ImGui::TextColored(ImVec4(1, 0, 0, 1), text.c_str());
 						for (std::size_t i = 0; i < sf::Keyboard::KeyCount; ++i)
 						{
@@ -331,14 +374,14 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						}
 
 						ImGui::SetCursorPos(ImVec2(vMin.x, vMax.y - 30.f));
-						if (ImGui::Button("Cancle##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+						if (ImGui::Button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 							this->m_ChangeKeybindigs = false;
 						ImGui::SetCursorPos(ImVec2(vMax.x - 100.f, vMax.y - 30.f));
 						if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 						{
 							this->m_ChangeKeybindigs = false;
-							this->key.m_EventType = this->m_ToChange.second->m_EventType;
-							inputSystem::saveInput({ *this->m_ToChange.first, this->key });
+							this->key.m_EventType = this->m_ToChange.second.m_EventType;
+							inputSystem::saveInput({ this->m_ToChange.first, this->key });
 						}
 						ImGui::End();
 					}
@@ -370,28 +413,30 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				switch (this->m_SettingState)
 				{
 				case settingState::Profile:
+				{
 					if (ImGui::InputText("Account name: ", this->myAccount.account_name, MAX_CHAR_SIZE, ImGuiInputTextFlags_EnterReturnsTrue))
 						std::cout << "New account name: " << this->myAccount.account_name << '\n';
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip("Set your account name here.\nYou can just type it and it will be automaticaly saved.\nMaximum characters that are allowed is 16.");
 					break;
+				}
 				case settingState::Input:
-					for (auto& it : inputSystem::m_Action)
+				{
+					for (auto& it : is())
 					{
 						ImGui::Text(it.first.c_str());
 						ImGui::SameLine();
-						ImGui::PushID(std::string(it.first + std::string(inputSystem::convert(it.second))).c_str());
-						if (ImGui::Button(inputSystem::convert(it.second), ImVec2(300.f, 30.f)))
+						ImGui::PushID(std::string(it.first + is.keyToString(it.second)).c_str());
+						if (ImGui::Button(is.keyToString(it.second).c_str(), ImVec2(300.f, 30.f)))
 						{
-							this->m_ToChange.first = &it.first;
-							this->m_ToChange.second = &it.second;
+							this->m_ToChange = it;
 							this->m_ChangeKeybindigs = true;
 						}
 						ImGui::PopID();
 						ImGui::SameLine();
 						ImGui::SetNextItemWidth(200.f);
 						ImGui::PushID(it.first.c_str() + static_cast<std::uint32_t>(it.second.m_InputType));
-						if (ImGui::BeginCombo("###PressOrRelease", inputSystem::PressOrRelease(it.second), ImGuiComboFlags_HeightSmall))
+						if (ImGui::BeginCombo("###PressOrRelease", is.eventToString(it.second).c_str(), ImGuiComboFlags_HeightSmall))
 						{
 							if (ImGui::Selectable("Press"))
 								std::cout << "Later...\n";
@@ -402,11 +447,14 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						ImGui::PopID();
 					}
 					break;
+				}
 				case settingState::Graphics:
+				{
 					if (ImGui::Checkbox("Fullscreen: ", &settings::m_Fullscreen))
 						this->m_window->recreate();
 
 					ImGui::SetNextItemWidth(300.f);
+					std::string preview = std::to_string(settings::m_Videomodes[settings::m_currVideomode].width) + "x" + std::to_string(settings::m_Videomodes[settings::m_currVideomode].height);
 					if (ImGui::BeginCombo("Resolution: ", preview.c_str(), ImGuiComboFlags_HeightSmall))
 					{
 						for (std::size_t i = 0; i < settings::m_Videomodes.size(); ++i)
@@ -442,11 +490,15 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						}
 					}
 					break;
+				}
 				case settingState::Game:
+				{
 					ImGui::SliderFloat("Vertical Sensivity: ", &settings::m_VerticalSensivity, 0.f, 20.f);
 					ImGui::SliderFloat("Horizontal Sensivity: ", &settings::m_HorizontalSensivity, 0.f, 20.f);
 					break;
+				}
 				case settingState::Mainmenu:
+				{
 					if (ImGui::SliderInt("Front image: ", &settings::m_currFrontPicture, 0, 0))
 						this->frontImage.setTextureRect(sf::IntRect(600 * settings::m_currFrontPicture, 0, 600, 600));
 					if (ImGui::IsItemHovered())
@@ -483,7 +535,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						ImGui::EndTooltip();
 					}
 					break;
+				}
 				case settingState::Audio:
+				{
 					ImGui::Text("Currently playing: ");
 					ImGui::SameLine();
 					WidgetPos = ImGui::GetCursorPos();
@@ -512,6 +566,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					if (ImGui::SliderFloat("Music volume: ", &settings::m_MusicVolume, 0.f, 100.f))
 						this->m_MainMusic->setVolume(settings::m_MusicVolume);
 					break;
+				}
 				default:
 					break;
 				}
@@ -523,7 +578,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 			}ImGui::End();
 			break;
+		}
 		case state::Characters:
+		{
 			if (ImGui::Begin("Characters", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Characters", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
@@ -631,7 +688,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					this->m_State = state::MainMenu;
 			}ImGui::End();
 			break;
+		}
 		case state::Multiplayer:
+		{
 			if (ImGui::Begin("Multiplayer", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Multiplayer", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
@@ -763,7 +822,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 			}ImGui::End();
 			break;
+		}
 		case state::Singleplayer:
+		{
 			if (ImGui::Begin("Singleplayer", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Singleplayer", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
@@ -771,7 +832,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::End();
 			}
 			break;
+		}
 		case state::MultiLobby:
+		{
 			if (ImGui::Begin("Lobby", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 			{
 				ImGui::SetWindowSize("Lobby", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
@@ -871,15 +934,50 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 			}ImGui::End();
 			break;
+		}
+		case state::Login:
+		{
+			if (ImGui::Begin("Login", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground))
+			{
+				ImGui::SetWindowSize("Login", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
+				ImGui::SetWindowPos("Login", ImVec2(50.f, 50.f));
+
+				if (ImGui::InputTextWithHint("User Name:", "Enter your user name here...", this->inputName, sizeof(this->inputName), ImGuiInputTextFlags_EnterReturnsTrue))
+					this->login();
+				if (ImGui::InputTextWithHint("Password:", "Enter your password here...", this->inputPW, sizeof(this->inputPW), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password))
+					this->login();
+
+				if (ImGui::Button("Create Account"))
+					ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 4000, "Cannot create account yet!"));
+				ImGui::SameLine();
+				if (ImGui::Button("Login"))
+					this->login();
+
+				if (ImGui::Checkbox("Remember Me!", &this->rememberToStayLogedIn))
+					ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Info, 4000, "Ok will deffinenitly do that!"));
+
+				ImGui::End();
+			}
+			break;
+		}
 		default:
+		{
 			ImGui::Text("You're not suposed to see this LOL...\nSomething went horibly wrong...");
 			ImGui::LogButtons();
 			if (ImGui::Button("Help me!"))
 				this->m_State = state::MainMenu;
+		}
 			break;
 		}
 		ImGui::End();
 	}
+	ImGui::PopFont();
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 5.f);
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f));
+	ImGui::RenderNotifications();
+	ImGui::PopStyleVar(1);
+	ImGui::PopStyleColor(1);
 }
 
 const void menu::processEvent(const sf::Event& event) noexcept 
@@ -898,10 +996,25 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 {
 	window.setView(this->m_view);
 	window.draw(this->backgroundImage);
-	window.draw(this->xp_bar);
-	window.draw(this->curr_xp);
+	if (this->m_State == state::MainMenu && this->logged_in)
+	{
+		window.draw(this->xp_bar);
+		window.draw(this->curr_xp);
+	}
 	window.setView(window.getDefaultView());
 	ImGui::SFML::Render(window);
+}
+
+const void menu::login() noexcept
+{
+	if (std::string(this->inputName) == std::string(this->myAccount.account_name) && std::string(this->inputPW) == std::string("admin123"))
+	{
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 4000, "Succesfuly loged in as %s", this->myAccount.account_name));
+		this->logged_in = true;
+		this->m_State = state::MainMenu;
+	}
+	else
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect username or password!"));
 }
 
 void menu::startServer()

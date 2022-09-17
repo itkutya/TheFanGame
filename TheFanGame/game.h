@@ -1,8 +1,5 @@
 #pragma once
 
-#include "ImGUI/imgui.h"
-#include "ImGUI/imgui-SFML.h"
-
 #include "window.h"
 
 #include "ray.h"

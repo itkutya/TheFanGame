@@ -25,7 +25,7 @@ const void window::pollEvents() noexcept
 		if (event.type == sf::Event::Closed)
 			this->m_window.close();
 
-		if (inputSystem::input(inputSystem::m_Action.at("ScreenShot"), &event))
+		if (inputSystem()("ScreenShot", &event))
 			this->ScreenShot();
 	}
 }
@@ -53,7 +53,9 @@ const void window::ScreenShot() noexcept
 	auto str = oss.str();
 
 	if (!texture.copyToImage().saveToFile("screenshots/" + str + ".png"))
-		std::cout << "Error cannot create a screenshot...\n";
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error while taking a screenshot!"));
+	else
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Yay! Your screenshot can be found at\nscreenshots/%s.png", str.c_str()));
 }
 
 window::operator const bool() noexcept { return this->m_window.isOpen(); }

@@ -38,12 +38,11 @@ private:
 	enum class state
 	{
 		Login = -1, MainMenu = 0, Settings, Characters, Singleplayer, Multiplayer, MultiLobby
-	};
-	state m_State = state::MainMenu;
+	};state m_State = state::Login;
 	bool m_PlaySelected = false;
 	bool m_ServerError = false;
 	bool m_ChangeKeybindigs = false;
-	std::pair<const std::string*, const m_Keys*> m_ToChange;
+	std::pair<std::string, m_Keys> m_ToChange;
 	m_Keys key = m_Keys();
 
 	enum class settingState
@@ -52,6 +51,8 @@ private:
 	};settingState m_SettingState = settingState::Graphics;
 
 	sf::MyMusic* m_MainMusic;
+
+	ImFont* font;
 	
 	sf::Sprite icon;
 	sf::Sprite frontImage;
@@ -60,6 +61,12 @@ private:
 	sf::RectangleShape xp_bar;
 	sf::RectangleShape curr_xp;
 	profile myAccount;
+
+	char inputName[12];
+	char inputPW[24];
+	bool logged_in = false;
+	bool rememberToStayLogedIn = false;
+	const void login() noexcept;
 
 	sf::TcpSocket socket;
 	sf::IpAddress serverIP = sf::IpAddress::getLocalAddress();
