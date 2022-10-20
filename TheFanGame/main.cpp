@@ -4,29 +4,21 @@
 
 int main()
 {
-	//Uses the current time to generate random numbers.
 	std::srand((std::uint32_t)std::time(0));
 	try
 	{
-		resourceSystem::add<sf::Texture>("WallTexture", "res/wolftextures.png");
-		resourceSystem::add<sf::Texture>("Background", "res/MainMenu/Backgrounds.png");
-		resourceSystem::add<sf::Texture>("FrontImage", "res/MainMenu/FontImages.png");
-		resourceSystem::add<sf::Texture>("Icon", "res/MainMenu/Icons.png");
-		resourceSystem::add<sf::Texture>("Pause", "res/MainMenu/Pause.png");
-		resourceSystem::add<sf::Texture>("Resume", "res/MainMenu/Resume.png");
-		resourceSystem::add<sf::Texture>("CharacterTexture", "res/char.png");
-		resourceSystem::add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
-		resourceSystem::add<sf::MyMusic>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
-		resourceSystem::add<sf::MyMusic>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
-		
-		inputSystem::init();
+		resourceSystem rs;
+		inputSystem is;
+		stateSystem ss;
+		settings s("res/Settings.ini");
+		engine e = engine(&rs, &is, &ss, &s);
 
-		window mainWindow = window("Game!");
-		stateSystem::add<menu>(mainWindow);
+		window mainWindow(s.m_Videomodes[s.m_currVideomode], "Fan Game!", s.m_Fullscreen, s.m_FpsLimit, s.m_Vsync, e);
+		ss.add<menu>(e, mainWindow);
 
 		while (mainWindow)
 		{
-			stateSystem::processStateChange(mainWindow);
+			ss.processStateChange(mainWindow);
 			mainWindow.pollEvents();
 			mainWindow.update();
 			mainWindow.draw();
@@ -34,20 +26,13 @@ int main()
 	}
 	catch (const std::exception& e)
 	{
-		//Catch std::exceptions and return with -1.
 		std::cout << "\033[1;4;31m" << e.what() << '\n' << "\033[0m";
 		return -1;
 	}
 	catch(...)
 	{
-		//Catch any exception and return with -2.
 		std::cout << "\033[1;4;31m" << "Something went terribly wrong...\n" << "\033[0m";
 		return -2;
 	}
-	//Clear everything.
-	inputSystem::clear();
-	stateSystem::clear();
-	resourceSystem::clear();
-	//Exit the program with a success.
 	return 0;
 }

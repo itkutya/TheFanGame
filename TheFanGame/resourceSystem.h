@@ -19,8 +19,8 @@ namespace sf
 	class MyMusic : public sf::Music
 	{
 	public:
-		MyMusic() {};
-		virtual ~MyMusic() {};
+		MyMusic() = default;
+		virtual ~MyMusic() = default;
 
 		inline bool loadFromFile(const std::string& filePath)
 		{
@@ -35,27 +35,29 @@ namespace sf
 class resourceSystem
 {
 public:
-	resourceSystem() = delete;
+	resourceSystem() = default;
 	resourceSystem(const resourceSystem&) = delete;
 	resourceSystem(const resourceSystem&&) = delete;
-	virtual ~resourceSystem() { clear(); };
+	resourceSystem& operator=(resourceSystem& other) = delete;
+	resourceSystem& operator=(const resourceSystem& other) = delete;
+	virtual ~resourceSystem() { this->m_resources.clear(); };
 
 	template<class T>
-	static inline const void add(const std::string& id, const std::string& filePath)
+	inline const void add(const std::string& id, const std::string& filePath)
 	{
-		m_resources[id].emplace<T>();
+		this->m_resources[id].emplace<T>();
 
-		if (!std::get<T>(m_resources[id]).loadFromFile(filePath))
-			throw "Cannot load texture...\n";
+		if (!std::get<T>(this->m_resources[id]).loadFromFile(filePath))
+			throw "Cannot load resource...\n";
 	};
 
-	template<class T>
-	[[nodiscard]]static inline const T& c_get(const std::string& id) { return std::get<T>(m_resources.at(id)); };
+	void release(const std::string& id) noexcept { this->m_resources.erase(id); };
 
 	template<class T>
-	[[nodiscard]] static inline T& get(const std::string& id) { return std::get<T>(m_resources.at(id)); };
+	[[nodiscard]] inline const T& c_get(const std::string& id) { return std::get<T>(this->m_resources.at(id)); };
 
-	static inline void clear() { m_resources.clear(); };
+	template<class T>
+	[[nodiscard]] inline T& get(const std::string& id) { return std::get<T>(this->m_resources.at(id)); };
 private:
-	static std::unordered_map<std::string, std::variant<sf::Texture, sf::Font, sf::SoundBuffer, sf::MyMusic>> m_resources;
+	std::unordered_map<std::string, std::variant<sf::Texture, sf::Font, sf::SoundBuffer, sf::MyMusic>> m_resources;
 };

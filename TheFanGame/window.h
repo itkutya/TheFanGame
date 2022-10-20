@@ -18,30 +18,23 @@
 class window
 {
 public:
-	//Construct's the window class.
-	window(const char* name) noexcept;
-	//Destruct's the window class.
-	virtual ~window() noexcept;
-	//Returns m_window.isOpen().
-	explicit operator const bool() noexcept;
-	//Returns the address of m_window.
+	window(const sf::VideoMode& vm, const std::string& name, const bool& fs, const std::uint32_t& limit, const bool& vsync, engine& e) noexcept;
+	virtual ~window() noexcept = default;
+
+	explicit operator const bool() const noexcept;
 	operator sf::RenderWindow&() noexcept;
-	//Set FPS limit.
-	const void setFramerateLimit() noexcept;
-	//Set VSync to true.
-	const void setVSync() noexcept;
-	//Recreate's the window.
-	const void recreate() noexcept;
-	//Poll events in the main loop.
+
+	const void setFramerateLimit(const std::uint32_t& limit) noexcept;
+	const void setVSync(const bool& vsync) noexcept;
+	const void create(const sf::VideoMode& vm, const std::string& name, const bool& fs, const std::uint32_t& limit, const bool& vsync) noexcept;
+
 	const void pollEvents() noexcept;
-	//Draw's everything on the m_window.
 	const void draw() noexcept;
-	//Update's the game logic.
 	const void update() noexcept;
 private:
 	sf::RenderWindow m_window;
 	sf::Clock deltaTime;
-	const char* title;
-	//Takes a screenshot in any given state.
+	engine& m_enigne;
+
 	const void ScreenShot() noexcept;
 };

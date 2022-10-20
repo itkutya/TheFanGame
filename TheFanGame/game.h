@@ -2,6 +2,7 @@
 
 #include "window.h"
 
+#include "network.h"
 #include "ray.h"
 #include "Timer.h"
 
@@ -9,7 +10,7 @@ class game : public state
 {
 public:
 	//Construct the main game class.
-	game(window& window) noexcept;
+	game(engine& e, window& w) noexcept;
 	//Defauilt destructor.
 	virtual ~game() noexcept;
 	//Init main game class.
@@ -21,7 +22,8 @@ public:
 	//Draw the main game objects.
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 private:
-	window* m_window;
+	engine& m_engine;
+	window& m_window;
 	world m_map;
 
 	sf::View m_view;

@@ -18,31 +18,31 @@
 class settings
 {
 public:
-	settings() = delete;
+	explicit settings(const char* filePath) noexcept;
 	settings(const settings&) = delete;
 	settings(const settings&&) = delete;
 	settings& operator=(settings& other) = delete;
 	settings& operator=(const settings& other) = delete;
-	virtual ~settings() = default;
+	virtual ~settings() noexcept;
 
-	static const bool saveSettings(const std::string& filePath) noexcept;
-	static const bool loadSettings(const std::string& filePath) noexcept;
-
-	static std::string m_currMusic;
-	static std::array<const char*, 2> m_Music;
-	static std::vector<sf::VideoMode> m_Videomodes;
-	static int m_currVideomode;
-	static bool m_Fullscreen;
-	static bool m_ShowFPS;
-	static bool m_isFPSLimited;
-	static bool m_Vsync;
-	static int m_FpsLimit;
-	static float m_VerticalSensivity;
-	static float m_HorizontalSensivity;
-	static float m_GameVolume;
-	static float m_MusicVolume;
-	static int m_currProfilePicture;
-	static int m_currFrontPicture;
-	static int m_currBackgroundPicture;
+	const bool saveSettings(const char* filePath) noexcept;
+	
+	std::array<const char*, 2> m_Music = { {"Blackbird - Cecile Corbel", "Sakakibara Yui - Koi no Honoo"} };
+	std::vector<sf::VideoMode> m_Videomodes = sf::VideoMode::getFullscreenModes();
+	std::string m_currMusic = "";
+	int m_currVideomode = 0;
+	bool m_Fullscreen = false;
+	int m_FpsLimit = 60;
+	bool m_ShowFPS = true;
+	bool m_isFPSLimited = true;
+	bool m_Vsync = false;
+	float m_VerticalSensivity = 3.0f;
+	float m_HorizontalSensivity = 3.0f;
+	float m_GameVolume = 100.f;
+	float m_MusicVolume = 100.f;
+	int m_currProfilePicture = 0;
+	int m_currFrontPicture = 0;
+	int m_currBackgroundPicture = 0;
 private:
+	const char* m_filePath;
 };

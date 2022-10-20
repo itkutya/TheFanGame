@@ -87,6 +87,9 @@
     <ClCompile Include="settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="network.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGUI\imconfig.h">
@@ -172,6 +175,9 @@
     </ClInclude>
     <ClInclude Include="ImGUI\tahoma.h">
       <Filter>ImGUI\Notify</Filter>
+    </ClInclude>
+    <ClInclude Include="network.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

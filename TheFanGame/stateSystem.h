@@ -13,59 +13,68 @@
     #endif
 #endif
 
-#include "window.h"
-
+class resourceSystem;
+class inputSystem;
+class stateSystem;
+class settings;
 class window;
+
+struct engine
+{
+    resourceSystem* const Resources;
+    inputSystem* const Inputs;
+    stateSystem* const States;
+    settings* const Settings;
+
+    explicit engine(resourceSystem* rs, inputSystem* is, stateSystem* ss, settings* s)
+        : Resources(rs), Inputs(is), States(ss), Settings(s) {};
+    virtual ~engine() = default;
+};
 
 class state
 {
 public:
-    //Construct's the state
-    inline state() noexcept {};
-    //Destruct's the state
-    inline virtual ~state() noexcept {};
-
-    //Init the current state
+    inline state() noexcept = default;
+    inline virtual ~state() noexcept = default;
     virtual const void init(sf::RenderWindow& window) = 0;
-    //Process the current state events
     virtual const void processEvent(const sf::Event& event) noexcept = 0;
-    //Update the current state
     virtual const void update(sf::RenderWindow& window, const sf::Time& dt) noexcept = 0;
-    //Draw the current state objects
     virtual const void draw(sf::RenderWindow& window) noexcept = 0;
 };
 
 class stateSystem
 {
 public:
-	stateSystem() = delete;
+	stateSystem() = default;
 	stateSystem(const stateSystem&) = delete;
 	stateSystem(const stateSystem&&) = delete;
-	virtual ~stateSystem() noexcept {};
-
-    //Add a new state and either replace it or add it to the top of the stack.
-    template<typename T>
-    inline static const void add(window& window, const bool& replace = false) noexcept
+    stateSystem& operator=(stateSystem& other) = delete;
+    stateSystem& operator=(const stateSystem& other) = delete;
+	virtual ~stateSystem() noexcept 
     {
-        m_add = true;
-        m_newState = std::move(std::make_unique<T>(window));
-        m_replace = replace;
+        std::size_t maxSize = getSize();
+        for (std::size_t i = 0; i < maxSize; ++i)
+            if ((!this->m_stateStack.empty()))
+                this->m_stateStack.pop();
     };
-    //Delete the top state.
-    static const void popCurrent() noexcept;
-    //Process the change's made in the state system in the begining of the main loop to prevent undifend error's.
-    static const void processStateChange(sf::RenderWindow& window) noexcept;
-    //Get the address of the current state.
-    static const std::unique_ptr<state>& getState() noexcept;
-    //Get the size of the stack.
-    static const std::size_t getSize() noexcept;
-    //Clears stack states.
-    static const void clear();
+    
+    template<typename T>
+    inline const void add(engine& e, window& w, const bool& replace = false) noexcept
+    {
+        this->m_add = true;
+        this->m_newState = std::move(std::make_unique<T>(e, w));
+        this->m_replace = replace;
+    };
+    
+    const void popCurrent() noexcept;
+    const void processStateChange(sf::RenderWindow& window) noexcept;
+    const std::unique_ptr<state>& getState() noexcept;
+    const std::size_t getSize() noexcept;
 private:
-    static std::stack<std::unique_ptr<state>> m_stateStack;
-    static std::unique_ptr<state> m_newState;
+    std::stack<std::unique_ptr<state>> m_stateStack;
+    std::unique_ptr<state> m_newState;
 
-    static bool m_add;
-    static bool m_replace;
-    static bool m_remove;
+    bool m_add = false;
+    bool m_replace = false;
+    bool m_remove = false;
 };

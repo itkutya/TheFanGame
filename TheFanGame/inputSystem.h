@@ -37,7 +37,7 @@ struct m_Keys
 class inputSystem
 {
 public:
-	inputSystem() = default;
+	inputSystem();
 	inputSystem(const inputSystem&) = delete;
 	inputSystem(const inputSystem&&) = delete;
     inputSystem& operator=(inputSystem& other) = delete;
@@ -58,7 +58,7 @@ public:
             {
                 for (std::uint32_t i = 0; i < sf::Joystick::Count; ++i)
                 {
-                    if (sf::Joystick::isButtonPressed(i, m_Action.at(action).m_joystickButton))
+                    if (sf::Joystick::isButtonPressed(i, m_Action.at(action).m_joystickButton) || sf::Joystick::getAxisPosition(i, m_Action.at(action).m_JoystickAxis) != 0.f)
                         return true;
                 }
             }
@@ -77,13 +77,15 @@ public:
                 m_Action.at(action).m_EventType == event->type &&
                 m_Action.at(action).m_KeyCode == event->key.code)
                 return true;
+            if (m_Action.at(action).m_InputType == InputType::JoystickAxisInput &&
+                m_Action.at(action).m_EventType == event->type &&
+                m_Action.at(action).m_KeyCode == event->key.code)
+                return true;
         }
         return false;
     };
 
-	static const void init();
-	static const void saveInput(const std::pair<std::string, m_Keys>& temp) noexcept;
-	static const void clear() noexcept;
+	const void saveInput(const std::pair<std::string, m_Keys>& temp) noexcept;
 
 	inline constexpr std::string keyToString(const m_Keys& it) const noexcept
 	{
@@ -99,6 +101,8 @@ public:
                 return "D";
             case sf::Keyboard::S:
                 return "S";
+            case sf::Keyboard::F8:
+                return "F8";
             case sf::Keyboard::F12:
                 return "F12";
             default:
@@ -140,6 +144,6 @@ public:
     };
 	
 private:
-	static std::unordered_map<std::string, m_Keys> m_Action;
-	static bool isJoystickConnected;
+	std::unordered_map<std::string, m_Keys> m_Action;
+	bool isJoystickConnected = false;
 };

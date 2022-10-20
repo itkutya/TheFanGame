@@ -1,18 +1,10 @@
 #include "window.h"
 
-window::window(const char* name) noexcept : title(name)
+window::window(const sf::VideoMode& vm, const std::string& name, const bool& fs, const std::uint32_t& limit, const bool& vsync, engine& e) noexcept 
+	: m_enigne(e)
 {
-	if (!settings::loadSettings("res/Settings.ini"))
-		std::cout << "NOT_OK!\n";
-
-	this->recreate();
+	this->create(vm, name, fs, limit, vsync);
 	this->deltaTime.restart();
-}
-
-window::~window() noexcept 
-{
-	if (!settings::saveSettings("res/Settings.ini"))
-		std::cout << "NOT_OK!\n";
 }
 
 const void window::pollEvents() noexcept
@@ -20,12 +12,12 @@ const void window::pollEvents() noexcept
 	sf::Event event;
 	while (this->m_window.pollEvent(event))
 	{
-		stateSystem::getState()->processEvent(event);
+		this->m_enigne.States->getState()->processEvent(event);
 
 		if (event.type == sf::Event::Closed)
 			this->m_window.close();
 
-		if (inputSystem()("ScreenShot", &event))
+		if (this->m_enigne.Inputs->operator()("ScreenShot", &event))
 			this->ScreenShot();
 	}
 }
@@ -33,11 +25,11 @@ const void window::pollEvents() noexcept
 const void window::draw() noexcept
 {
 	this->m_window.clear();
-	stateSystem::getState()->draw(this->m_window);
+	this->m_enigne.States->getState()->draw(this->m_window);
 	this->m_window.display();
 }
 
-const void window::update() noexcept { stateSystem::getState()->update(this->m_window, this->deltaTime.restart()); }
+const void window::update() noexcept { this->m_enigne.States->getState()->update(this->m_window, this->deltaTime.restart()); }
 
 const void window::ScreenShot() noexcept
 {
@@ -58,44 +50,26 @@ const void window::ScreenShot() noexcept
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Yay! Your screenshot can be found at\nscreenshots/%s.png", str.c_str()));
 }
 
-window::operator const bool() noexcept { return this->m_window.isOpen(); }
+window::operator const bool() const noexcept { return this->m_window.isOpen(); }
 
 window::operator sf::RenderWindow&() noexcept { return this->m_window; }
 
-const void window::setFramerateLimit() noexcept
+const void window::setFramerateLimit(const std::uint32_t& limit) noexcept 
 {
-	if (!settings::m_Vsync)
-		if (!settings::m_isFPSLimited)
-			this->m_window.setFramerateLimit(0);
-		else
-			this->m_window.setFramerateLimit(settings::m_FpsLimit);
-}
-
-const void window::setVSync() noexcept
-{
-	if (!settings::m_isFPSLimited)
-		this->m_window.setVerticalSyncEnabled(settings::m_Vsync);
-}
-
-const void window::recreate() noexcept
-{
-	if (settings::m_Fullscreen)
-		this->m_window.create(settings::m_Videomodes[settings::m_currVideomode], this->title, sf::Style::Fullscreen);
-	else
-		this->m_window.create(settings::m_Videomodes[settings::m_currVideomode], this->title);
-
-	this->m_window.setKeyRepeatEnabled(false);
-
-	if (!settings::m_Vsync)
-		if (!settings::m_isFPSLimited)
-			this->m_window.setFramerateLimit(0);
-		else
-			this->m_window.setFramerateLimit(settings::m_FpsLimit);
-	else
-		std::cout << "Disable Vsync before settings a FPS limit...\n";
-
-	if (!settings::m_isFPSLimited)
-		this->m_window.setVerticalSyncEnabled(true);
-	else
+	if (limit > 0)
 		this->m_window.setVerticalSyncEnabled(false);
+	this->m_window.setFramerateLimit(limit);
+}
+
+const void window::setVSync(const bool& vsync) noexcept 
+{
+	if (vsync)
+		this->m_window.setFramerateLimit(0);
+	this->m_window.setVerticalSyncEnabled(vsync);
+}
+
+const void window::create(const sf::VideoMode& vm, const std::string& name, const bool& fs, const std::uint32_t& limit, const bool& vsync) noexcept
+{
+	fs ? this->m_window.create(vm, name, sf::Style::Fullscreen) : this->m_window.create(vm, name);
+	limit ? setFramerateLimit(limit) : setVSync(vsync);
 }

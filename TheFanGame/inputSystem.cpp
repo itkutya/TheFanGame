@@ -1,9 +1,6 @@
 #include "inputSystem.h"
 
-std::unordered_map<std::string, m_Keys> inputSystem::m_Action;
-bool inputSystem::isJoystickConnected = false;
-
-const void inputSystem::init()
+inputSystem::inputSystem()
 {
     m_Keys key = m_Keys();
 
@@ -179,5 +176,3 @@ const void inputSystem::saveInput(const std::pair<std::string, m_Keys>& temp) no
     }
     inputSettings.close();
 }
-
-const void inputSystem::clear() noexcept { m_Action.clear(); }

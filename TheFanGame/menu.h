@@ -1,18 +1,5 @@
 #pragma once
 
-#include <stdlib.h>
-#include <stdio.h>
-
-#if _WIN32 || _WIN64
-	#if _WIN64
-		#include "SFML64/System.hpp"
-		#include "SFML64/Network.hpp"
-	#else
-		#include "SFML32/System.hpp"
-		#include "SFML32/Network.hpp"
-	#endif
-#endif
-
 #include "game.h"
 #include "profile.h"
 
@@ -20,7 +7,7 @@ class menu : public state
 {
 public:
 	//Construct a GUI interface.
-	menu(window& window) noexcept;
+	menu(engine& e, window& w) noexcept;
 	//Default destructor.
 	virtual ~menu() noexcept;
 	//Init a GUI interface.
@@ -32,13 +19,25 @@ public:
 	//Draw the GUI interface.
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 private:
-	window* m_window;
+	engine& m_engine;
+	window& m_window;
 	sf::View m_view;
+
+	localhost lh;
+	network admin;
+	bool isAdmin = true;
+	network client;
+	bool isClient = false;
+
+	std::string atext;
+	char astring[24];
+	std::string ctext;
+	char cstring[24];
 
 	enum class state
 	{
 		Login = -1, MainMenu = 0, Settings, Characters, Singleplayer, Multiplayer, MultiLobby
-	};state m_State = state::MainMenu;
+	};state m_State = state::Login;
 	bool m_PlaySelected = false;
 	bool m_ServerError = false;
 	bool m_ChangeKeybindigs = false;
