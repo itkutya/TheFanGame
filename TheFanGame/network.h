@@ -23,14 +23,14 @@
 
 enum class Network_MSG
 {
-	None, Network_Test, Player_Connected, Player_Disconnected, Player_AttemptedConnection, Player_SentMsg, Count
+	None, Error, Test, LogInAttempt, LogInResult, Count
 };
 
-class network
+class client
 {
 public:
-	network() noexcept = default;
-	virtual ~network() noexcept 
+	client() noexcept = default;
+	virtual ~client() noexcept 
 	{ 
 		this->disconnect();
 		for (auto& data : this->m_data)
@@ -57,23 +57,22 @@ public:
 			{
 			case Network_MSG::None:
 				break;
-			case Network_MSG::Network_Test:
+			case Network_MSG::Error:
+				break;
+			case Network_MSG::Test:
 			{
 				std::string temp;
 				this->m_packet >> temp;
 				this->m_data[msg] = new std::string(temp);
+				break;
 			}
+			case Network_MSG::LogInResult:
+			{
+				bool tempResult;
+				this->m_packet >> tempResult;
+				this->m_data[msg] = new bool(tempResult);
 				break;
-			case Network_MSG::Player_Connected:
-				break;
-			case Network_MSG::Player_Disconnected:
-				break;
-			case Network_MSG::Player_AttemptedConnection:
-				break;
-			case Network_MSG::Player_SentMsg:
-				break;
-			case Network_MSG::Count:
-				break;
+			}
 			default:
 				break;
 			}
@@ -85,13 +84,13 @@ public:
 	 * without std::move, we continiously can get the sent data...
 	 */
 	template<typename T>
-	inline const T getData(const Network_MSG& msg) noexcept
+	inline const T* getData(const Network_MSG& msg) noexcept
 	{
 		std::lock_guard<std::mutex> lock(this->m_mutex);
 		if (this->m_data[msg] != nullptr)
-			return *static_cast<T*>(this->m_data.at(msg));
+			return static_cast<T*>(this->m_data.at(msg));
 		else
-			return T();
+			return static_cast<T*>(nullptr);
 	};
 
 	inline const std::future<void>& keepAlive() noexcept
@@ -124,8 +123,8 @@ public:
 							{
 								this->m_keepAlive = false;
 								this->m_socket.disconnect();
-							}
 								break;
+							}
 							case sf::Socket::Error:
 								std::printf("Error\n");
 								break;
@@ -212,29 +211,30 @@ public:
 	{ 
 		this->shouldRun = true;
 		this->m_serverThread = std::make_unique<std::thread>(&localhost::localServer, this);
-		using namespace std::chrono_literals;
-		std::this_thread::sleep_for(1000ms);
-		return this->didServerSuccesfullyRun;
+		return true;
 	};
-	inline const void shutdown() noexcept { this->shouldRun = false; this->m_serverThread->join(); };
+
+	inline const void shutdown() noexcept 
+	{
+		if (this->m_serverThread != nullptr)
+		{
+			this->shouldRun = false;
+			this->m_serverThread->join();
+		}
+	};
 private:
 	std::unique_ptr<std::thread> m_serverThread;
 	sf::TcpListener m_listener;
 	sf::SocketSelector m_selector;
 	std::vector<std::unique_ptr<sf::TcpSocket>> m_clients;
 	std::atomic<bool> shouldRun = false;
-	std::atomic<bool> didServerSuccesfullyRun = false;
 
 	void localServer()
 	{
 		if (this->m_listener.listen(52200, sf::IpAddress::getLocalAddress()) != sf::Socket::Done)
-		{
 			std::printf("Error: Cannot start local server!\n");
-			this->didServerSuccesfullyRun = false;
-		}
 		else
 		{
-			this->didServerSuccesfullyRun = true;
 			std::printf("Success: Local server has been started on %s:%u\n", sf::IpAddress::getLocalAddress().toString().c_str(), this->m_listener.getLocalPort());
 			this->m_selector.add(this->m_listener);
 
@@ -251,9 +251,6 @@ private:
 							this->m_clients.push_back(std::move(client));
 							auto& newClient = (**(this->m_clients.end() - 1));
 							this->m_selector.add(newClient);
-							sf::Packet packet;
-							packet << std::string("Welcome\n");
-							newClient.send(packet);
 						}
 					}
 					else
@@ -275,11 +272,40 @@ private:
 									break;
 								case sf::Socket::Done:
 								{
-									for (auto it2 = this->m_clients.begin(); it2 != this->m_clients.end(); ++it2)
+									sf::Uint32 tempType;
+									packet >> tempType;
+									Network_MSG msg = static_cast<Network_MSG>(tempType);
+									switch (msg)
 									{
-										sf::TcpSocket& client2 = **it2;
-										if (it2 != it)
-											client2.send(packet);
+									case Network_MSG::LogInAttempt:
+									{
+										std::string temp_Un;
+										std::string temp_Pw;
+										packet >> temp_Un >> temp_Pw;
+										packet.clear();
+										//On real server we will store it in txt and undordered_map...
+										if (temp_Un == std::string("admin") && temp_Pw == std::string("admin"))
+										{
+											packet << true;
+											client.send(packet);
+										}
+										else
+										{
+											packet << false;
+											client.send(packet);
+										}
+										break;
+									}
+									default:
+									{
+										for (auto it2 = this->m_clients.begin(); it2 != this->m_clients.end(); ++it2)
+										{
+											sf::TcpSocket& client2 = **it2;
+											if (it2 != it)
+												client2.send(packet);
+										}
+										break;
+									}
 									}
 								}
 								break;

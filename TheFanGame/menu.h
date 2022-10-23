@@ -23,16 +23,8 @@ private:
 	window& m_window;
 	sf::View m_view;
 
-	localhost lh;
-	network admin;
-	bool isAdmin = true;
-	network client;
-	bool isClient = false;
-
-	std::string atext;
-	char astring[24];
-	std::string ctext;
-	char cstring[24];
+	localhost m_localhost;
+	client m_client;
 
 	enum class state
 	{

@@ -143,17 +143,9 @@ const void menu::init(sf::RenderWindow& window)
 	this->m_MainMusic->setVolume(this->m_engine.Settings->m_MusicVolume);
 
 	if (this->rememberToStayLogedIn)
-		this->m_State = state::Login;
+		this->m_State = state::MainMenu;
 
-	this->isAdmin = this->lh.start();
-	if (this->isAdmin)
-	{
-		this->admin.join(sf::IpAddress::getLocalAddress(), 52200);
-		std::string stuff;
-		this->admin.receive(stuff).wait();
-		std::printf("Received from that...: %s", stuff.c_str());
-		this->admin.keepAlive();
-	}
+	this->m_localhost.start();
 }
 
 /*
@@ -1025,49 +1017,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 				if (ImGui::Checkbox("Remember Me!", &this->rememberToStayLogedIn))
 					ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Info, 4000, "Ok will deffinenitly do that!"));
-
-				if (ImGui::Button("Join"))
-				{
-					this->isClient = this->client.join();
-					if (this->isClient)
-					{
-						std::string stuff;
-						this->client.receive(stuff).wait();
-						std::printf("Received from that...: %s", stuff.c_str());
-						this->client.keepAlive();
-					}
-				}
-				if (ImGui::Button("Disconnect") && this->isClient)
-					this->client.disconnect();
-				if (this->isClient)
-				{
-					if (ImGui::Button("Send Stuff") && this->isClient)
-						this->client.send(static_cast<sf::Uint32>(Network_MSG::Network_Test), std::string(this->cstring) + '\n');
-					ImGui::SameLine();
-					ImGui::InputText("Client msg: ", this->cstring, sizeof(this->cstring), ImGuiInputTextFlags_EnterReturnsTrue);
-					this->client.update();
-					std::string temp = this->client.getData<std::string>(Network_MSG::Network_Test);
-					if (this->ctext != temp)
-					{
-						this->ctext = temp;
-						std::printf("%s", temp.c_str());
-					}
-				}
-				if (this->isAdmin)
-				{
-					if (ImGui::Button("Send Stuff from the server") && this->isAdmin)
-						this->admin.send(static_cast<sf::Uint32>(Network_MSG::Network_Test), std::string(this->astring) + '\n');
-					ImGui::SameLine();
-					ImGui::InputText("Admin msg: ", this->astring, sizeof(this->astring), ImGuiInputTextFlags_EnterReturnsTrue);
-					this->admin.update();
-					std::string temp = this->admin.getData<std::string>(Network_MSG::Network_Test);
-					if (this->atext != temp)
-					{
-						this->atext = temp;
-						std::printf("%s", temp.c_str());
-					}
-				}
-
 				ImGui::End();
 			}
 			break;
@@ -1119,7 +1068,12 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 
 const void menu::login() noexcept
 {
-	if (std::string(this->inputName) == std::string(this->myAccount.account_name) && std::string(this->inputPW) == std::string("admin123"))
+	this->m_client.join();
+	this->m_client.send(static_cast<sf::Uint32>(Network_MSG::LogInAttempt), std::string(this->inputName), std::string(this->inputPW));
+	bool resoult = false;
+	using namespace std::chrono_literals;
+	this->m_client.receive(resoult).wait_for(1s);
+	if (resoult)
 	{
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 4000, "Succesfuly loged in as %s", this->myAccount.account_name));
 		this->logged_in = true;
@@ -1127,6 +1081,7 @@ const void menu::login() noexcept
 	}
 	else
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect username or password!"));
+	this->m_client.disconnect();
 }
 
 void menu::startServer()
