@@ -23,7 +23,7 @@ private:
 	window& m_window;
 	sf::View m_view;
 
-	localhost m_localhost;
+	//localhost m_localhost;
 	client m_client;
 
 	enum class state

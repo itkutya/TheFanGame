@@ -10,6 +10,7 @@
 #include <atomic>
 #include <utility>
 #include <unordered_map>
+#include <mutex>
 
 #if _WIN32 || _WIN64
 	#if _WIN64
@@ -93,7 +94,7 @@ public:
 			return static_cast<T*>(nullptr);
 	};
 
-	inline const std::future<void>& keepAlive() noexcept
+	inline const std::future<void>& keepAlive(const sf::Int64& thickRate) noexcept
 	{
 		return this->m_future.emplace_back(std::async(std::launch::async,
 			[&]()
@@ -103,7 +104,7 @@ public:
 				selector.add(this->m_socket);
 				while (this->m_keepAlive)
 				{
-					if (selector.wait(sf::microseconds(1)))
+					if (selector.wait(sf::microseconds(thickRate)))
 					{
 						std::lock_guard<std::mutex> lock(this->m_mutex);
 						if (selector.isReady(this->m_socket))

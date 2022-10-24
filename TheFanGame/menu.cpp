@@ -145,7 +145,7 @@ const void menu::init(sf::RenderWindow& window)
 	if (this->rememberToStayLogedIn)
 		this->m_State = state::MainMenu;
 
-	this->m_localhost.start();
+	//this->m_localhost.start();
 }
 
 /*
