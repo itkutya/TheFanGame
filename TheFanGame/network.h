@@ -24,7 +24,7 @@
 
 enum class Network_MSG
 {
-	None, Error, Test, LogInAttempt, LogInResult, Count
+	None, Error, Test, LogInAttempt, LogInResult, RegisterAttempt, RegisterResult, Count
 };
 
 class client
@@ -80,10 +80,7 @@ public:
 			this->m_packet.clear();
 		}
 	};
-	/*
-	 * with std::move we get the data once, and after that it gets set to nullptr,
-	 * without std::move, we continiously can get the sent data...
-	 */
+
 	template<typename T>
 	inline const T* getData(const Network_MSG& msg) noexcept
 	{
@@ -162,7 +159,7 @@ public:
 			[&](Args... arguments)
 			{
 				std::lock_guard<std::mutex> lock(this->m_mutex);
-				int dummy[] = { 0, ((void)(this->m_packet << std::forward<Args>(arguments)), 0)... };
+				int dummy[] = { 0, ((void)(this->m_packet << arguments), 0)... };
 				this->m_socket.send(this->m_packet);
 				this->m_packet.clear();
 			}, args...));
@@ -175,7 +172,7 @@ public:
 			[&](Args... arguments)
 			{
 				std::lock_guard<std::mutex> lock(this->m_mutex);
-				int dummy[] = { 0, ((void)(this->m_packet << std::forward<Args>(arguments)), 0)... };
+				int dummy[] = { 0, ((void)(this->m_packet << arguments), 0)... };
 				this->m_socket.send(this->m_packet);
 				this->m_packet.clear();
 			}, args...));

@@ -5,6 +5,7 @@
 #include <atomic>
 #include <mutex>
 #include <unordered_map>
+#include <fstream>
 
 #include "ImGUI/imgui.h"
 #include "ImGUI/imgui-SFML.h"
@@ -23,14 +24,21 @@
 
 #define u8(x) reinterpret_cast<const char*>(u8#x)
 #define LOG(fmt, ...) std::printf(fmt, __VA_ARGS__)
-#define LOG_ERROR(x) std::printf("\033[31mError:\033[34m %s\033[0m\n", x)
-#define LOG_SUCCES(x) std::printf("\033[32mSucces:\033[34m %s\033[0m\n", x)
-#define LOG_ERROR_WITH_IP(x, y, z) std::printf("\033[31mError:\033[34m %s \033[37m(%s:%u)\033[0m\n", x, y, z)
-#define LOG_SUCCES_WITH_IP(x, y, z) std::printf("\033[32mSucces:\033[34m %s \033[37m(%s:%u)\033[0m\n", x, y, z)
+#define LOG_ERROR(fmt, ...)	{											\
+								std::printf("\033[31mError:\033[34m "); \
+								std::printf(fmt, __VA_ARGS__);			\
+								std::printf("\033[0m\n");				\
+							}
+
+#define LOG_SUCCES(fmt, ...){											\
+								std::printf("\033[32mSucces:\033[34m ");\
+								std::printf(fmt, __VA_ARGS__);			\
+								std::printf("\033[0m\n");				\
+							}
 
 enum class Network_MSG
 {
-	None, Error, Test, LogInAttempt, LogInResult, Count
+	None, Error, Test, LogInAttempt, LogInResult, RegisterAttempt, RegisterResult, Count
 };
 
 static sf::TcpListener listener;
@@ -43,12 +51,13 @@ static std::unordered_map<std::string, std::string> users;
 
 void startServer(const sf::Int64& thickRate = 0)
 {
-	users.insert({ "admin", "admin" });
 	if (listener.listen(52200, sf::IpAddress::getLocalAddress()) != sf::Socket::Done)
+	{
 		LOG_ERROR("Cannot start server!");
+	}
 	else
 	{
-		LOG_SUCCES_WITH_IP("Server has been started!", sf::IpAddress::getLocalAddress().toString().c_str(), listener.getLocalPort());
+		LOG_SUCCES("Server has been started! %s(%s:%u)", "\033[37m", sf::IpAddress::getLocalAddress().toString().c_str(), listener.getLocalPort());
 		selector.add(listener);
 
 		while (shouldRun)
@@ -61,7 +70,7 @@ void startServer(const sf::Int64& thickRate = 0)
 					auto client = std::make_unique<sf::TcpSocket>();
 					if (listener.accept(*client) == sf::Socket::Done)
 					{
-						LOG_SUCCES_WITH_IP("Player connected:", client->getRemoteAddress().toString().c_str(), client->getRemotePort());
+						LOG_SUCCES("Player connected: %s(%s:%u)", "\033[37m", client->getRemoteAddress().toString().c_str(), client->getRemotePort());
 						clients.push_back(std::move(client));
 						auto& newClient = (**(clients.end() - 1));
 						selector.add(newClient);
@@ -79,7 +88,7 @@ void startServer(const sf::Int64& thickRate = 0)
 							switch (client.receive(packet))
 							{
 							case sf::Socket::Disconnected:
-								LOG_ERROR_WITH_IP("Player disconnected:", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
+								LOG_ERROR("Player disconnected: %s(%s:%u)", "\033[37m", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
 								disconnected.push_back(it);
 								selector.remove(client);
 								client.disconnect();
@@ -99,15 +108,47 @@ void startServer(const sf::Int64& thickRate = 0)
 									packet.clear();
 									if (users.contains(temp_Un) && users.at(temp_Un) == temp_Pw)
 									{
+										LOG_SUCCES("Player loged in: %s(%s:%u)", "\033[37m", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
 										packet << true;
-										LOG_SUCCES_WITH_IP("Player loged in:", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
 										client.send(packet);
 									}
 									else
 									{
+										LOG_ERROR("Player failed to login: %s(%s:%u)", "\033[37m", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
 										packet << false;
-										LOG_ERROR_WITH_IP("Player failed to login:", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
 										client.send(packet);
+									}
+									break;
+								}
+								case Network_MSG::RegisterAttempt:
+								{
+									std::string temp_Un;
+									std::string temp_Pw;
+									packet >> temp_Un >> temp_Pw;
+									packet.clear();
+									if (users.contains(temp_Un))
+									{
+										LOG_ERROR("Player failed to create account: %s(%s:%u)", "\033[37m", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
+										packet << false;
+										client.send(packet);
+									}
+									else
+									{
+										LOG_SUCCES("Player created an account: %s(%s:%u)", "\033[37m", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
+										packet << true;
+										client.send(packet);
+										users.insert({ temp_Un, temp_Pw });
+										std::ofstream file("users.ini", std::ios_base::app);
+										if (file.is_open())
+										{
+											file.write(temp_Un.c_str(), sizeof(temp_Un.c_str()));
+											file.write("\n", sizeof(char));
+											file.write(temp_Pw.c_str(), sizeof(temp_Pw.c_str()));
+											file.write("\n", sizeof(char));
+										}
+										else
+											LOG_ERROR("Cannot load user datas'...");
+										file.close();
 									}
 									break;
 								}
@@ -164,6 +205,21 @@ int main()
     ImFont* font = io.Fonts->AddFontFromFileTTF("Gen Jyuu Gothic Monospace Bold.ttf", 25.0f, 0, io.Fonts->GetGlyphRangesJapanese());
     ImGui::SFML::UpdateFontTexture();
 
+	std::ifstream file("users.ini");
+	if (file.is_open())
+	{
+		std::string tempUN;
+		while (std::getline(file, tempUN))
+		{
+			std::string tempPW;
+			std::getline(file, tempPW);
+			users.insert({ tempUN, tempPW });
+		}
+	}
+	else
+		LOG_ERROR("Cannot load user datas'...");
+	file.close();
+
 	std::thread server(&startServer, 16);
 
     sf::Clock deltaTime;
@@ -183,7 +239,15 @@ int main()
         {
 			std::lock_guard<std::mutex> lock(mutex);
             ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
-            ImGui::Text(u8(平仮名));
+			for (auto& client : clients)
+			{
+				std::string text = client->getRemoteAddress().toString() + std::to_string(client->getRemotePort());
+				if (ImGui::BeginListBox("Connected clients"))
+				{
+					ImGui::Selectable(text.c_str());
+					ImGui::EndListBox();
+				}
+			}
         }ImGui::End();
 
         window.clear();

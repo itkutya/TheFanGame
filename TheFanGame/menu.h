@@ -23,7 +23,7 @@ private:
 	window& m_window;
 	sf::View m_view;
 
-	//localhost m_localhost;
+	localhost m_localhost;
 	client m_client;
 
 	enum class state
@@ -58,6 +58,7 @@ private:
 	bool logged_in = false;
 	bool rememberToStayLogedIn = false;
 	const void login() noexcept;
+	const void createAccount() noexcept;
 
 	sf::TcpSocket socket;
 	sf::IpAddress serverIP = sf::IpAddress::getLocalAddress();

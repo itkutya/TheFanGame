@@ -144,37 +144,7 @@ const void menu::init(sf::RenderWindow& window)
 
 	if (this->rememberToStayLogedIn)
 		this->m_State = state::MainMenu;
-
-	//this->m_localhost.start();
 }
-
-/*
-#define min(x,y) ((x)<(y)?x:y)
-#define wh(a) ImColor(1.f,1.f,1.f,a)
-void FX(ImDrawList* d, ImVec2 a, ImVec2 b, ImVec2 sz, ImVec2, float t)
-{
-	static float fl;
-	if ((rand() % 500) == 0) fl = t;
-	if ((t - fl) > 0)
-	{
-		auto ft = 0.25f;
-		d->AddRectFilled(a, b, wh((ft - (t - fl)) / ft));
-	}
-
-	for (int i = 0; i < 2000; ++i) {
-		unsigned h = ImGui::GetID(d + i + int(t / 4));
-		auto f = fmodf(t + fmodf(h / 777.f, 99), 99);
-		auto tx = h % (int)sz.x;
-		auto ty = h % (int)sz.y;
-		if (f < 1) {
-			auto py = ty - 1000 * (1 - f);
-			d->AddLine({ a.x + tx, a.y + py }, { a.x + tx, a.y + min(py + 10,ty) }, (ImU32)-1);
-		}
-		else if (f < 1.2f)
-			d->AddCircle({ a.x + tx, a.y + ty }, (f - 1) * 10 + h % 5, wh(1 - (f - 1) * 5.f));
-	}
-}
-*/
 
 const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
@@ -185,9 +155,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		this->m_MainMusic->pause();
 	else if (this->m_engine.Settings->m_MusicVolume > 0.f && this->m_MainMusic->getStatus() == sf::SoundSource::Stopped)
 		this->m_MainMusic->play();
-
-	//sf::Vector2f scaleFactor = sf::Vector2f(static_cast<float>(window.getSize().x) / static_cast<float>(this->m_videomodes[0].width),
-	//										  static_cast<float>(window.getSize().y) / static_cast<float>(this->m_videomodes[0].height));
 
 	if (ImGui::Begin("Main Window", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus))
 	{
@@ -201,12 +168,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		vMin.y += ImGui::GetWindowPos().y;
 		vMax.x += ImGui::GetWindowPos().x;
 		vMax.y += ImGui::GetWindowPos().y;
-
-		/*
-		ImDrawList* draw_list = ImGui::GetWindowDrawList();
-		ImGuiViewport* viewPort = ImGui::GetMainViewport();
-		draw_list->AddRectFilled(vMin, ImVec2(vMax.x, vMax.y * 0.75f), ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 255, 255)));
-		*/
 
 		if (this->m_engine.Settings->m_ShowFPS)
 		{
@@ -1010,7 +971,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					this->login();
 
 				if (ImGui::Button("Create Account"))
-					ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 4000, "Cannot create account yet!"));
+					this->createAccount();
 				ImGui::SameLine();
 				if (ImGui::Button("Login"))
 					this->login();
@@ -1066,21 +1027,39 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 	ImGui::SFML::Render(window);
 }
 
+/*
+* TODO: Fix bug where sent login info is not received correctly...
+*/
+
 const void menu::login() noexcept
 {
 	this->m_client.join();
-	this->m_client.send(static_cast<sf::Uint32>(Network_MSG::LogInAttempt), std::string(this->inputName), std::string(this->inputPW));
+	this->m_client.send(static_cast<sf::Uint32>(Network_MSG::LogInAttempt), std::string(this->inputName), std::string(this->inputPW)).wait();
 	bool resoult = false;
 	using namespace std::chrono_literals;
 	this->m_client.receive(resoult).wait_for(1s);
 	if (resoult)
 	{
-		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 4000, "Succesfuly loged in as %s", this->myAccount.account_name));
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfuly loged in as %s", this->myAccount.account_name));
 		this->logged_in = true;
 		this->m_State = state::MainMenu;
 	}
 	else
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect username or password!"));
+	this->m_client.disconnect();
+}
+
+const void menu::createAccount() noexcept
+{
+	this->m_client.join();
+	this->m_client.send(static_cast<sf::Uint32>(Network_MSG::RegisterAttempt), std::string(this->inputName), std::string(this->inputPW)).wait();
+	bool resoult = false;
+	using namespace std::chrono_literals;
+	this->m_client.receive(resoult).wait_for(1s);
+	if (resoult)
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Account succesfuly created!"));
+	else
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account with given detailes!"));
 	this->m_client.disconnect();
 }
 
