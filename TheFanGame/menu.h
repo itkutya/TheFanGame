@@ -53,8 +53,8 @@ private:
 	sf::RectangleShape curr_xp;
 	profile myAccount;
 
-	char inputName[12];
-	char inputPW[24];
+	std::string inputName;
+	std::string inputPW;
 	bool logged_in = false;
 	bool rememberToStayLogedIn = false;
 	const void login() noexcept;

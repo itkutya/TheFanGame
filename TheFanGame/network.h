@@ -151,42 +151,58 @@ public:
 			future.wait();
 		this->m_socket.disconnect(); 
 	};
-	
-	template<typename... Args>
-	inline const std::future<void>& send(Args&... args) noexcept
+
+	template<typename T, typename... Args>
+	inline constexpr void makeSendPacket(T& firstParam, Args&... otherParams)
 	{
-		return this->m_future.emplace_back(std::async(std::launch::async,
-			[&](Args... arguments)
-			{
-				std::lock_guard<std::mutex> lock(this->m_mutex);
-				int dummy[] = { 0, ((void)(this->m_packet << arguments), 0)... };
-				this->m_socket.send(this->m_packet);
-				this->m_packet.clear();
-			}, args...));
+		this->m_packet << firstParam;
+		if constexpr (sizeof...(otherParams) > 0)
+			this->makeSendPacket(otherParams...);
 	};
 
-	template<typename... Args>
-	inline const std::future<void>& send(const Args&... args) noexcept
+	template<typename T, typename... Args>
+	inline const std::future<void>& send(T& firstParam, Args&... otherParams) noexcept
 	{
 		return this->m_future.emplace_back(std::async(std::launch::async,
-			[&](Args... arguments)
+			[&](T firstArg, Args... otherArg)
 			{
 				std::lock_guard<std::mutex> lock(this->m_mutex);
-				int dummy[] = { 0, ((void)(this->m_packet << arguments), 0)... };
+				this->makeSendPacket(firstArg, otherArg...);
 				this->m_socket.send(this->m_packet);
 				this->m_packet.clear();
-			}, args...));
+			}, firstParam, otherParams...));
 	};
 
-	template<typename... Args>
-	inline const std::future<void>& receive(Args&... args) noexcept
+	template<typename T, typename... Args>
+	inline const std::future<void>& send(const T& firstParam, const Args&... otherParams) noexcept
+	{
+		return this->m_future.emplace_back(std::async(std::launch::async,
+			[&](T firstArg, Args... otherArg)
+			{
+				std::lock_guard<std::mutex> lock(this->m_mutex);
+				this->makeSendPacket(firstArg, otherArg...);
+				this->m_socket.send(this->m_packet);
+				this->m_packet.clear();
+			}, firstParam, otherParams...));
+	};
+
+	template<typename T, typename... Args>
+	inline constexpr void makeReceivePacket(T& firstParam, Args&... otherParams)
+	{
+		this->m_packet >> firstParam;
+		if constexpr (sizeof...(otherParams) > 0)
+			this->makeReceivePacket(otherParams...);
+	};
+
+	template<typename T, typename... Args>
+	inline const std::future<void>& receive(T& firstParam, Args&... otherParams) noexcept
 	{
 		return this->m_future.emplace_back(std::async(std::launch::async,
 			[&]()
 			{
 				std::lock_guard<std::mutex> lock(this->m_mutex);
 				this->m_socket.receive(this->m_packet);
-				int dummy[] = { 0, ((void)(this->m_packet >> args), 0)... };
+				this->makeReceivePacket(firstParam, otherParams...);
 				this->m_packet.clear();
 			}));
 	};

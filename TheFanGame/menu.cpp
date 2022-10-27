@@ -1,5 +1,7 @@
 ﻿#include "menu.h"
 
+#include "ImGUI/imgui_stdlib.h"
+
 menu::menu(engine& e, window& w) noexcept : m_engine(e), m_window(w) 
 {
 	m_engine.Resources->add<sf::Texture>("WallTexture", "res/wolftextures.png");
@@ -965,9 +967,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetWindowSize("Login", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
 				ImGui::SetWindowPos("Login", ImVec2(50.f, 50.f));
 
-				if (ImGui::InputTextWithHint("User Name:", "Enter your user name here...", this->inputName, sizeof(this->inputName), ImGuiInputTextFlags_EnterReturnsTrue))
+				if (ImGui::InputTextWithHint("User Name:", "Enter your user name here...", &this->inputName, ImGuiInputTextFlags_EnterReturnsTrue))
 					this->login();
-				if (ImGui::InputTextWithHint("Password:", "Enter your password here...", this->inputPW, sizeof(this->inputPW), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password))
+				if (ImGui::InputTextWithHint("Password:", "Enter your password here...", &this->inputPW, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password))
 					this->login();
 
 				if (ImGui::Button("Create Account"))
@@ -1034,7 +1036,8 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 const void menu::login() noexcept
 {
 	this->m_client.join();
-	this->m_client.send(static_cast<sf::Uint32>(Network_MSG::LogInAttempt), std::string(this->inputName), std::string(this->inputPW)).wait();
+	sf::Uint32 type = static_cast<sf::Uint32>(Network_MSG::LogInAttempt);
+	this->m_client.send(type, this->inputName, this->inputPW).wait();
 	bool resoult = false;
 	using namespace std::chrono_literals;
 	this->m_client.receive(resoult).wait_for(1s);
