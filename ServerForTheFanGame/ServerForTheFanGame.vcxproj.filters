@@ -39,6 +39,9 @@
     <ClCompile Include="..\TheFanGame\ImGUI\imgui-SFML.cpp">
       <Filter>ImGUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\TheFanGame\ImGUI\imgui_stdlib.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\TheFanGame\ImGUI\imconfig.h">
@@ -66,6 +69,9 @@
       <Filter>ImGUI</Filter>
     </ClInclude>
     <ClInclude Include="..\TheFanGame\ImGUI\imstb_truetype.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TheFanGame\ImGUI\imgui_stdlib.h">
       <Filter>ImGUI</Filter>
     </ClInclude>
   </ItemGroup>

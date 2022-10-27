@@ -151,6 +151,7 @@
     <ClCompile Include="..\TheFanGame\ImGUI\imgui.cpp" />
     <ClCompile Include="..\TheFanGame\ImGUI\imgui_demo.cpp" />
     <ClCompile Include="..\TheFanGame\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="..\TheFanGame\ImGUI\imgui_stdlib.cpp" />
     <ClCompile Include="..\TheFanGame\ImGUI\imgui_tables.cpp" />
     <ClCompile Include="..\TheFanGame\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="..\TheFanGame\ImGUI\imgui-SFML_export.h" />
     <ClInclude Include="..\TheFanGame\ImGUI\imgui.h" />
     <ClInclude Include="..\TheFanGame\ImGUI\imgui_internal.h" />
+    <ClInclude Include="..\TheFanGame\ImGUI\imgui_stdlib.h" />
     <ClInclude Include="..\TheFanGame\ImGUI\imstb_rectpack.h" />
     <ClInclude Include="..\TheFanGame\ImGUI\imstb_textedit.h" />
     <ClInclude Include="..\TheFanGame\ImGUI\imstb_truetype.h" />
