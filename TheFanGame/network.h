@@ -224,20 +224,18 @@ public:
 	inline const bool start() noexcept 
 	{ 
 		this->shouldRun = true;
-		this->m_serverThread = std::make_unique<std::thread>(&localhost::localServer, this);
+		this->m_serverThread = std::thread(&localhost::localServer, this);
 		return true;
 	};
 
 	inline const void shutdown() noexcept 
-	{
-		if (this->m_serverThread != nullptr)
-		{
-			this->shouldRun = false;
-			this->m_serverThread->join();
-		}
+	{	
+		this->shouldRun = false;
+		if (this->m_serverThread.joinable())
+			this->m_serverThread.join();
 	};
 private:
-	std::unique_ptr<std::thread> m_serverThread;
+	std::thread m_serverThread;
 	sf::TcpListener m_listener;
 	sf::SocketSelector m_selector;
 	std::vector<std::unique_ptr<sf::TcpSocket>> m_clients;

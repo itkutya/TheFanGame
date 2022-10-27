@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <string>
 #include <variant>
+#include <stdlib.h>
+#include <stdio.h>
 
 #if _WIN32 || _WIN64
 	#if _WIN64
@@ -13,24 +15,6 @@
 		#include "SFML32/Audio.hpp"
 	#endif
 #endif
-
-namespace sf
-{
-	class MyMusic : public sf::Music
-	{
-	public:
-		MyMusic() = default;
-		virtual ~MyMusic() = default;
-
-		inline bool loadFromFile(const std::string& filePath)
-		{
-			if (!this->openFromFile(filePath))
-				return false;
-			return true;
-		}
-	private:
-	};
-}
 
 class resourceSystem
 {
@@ -43,12 +27,20 @@ public:
 	virtual ~resourceSystem() { this->m_resources.clear(); };
 
 	template<class T>
-	inline const void add(const std::string& id, const std::string& filePath)
+	inline const T& add(const std::string& id, const std::string& filePath)
 	{
 		this->m_resources[id].emplace<T>();
-
-		if (!std::get<T>(this->m_resources[id]).loadFromFile(filePath))
-			throw "Cannot load resource...\n";
+		if constexpr (requires { std::get<T>(this->m_resources[id]).loadFromFile(filePath); })
+		{
+			if (!std::get<T>(this->m_resources[id]).loadFromFile(filePath))
+				std::printf("Cannot load from file: %s", filePath.c_str());
+		}
+		else
+		{
+			if (!std::get<T>(this->m_resources[id]).openFromFile(filePath))
+				std::printf("Cannot open from file: %s", filePath.c_str());
+		}
+		return std::get<T>(this->m_resources[id]);
 	};
 
 	void release(const std::string& id) noexcept { this->m_resources.erase(id); };
@@ -59,5 +51,5 @@ public:
 	template<class T>
 	[[nodiscard]] inline T& get(const std::string& id) { return std::get<T>(this->m_resources.at(id)); };
 private:
-	std::unordered_map<std::string, std::variant<sf::Texture, sf::Font, sf::SoundBuffer, sf::MyMusic>> m_resources;
+	std::unordered_map<std::string, std::variant<sf::Texture, sf::Font, sf::SoundBuffer, sf::Music>> m_resources;
 };

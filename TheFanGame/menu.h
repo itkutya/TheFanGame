@@ -41,7 +41,7 @@ private:
 		Graphics = 0, Game, Audio, Mainmenu, Input, Profile
 	};settingState m_SettingState = settingState::Graphics;
 
-	sf::MyMusic* m_MainMusic;
+	sf::Music* m_MainMusic;
 
 	ImFont* font;
 	

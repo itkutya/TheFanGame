@@ -12,8 +12,8 @@ menu::menu(engine& e, window& w) noexcept : m_engine(e), m_window(w)
 	m_engine.Resources->add<sf::Texture>("Resume", "res/MainMenu/Resume.png");
 	m_engine.Resources->add<sf::Texture>("CharacterTexture", "res/char.png");
 	m_engine.Resources->add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
-	m_engine.Resources->add<sf::MyMusic>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
-	m_engine.Resources->add<sf::MyMusic>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
+	m_engine.Resources->add<sf::Music>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
+	m_engine.Resources->add<sf::Music>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
 }
 
 menu::~menu() noexcept 
@@ -138,7 +138,7 @@ const void menu::init(sf::RenderWindow& window)
 	this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->m_engine.Settings->m_currBackgroundPicture, 0, 1920, 1080));
 	this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
 
-	this->m_MainMusic = &this->m_engine.Resources->get<sf::MyMusic>(this->m_engine.Settings->m_currMusic);
+	this->m_MainMusic = &this->m_engine.Resources->get<sf::Music>(this->m_engine.Settings->m_currMusic);
 	this->m_MainMusic->setLoop(true);
 	if (this->m_engine.Settings->m_MusicVolume > 0.f)
 		this->m_MainMusic->play();
@@ -155,7 +155,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 	if (this->m_engine.Settings->m_MusicVolume == 0.f)
 		this->m_MainMusic->pause();
-	else if (this->m_engine.Settings->m_MusicVolume > 0.f && this->m_MainMusic->getStatus() == sf::SoundSource::Stopped)
+	else if (this->m_engine.Settings->m_MusicVolume > 0.f && (this->m_MainMusic->getStatus() == sf::SoundSource::Paused || this->m_MainMusic->getStatus() == sf::SoundSource::Stopped))
 		this->m_MainMusic->play();
 
 	if (ImGui::Begin("Main Window", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus))
@@ -219,7 +219,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						{
 							this->m_engine.Settings->m_currMusic = music;
 							this->m_MainMusic->stop();
-							this->m_MainMusic = &this->m_engine.Resources->get<sf::MyMusic>(this->m_engine.Settings->m_currMusic);
+							this->m_MainMusic = &this->m_engine.Resources->get<sf::Music>(this->m_engine.Settings->m_currMusic);
 							if (this->m_engine.Settings->m_MusicVolume > 0.f)
 								this->m_MainMusic->play();
 							this->m_MainMusic->setVolume(this->m_engine.Settings->m_MusicVolume);
@@ -578,7 +578,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 								{
 									this->m_engine.Settings->m_currMusic = music;
 									this->m_MainMusic->stop();
-									this->m_MainMusic = &this->m_engine.Resources->get<sf::MyMusic>(this->m_engine.Settings->m_currMusic);
+									this->m_MainMusic = &this->m_engine.Resources->get<sf::Music>(this->m_engine.Settings->m_currMusic);
 									if (this->m_engine.Settings->m_MusicVolume > 0.f)
 										this->m_MainMusic->play();
 									this->m_MainMusic->setVolume(this->m_engine.Settings->m_MusicVolume);
