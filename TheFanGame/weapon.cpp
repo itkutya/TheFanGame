@@ -156,13 +156,13 @@ const void weapon::update(entity& ent, const sf::Vector2u& screenSize) noexcept
         int drawEndX = (int)(spriteWidth / 2.f + spriteScreenX);
 
         if (transformY > 0.f)
-            this->w_impactPoint[i]->setPosition((drawStartX + drawEndX) / 2.f, (drawStartY + drawEndY) / 2.f);
+            this->w_impactPoint[i]->setPosition(sf::Vector2f((drawStartX + drawEndX) / 2.f, (drawStartY + drawEndY) / 2.f));
     }
 }
 
-void weapon::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void weapon::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
 {
-    states.transform *= getTransform();
+    //states.transform *= getTransform();
     for (auto& i : this->w_impactPoint)
         target.draw(*i, states);
 }

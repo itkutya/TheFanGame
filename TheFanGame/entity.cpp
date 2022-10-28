@@ -2,10 +2,10 @@
 
 entity::entity(const sf::Vector2f& size, const sf::Vector2f& pos, const sf::Color& color) noexcept
 {
-    this->m_sprites.setPrimitiveType(sf::PrimitiveType::Quads);
+    this->m_sprites.setPrimitiveType(sf::PrimitiveType::Points);
     this->m_sprites.resize(4);
 
-    this->m_vertices.setPrimitiveType(sf::PrimitiveType::Quads);
+    this->m_vertices.setPrimitiveType(sf::PrimitiveType::Points);
     this->m_vertices.resize(4);
 
     this->m_vertices[0].position = sf::Vector2f(-size.x, -size.y);
@@ -92,26 +92,26 @@ const void entity::update(entity& player, const sf::Vector2u& windowSize, const 
             if (firstX + 1 < drawEndX && lastX > drawStartX)
             {
                 this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 1,
-                                         sf::FloatRect((float)(texWidth * this->m_texture + texWidth * (1 - diff)), 0.f,
-                                                       (float)(texWidth * this->m_texture + texWidth - texWidth * (1 - diff)), (float)texHeight));
+                                         sf::FloatRect(sf::Vector2f((float)(texWidth * this->m_texture + texWidth * (1 - diff)), 0.f),
+                                                       sf::Vector2f((float)(texWidth * this->m_texture + texWidth - texWidth * (1 - diff)), (float)texHeight)));
             }
             else if (lastX > drawStartX)
             {
                 this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 1,
-                                         sf::FloatRect((float)(texWidth * this->m_texture + texWidth * (1 - diff)), 0.f,
-                                                       (float)(texWidth * this->m_texture + texWidth), (float)texHeight));
+                                         sf::FloatRect(sf::Vector2f((float)(texWidth * this->m_texture + texWidth * (1 - diff)), 0.f),
+                                             sf::Vector2f((float)(texWidth * this->m_texture + texWidth), (float)texHeight)));
             }
             else if (firstX + 1 < drawEndX)
             {
                 this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 1,
-                                         sf::FloatRect((float)(texWidth * this->m_texture), 0.f,
-                                                       (float)(texWidth * this->m_texture + texWidth - texWidth * (1 - diff)), (float)texHeight));
+                                         sf::FloatRect(sf::Vector2f((float)(texWidth * this->m_texture), 0.f),
+                                                       sf::Vector2f((float)(texWidth * this->m_texture + texWidth - texWidth * (1 - diff)), (float)texHeight)));
             }
             else
             {
                 this->m_animation.update(sf::seconds(this->animationSpeed), this->m_sprites, 1,
-                                         sf::FloatRect((float)(texWidth * this->m_texture), 0.f,
-                                                       (float)(texWidth * this->m_texture + texWidth), (float)texHeight));
+                                         sf::FloatRect(sf::Vector2f((float)(texWidth * this->m_texture), 0.f),
+                                                       sf::Vector2f((float)(texWidth * this->m_texture + texWidth), (float)texHeight)));
             }
         }
     }
@@ -141,8 +141,8 @@ const sf::Color entity::getDistanceColor(const sf::Vector2f& pos)
                      255 - (int)(std::hypotf(pos.x, pos.y) * 4.f > 255 ? 255 : std::hypotf(pos.x, pos.y) * 4.f), 255);
 }
 
-void entity::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-	states.transform *= getTransform();
+void entity::draw(sf::RenderTarget& target, const sf::RenderStates& states) const {
+	//states.transform *= getTransform();
 	target.draw(this->m_sprites, states.texture);
 	target.draw(this->m_vertices, states.transform);
 }

@@ -1,11 +1,11 @@
 #ifndef IMGUI_SFML_H
 #define IMGUI_SFML_H
 
-#include <Graphics/Color.hpp>
-#include <Graphics/Rect.hpp>
-#include <System/Time.hpp>
-#include <System/Vector2.hpp>
-#include <Window/Joystick.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/System/Time.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Joystick.hpp>
 
 #include "imgui-SFML_export.h"
 

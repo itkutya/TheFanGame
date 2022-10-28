@@ -4,6 +4,9 @@
 
 menu::menu(engine& e, window& w) noexcept : m_engine(e), m_window(w) 
 {
+	sf::Clock clock;
+	m_engine.Resources->add<sf::Music>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
+	m_engine.Resources->add<sf::Music>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
 	m_engine.Resources->add<sf::Texture>("WallTexture", "res/wolftextures.png");
 	m_engine.Resources->add<sf::Texture>("Background", "res/MainMenu/Backgrounds.png");
 	m_engine.Resources->add<sf::Texture>("FrontImage", "res/MainMenu/FontImages.png");
@@ -12,20 +15,14 @@ menu::menu(engine& e, window& w) noexcept : m_engine(e), m_window(w)
 	m_engine.Resources->add<sf::Texture>("Resume", "res/MainMenu/Resume.png");
 	m_engine.Resources->add<sf::Texture>("CharacterTexture", "res/char.png");
 	m_engine.Resources->add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
-	m_engine.Resources->add<sf::Music>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
-	m_engine.Resources->add<sf::Music>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
+
+	while (m_engine.Resources->wait())
+		continue;
+	std::printf("Time: %f\n", clock.getElapsedTime().asSeconds());
 }
 
 menu::~menu() noexcept 
 {
-	if (!this->shutdownServer())
-	{
-		if (this->handleLocalPlayerNum != nullptr)
-		{
-			this->handleLocalPlayerNum->terminate();
-			this->handleLocalPlayerNum.release();
-		}
-	}
 	this->m_MainMusic->stop();
 	ImGui::SFML::Shutdown();
 }
@@ -128,17 +125,18 @@ const void menu::init(sf::RenderWindow& window)
 	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
 
 	this->frontImage.setTexture(this->m_engine.Resources->c_get<sf::Texture>("FrontImage"));
-	this->frontImage.setTextureRect(sf::IntRect(600 * this->m_engine.Settings->m_currFrontPicture, 0, 600, 600));
+	this->frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * this->m_engine.Settings->m_currFrontPicture, 0), sf::Vector2i(600, 600)));
 
 	this->icon.setTexture(this->m_engine.Resources->c_get<sf::Texture>("Icon"));
-	this->icon.setTextureRect(sf::IntRect(100 * this->m_engine.Settings->m_currProfilePicture, 0, 100, 100));
+	this->icon.setTextureRect(sf::IntRect(sf::Vector2i(100 * this->m_engine.Settings->m_currProfilePicture, 0), sf::Vector2i(100, 100)));
 
 	this->backgroundImage.setTexture(&this->m_engine.Resources->c_get<sf::Texture>("Background"));
 	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
-	this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->m_engine.Settings->m_currBackgroundPicture, 0, 1920, 1080));
+	this->backgroundImage.setTextureRect(sf::IntRect(sf::Vector2i(1920 * this->m_engine.Settings->m_currBackgroundPicture, 0),
+													 sf::Vector2i(1920, 1080)));
 	this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
 
-	this->m_MainMusic = &this->m_engine.Resources->get<sf::Music>(this->m_engine.Settings->m_currMusic);
+	this->m_MainMusic = m_engine.Resources->get<std::unique_ptr<sf::Music>>(m_engine.Settings->m_currMusic).get();
 	this->m_MainMusic->setLoop(true);
 	if (this->m_engine.Settings->m_MusicVolume > 0.f)
 		this->m_MainMusic->play();
@@ -219,7 +217,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						{
 							this->m_engine.Settings->m_currMusic = music;
 							this->m_MainMusic->stop();
-							this->m_MainMusic = &this->m_engine.Resources->get<sf::Music>(this->m_engine.Settings->m_currMusic);
+							//this->m_MainMusic = &this->m_engine.Resources->get<sf::Music>(this->m_engine.Settings->m_currMusic);
 							if (this->m_engine.Settings->m_MusicVolume > 0.f)
 								this->m_MainMusic->play();
 							this->m_MainMusic->setVolume(this->m_engine.Settings->m_MusicVolume);
@@ -287,6 +285,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetCursorPos(ImVec2(WidgetPos.x + 305.f, WidgetPos.y + 45.f));
 				if (ImGui::Button("Multiplayer", ImVec2(200.f, 50.f)))
 				{
+					/*
 					if (this->socket.connect(this->serverIP, this->serverPort, sf::seconds(3.f)) != sf::Socket::Done)
 					{
 						this->m_PlaySelected = false;
@@ -298,6 +297,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						this->refreshServerList();
 						this->m_State = state::Multiplayer;
 					}
+					*/
 				}
 			}
 			break;
@@ -476,12 +476,12 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						this->m_window.create(m_engine.Settings->m_Videomodes[m_engine.Settings->m_currVideomode], "Fan Game!", m_engine.Settings->m_Fullscreen, m_engine.Settings->m_FpsLimit, m_engine.Settings->m_Vsync);
 
 					ImGui::SetNextItemWidth(300.f);
-					std::string preview = std::to_string(this->m_engine.Settings->m_Videomodes[this->m_engine.Settings->m_currVideomode].width) + "x" + std::to_string(this->m_engine.Settings->m_Videomodes[this->m_engine.Settings->m_currVideomode].height);
+					std::string preview = std::to_string(this->m_engine.Settings->m_Videomodes[this->m_engine.Settings->m_currVideomode].size.x) + "x" + std::to_string(this->m_engine.Settings->m_Videomodes[this->m_engine.Settings->m_currVideomode].size.y);
 					if (ImGui::BeginCombo("Resolution: ", preview.c_str(), ImGuiComboFlags_HeightSmall))
 					{
 						for (std::size_t i = 0; i < this->m_engine.Settings->m_Videomodes.size(); ++i)
 						{
-							std::string text = std::to_string(this->m_engine.Settings->m_Videomodes[i].width) + "x" + std::to_string(this->m_engine.Settings->m_Videomodes[i].height);
+							std::string text = std::to_string(this->m_engine.Settings->m_Videomodes[i].size.x) + "x" + std::to_string(this->m_engine.Settings->m_Videomodes[i].size.y);
 							if (ImGui::Selectable(text.c_str()))
 							{
 								this->m_engine.Settings->m_currVideomode = (int)i;
@@ -525,37 +525,43 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				case settingState::Mainmenu:
 				{
 					if (ImGui::SliderInt("Front image: ", &this->m_engine.Settings->m_currFrontPicture, 0, 0))
-						this->frontImage.setTextureRect(sf::IntRect(600 * this->m_engine.Settings->m_currFrontPicture, 0, 600, 600));
+						this->frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * this->m_engine.Settings->m_currFrontPicture, 0),
+																	sf::Vector2i(600, 600)));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->frontImage.getTexture());
-						background.setTextureRect(sf::IntRect(600 * this->m_engine.Settings->m_currFrontPicture, 0, 600, 600));
+						background.setTextureRect(sf::IntRect(sf::Vector2i(600 * this->m_engine.Settings->m_currFrontPicture, 0),
+															  sf::Vector2i(600, 600)));
 						ImGui::Image(background, ImVec2(300.f, 300.f));
 						ImGui::EndTooltip();
 					}
 
 					if (ImGui::SliderInt("Profile picture: ", &this->m_engine.Settings->m_currProfilePicture, 0, 3))
-						this->icon.setTextureRect(sf::IntRect(100 * this->m_engine.Settings->m_currProfilePicture, 0, 100, 100));
+						this->icon.setTextureRect(sf::IntRect(sf::Vector2i(100 * this->m_engine.Settings->m_currProfilePicture, 0),
+															  sf::Vector2i(100, 100)));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->icon.getTexture());
-						background.setTextureRect(sf::IntRect(100 * this->m_engine.Settings->m_currProfilePicture, 0, 100, 100));
+						background.setTextureRect(sf::IntRect(sf::Vector2i(100 * this->m_engine.Settings->m_currProfilePicture, 0),
+															  sf::Vector2i(100, 100)));
 						ImGui::Image(background, ImVec2(100.f, 100.f));
 						ImGui::EndTooltip();
 					}
 
 					if (ImGui::SliderInt("Background image: ", &this->m_engine.Settings->m_currBackgroundPicture, 0, 3))
-						this->backgroundImage.setTextureRect(sf::IntRect(1920 * this->m_engine.Settings->m_currBackgroundPicture, 0, 1920, 1080));
+						this->backgroundImage.setTextureRect(sf::IntRect(sf::Vector2i(1920 * this->m_engine.Settings->m_currBackgroundPicture, 0),
+																		 sf::Vector2i(1920, 1080)));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->backgroundImage.getTexture());
-						background.setTextureRect(sf::IntRect(1920 * this->m_engine.Settings->m_currBackgroundPicture, 0, 1920, 1080));
+						background.setTextureRect(sf::IntRect(sf::Vector2i(1920 * this->m_engine.Settings->m_currBackgroundPicture, 0),
+															  sf::Vector2i(1920, 1080)));
 						ImGui::Image(background, ImVec2(300.f, 300.f));
 						ImGui::EndTooltip();
 					}
@@ -578,7 +584,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 								{
 									this->m_engine.Settings->m_currMusic = music;
 									this->m_MainMusic->stop();
-									this->m_MainMusic = &this->m_engine.Resources->get<sf::Music>(this->m_engine.Settings->m_currMusic);
+									//this->m_MainMusic = &this->m_engine.Resources->get<sf::Music>(this->m_engine.Settings->m_currMusic);
 									if (this->m_engine.Settings->m_MusicVolume > 0.f)
 										this->m_MainMusic->play();
 									this->m_MainMusic->setVolume(this->m_engine.Settings->m_MusicVolume);
@@ -632,7 +638,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						else
 							temp.setTexture(this->m_engine.Resources->c_get<sf::Texture>("CharacterTexture"));
 
-						temp.setTextureRect(sf::IntRect(64 * (int)i, 0, 64, 64));
+						temp.setTextureRect(sf::IntRect(sf::Vector2i(64 * (int)i, 0), sf::Vector2i(64, 64)));
 						ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + 25.f, ImGui::GetCursorPos().y));
 						ImGui::Image(temp, sf::Vector2f(150.f, 150.f));
 
@@ -641,7 +647,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 							ImGui::BeginTooltip();
 							sf::Sprite ability;
 							ability.setTexture(this->m_engine.Resources->c_get<sf::Texture>("WallTexture"));
-							ability.setTextureRect(sf::IntRect(128, 0, 64, 64));
+							ability.setTextureRect(sf::IntRect(sf::Vector2i(128, 0), sf::Vector2i(64, 64)));
 							ImGui::SetCursorPos(ImVec2(5.f, 5.f));
 							ImGui::Image(ability, sf::Vector2f(50.f, 50.f));
 							ImGui::SameLine();
@@ -736,6 +742,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						if (ImGui::Selectable(serverInfo.c_str()))
 						{
 							std::cout << "connecting to the server... " << this->servers[i].first.toString() << ":" << this->servers[i].second << "\n";
+							/*
 							this->socket.disconnect();
 							if (this->socket.connect(this->servers[i].first, this->servers[i].second) == sf::Socket::Done)
 							{
@@ -767,13 +774,14 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 								this->socket.connect(this->serverIP, this->serverPort);
 								this->m_ServerError = true;
 							}
+							*/
 						}
 					}
 					ImGui::EndListBox();
 				}
 
 				if (ImGui::Button("Refress"))
-					this->refreshServerList();
+					//this->refreshServerList();
 
 				ImGui::SetCursorPos(ImVec2(vMin.x, vMax.y - 175.f));
 				ImGui::Text("Server IP: ");
@@ -793,6 +801,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				if (ImGui::Button("Join", ImVec2(200.f, 50.f)))
 				{
 					std::cout << "connecting to the server... " << this->InputIp << ":" << this->InputPort << "\n";
+					/*
 					this->socket.disconnect();
 					if (this->socket.connect(sf::IpAddress(this->InputIp), std::uint16_t(std::atoi(this->InputPort))) == sf::Socket::Done)
 					{
@@ -822,27 +831,21 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						this->socket.connect(this->serverIP, this->serverPort);
 						this->m_ServerError = true;
 					}
+					*/
 				}
 
 				ImGui::SetCursorPos(ImVec2(vMin.x + 25.f, vMax.y - 125.f));
 				if (ImGui::Button("Host", ImVec2(300.f, 75.f)))
-				{
-					if (this->serverThread == nullptr)
-					{
-						std::cout << "Started hosting a server...\n";
-						this->serverThread = std::make_unique<sf::Thread>(&menu::startServer, this);
-						this->serverThread->launch();
-					}
-					else
-						std::cout << "You are already hosting a game...\n";
-				}
+					std::printf("Will fix it soonTM...\n");
 
 				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
 				if (ImGui::Button("Back##Multiplayer", ImVec2(300.f, 75.f)))
 				{
+					/*
 					this->shutdownServer();
 					this->servers.clear();
 					this->socket.disconnect();
+					*/
 					this->m_State = state::MainMenu;
 				}
 			}ImGui::End();
@@ -876,6 +879,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SameLine();
 				if (ImGui::BeginListBox("##PlayerList", ImVec2(ImGui::GetWindowSize().x - 500.f, ImGui::GetWindowSize().y - 200.f)))
 				{
+					/*
 					sf::Lock lock(this->mutex);
 					for (std::size_t i = 0; i < this->localHostPlayers.size(); ++i)
 					{
@@ -888,6 +892,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 							//	Ban
 						}
 					}
+					*/
 					ImGui::EndListBox();
 				}
 				ImGui::SameLine();
@@ -935,6 +940,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
 				if (ImGui::Button("Back##MultiLobby", ImVec2(300.f, 75.f)))
 				{
+					/*
 					if (this->shutdownServer())
 						std::cout << "Server succesfully shut down...\n";
 					else
@@ -955,6 +961,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					this->localHostPlayers.clear();
 					this->LocalHostPlayerNum = 0;
 					this->refreshServerList();
+					*/
 					this->m_State = state::Multiplayer;
 				}
 			}ImGui::End();
@@ -1032,11 +1039,10 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 /*
 * TODO: Fix bug where sent login info is not received correctly...
 */
-
 const void menu::login() noexcept
 {
 	this->m_client.join();
-	sf::Uint32 type = static_cast<sf::Uint32>(Network_MSG::LogInAttempt);
+	std::uint32_t type = static_cast<std::uint32_t>(Network_MSG::LogInAttempt);
 	this->m_client.send(type, this->inputName, this->inputPW).wait();
 	bool resoult = false;
 	using namespace std::chrono_literals;
@@ -1055,7 +1061,7 @@ const void menu::login() noexcept
 const void menu::createAccount() noexcept
 {
 	this->m_client.join();
-	this->m_client.send(static_cast<sf::Uint32>(Network_MSG::RegisterAttempt), std::string(this->inputName), std::string(this->inputPW)).wait();
+	this->m_client.send(static_cast<std::uint32_t>(Network_MSG::RegisterAttempt), std::string(this->inputName), std::string(this->inputPW)).wait();
 	bool resoult = false;
 	using namespace std::chrono_literals;
 	this->m_client.receive(resoult).wait_for(1s);
@@ -1064,250 +1070,6 @@ const void menu::createAccount() noexcept
 	else
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account with given detailes!"));
 	this->m_client.disconnect();
-}
-
-void menu::startServer()
-{
-	if (this->hosting.listen(sf::TcpListener::AnyPort, sf::IpAddress::getLocalAddress()) == sf::Socket::Done)
-	{
-		this->m_State = state::MultiLobby;
-		this->localHostPlayers.push_back(std::pair<sf::IpAddress, sf::Uint16>(sf::IpAddress(sf::IpAddress().getLocalAddress()), this->hosting.getLocalPort()));
-
-		sf::Packet packet;
-		packet << sf::IpAddress::getLocalAddress().toString() << this->hosting.getLocalPort();
-		if (this->socket.send(packet) != sf::Socket::Done)
-			return;
-		packet.clear();
-
-		this->selector.add(this->hosting);
-
-		while (this->m_window)
-		{
-			if (this->selector.wait(sf::seconds(1.f)))
-			{
-				if (this->selector.isReady(this->hosting))
-				{
-					sf::TcpSocket* client = new sf::TcpSocket;
-					if (this->hosting.accept(*client) == sf::Socket::Done)
-					{
-						this->clients.push_back(client);
-						this->selector.add(*client);
-						std::cout << "A client has connected: " << client->getRemoteAddress() << ":" << client->getRemotePort() << '\n';
-
-						sf::Lock lock(this->mutex);
-						this->localHostPlayers.push_back(std::pair<sf::IpAddress, sf::Uint16>(sf::IpAddress(client->getRemoteAddress()), client->getRemotePort()));
-						for (std::size_t i = 0; i < this->clients.size(); ++i)
-						{
-							packet.clear();
-							packet << std::uint32_t(this->localHostPlayers.size());
-							if (this->clients[i]->send(packet) == sf::Socket::Done)
-							{
-								packet.clear();
-								for (std::size_t j = 0; j < this->localHostPlayers.size(); ++j)
-								{
-									packet << this->localHostPlayers[j].first.toString() << this->localHostPlayers[j].second;
-									if (this->clients[i]->send(packet) != sf::Socket::Done)
-										std::cout << "Error! Cannot reach the client...\n";
-									packet.clear();
-								}
-							}
-							packet.clear();
-						}
-					}
-					else
-					{
-						delete client;
-					}
-				}
-				else
-				{
-					for (std::vector<sf::TcpSocket*>::iterator it = this->clients.begin(); it != this->clients.end(); ++it)
-					{
-						sf::TcpSocket& client = **it;
-						if (this->selector.isReady(client))
-						{
-							sf::Lock lock(this->mutex);
-							if (client.receive(packet) == sf::Socket::Done)
-							{
-								if (packet.getDataSize() == sizeof(std::uint8_t))
-								{
-									std::uint8_t data;
-									packet >> data;
-									packet.clear();
-
-									switch (data)
-									{
-									case 52:
-										for (auto it2 = this->localHostPlayers.begin(); it2 != this->localHostPlayers.end(); ++it2)
-										{
-											if (client.getRemoteAddress() == it2->first)
-											{
-												this->localHostPlayers.erase(it2);
-												this->localHostPlayers.shrink_to_fit();
-												break;
-											}
-										}
-										break;
-									default:
-										std::cout << "Client sent an unknown command...\n";
-										break;
-									}
-								}
-							}
-							else
-							{
-								//std::cout << "Error! while receeving the packet...\n";
-								std::cout << "Player disconnected: " << client.getRemoteAddress().toString() << ":" << client.getRemotePort() << '\n';
-								this->selector.remove(client);
-								client.disconnect();
-								this->clients.erase(it);
-								this->clients.shrink_to_fit();
-								for (auto it2 = this->localHostPlayers.begin(); it2 != this->localHostPlayers.end(); ++it2)
-								{
-									if (client.getRemoteAddress() == it2->first)
-									{
-										this->localHostPlayers.erase(it2);
-										this->localHostPlayers.shrink_to_fit();
-										break;
-									}
-								}
-								for (std::size_t i = 0; i < this->clients.size(); ++i)
-								{
-									packet.clear();
-									packet << std::uint32_t(this->localHostPlayers.size());
-									if (this->clients[i]->send(packet) == sf::Socket::Done)
-									{
-										packet.clear();
-										for (std::size_t j = 0; j < this->localHostPlayers.size(); ++j)
-										{
-											packet << this->localHostPlayers[j].first.toString() << this->localHostPlayers[j].second;
-											if (this->clients[i]->send(packet) != sf::Socket::Done)
-												std::cout << "Error! Cannot reach the client...\n";
-											packet.clear();
-										}
-									}
-									packet.clear();
-								}
-								break;
-							}
-							packet.clear();
-						}
-					}
-				}
-			}
-		}
-	}
-	else
-		std::cout << "Error cannot start server...\n";
-}
-
-const bool menu::shutdownServer()
-{
-	if (this->serverThread != nullptr)
-	{
-		this->serverThread->terminate();
-		this->serverThread.release();
-		this->selector.clear();
-		this->hosting.close();
-
-		sf::Packet packet;
-		packet << std::uint8_t(52);
-		for (std::size_t i = 0; i < this->clients.size(); ++i)
-		{
-			if (this->clients[i]->send(packet) != sf::Socket::Done)
-				std::cout << "Error! Cannot reach the client...\n";
-		}
-		if (this->socket.send(packet) != sf::Socket::Done)
-			std::cout << "Error! Cannot send quit msg to the server...\n";
-		packet.clear();
-		return true;
-	}
-	return false;
-}
-
-void menu::refreshServerList()
-{
-	this->servers.clear();
-
-	sf::Packet packet;
-	packet << std::uint8_t(53);
-	if (this->socket.send(packet) != sf::Socket::Done)
-		std::cout << "Cannot refress server list...\n";
-	packet.clear();
-
-	if (this->socket.receive(packet) == sf::Socket::Done)
-	{
-		packet >> this->activeServerNum;
-		packet.clear();
-		for (std::size_t i = 0; i < this->activeServerNum; ++i)
-		{
-			if (this->socket.receive(packet) == sf::Socket::Done)
-			{
-				std::string ip;
-				sf::Uint16 g_port;
-				packet >> ip >> g_port;
-				this->servers.push_back(std::pair<sf::IpAddress, sf::Uint16>(sf::IpAddress(ip), g_port));
-				std::cout << this->servers[i].first.toString() << ":" << this->servers[i].second << '\n';
-			}
-			packet.clear();
-		}
-	}
-}
-
-void menu::updateLocalServerNum()
-{
-	if (this->serverThread == nullptr)
-	{
-		while (this->m_window)
-		{
-			sf::Packet packet;
-			if (this->socket.receive(packet) == sf::Socket::Done)
-			{
-				if (packet.getDataSize() == sizeof(std::uint8_t))
-				{
-					std::uint8_t data;
-					packet >> data;
-					packet.clear();
-
-					switch (data)
-					{
-					case 52:
-						std::cout << "Host disconnected...\n";
-						this->socket.disconnect();
-						this->socket.connect(this->serverIP, this->serverPort);
-						this->localHostPlayers.clear();
-						this->LocalHostPlayerNum = 0;
-						this->refreshServerList();
-						this->m_State = state::Multiplayer;
-						this->m_ServerError = true;
-						return;
-					default:
-						std::cout << "Client sent an unknown command...\n";
-						break;
-					}
-				}
-				else
-				{
-					sf::Lock lock(this->mutex);
-					this->LocalHostPlayerNum = 0;
-					this->localHostPlayers.clear();
-					packet >> this->LocalHostPlayerNum;
-					packet.clear();
-					for (std::size_t i = 0; i < this->LocalHostPlayerNum; ++i)
-					{
-						if (this->socket.receive(packet) == sf::Socket::Done)
-						{
-							std::string ip;
-							sf::Uint16 g_port;
-							packet >> ip >> g_port;
-							this->localHostPlayers.push_back(std::pair<sf::IpAddress, sf::Uint16>(sf::IpAddress(ip), g_port));
-						}
-						packet.clear();
-					}
-				}
-			}
-		}
-	}
 }
 
 const void menu::giveXP(const float& amount) noexcept

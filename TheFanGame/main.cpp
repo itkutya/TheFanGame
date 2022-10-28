@@ -26,13 +26,13 @@ int main()
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "\033[1;4;31m" << e.what() << '\n' << "\033[0m";
-		return -1;
+		std::printf("\033[1;4;31m%s\n\033[0m", e.what());
+		return 1;
 	}
 	catch(...)
 	{
-		std::cout << "\033[1;4;31m" << "Something went terribly wrong...\n" << "\033[0m";
-		return -2;
+		std::printf("\033[1;4;31mUnknown error, rethrowing...\n\033[0m");
+		throw;
 	}
 	return 0;
 }

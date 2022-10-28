@@ -6,17 +6,11 @@
 class menu : public state
 {
 public:
-	//Construct a GUI interface.
 	menu(engine& e, window& w) noexcept;
-	//Default destructor.
 	virtual ~menu() noexcept;
-	//Init a GUI interface.
 	virtual const void init(sf::RenderWindow& window) override;
-	//Process events on the GUI interface.
 	virtual const void processEvent(const sf::Event& event) noexcept override;
-	//Update the GUI interface.
 	virtual const void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
-	//Draw the GUI interface.
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 private:
 	engine& m_engine;
@@ -40,9 +34,7 @@ private:
 	{
 		Graphics = 0, Game, Audio, Mainmenu, Input, Profile
 	};settingState m_SettingState = settingState::Graphics;
-
 	sf::Music* m_MainMusic;
-
 	ImFont* font;
 	
 	sf::Sprite icon;
@@ -55,34 +47,16 @@ private:
 
 	std::string inputName;
 	std::string inputPW;
+	//Move these to settings...
 	bool logged_in = false;
 	bool rememberToStayLogedIn = false;
 	const void login() noexcept;
 	const void createAccount() noexcept;
 
-	sf::TcpSocket socket;
-	sf::IpAddress serverIP = sf::IpAddress::getLocalAddress();
-	sf::Uint16 serverPort = 52420;
-
 	char InputIp[12] = "";
 	char InputPort[6] = "";
-
-	std::vector<std::pair<sf::IpAddress, sf::Uint16>> servers;
+	std::vector<std::pair<sf::IpAddress, std::uint16_t>> servers;
 	std::uint32_t activeServerNum;
-
-	void startServer();
-	const bool shutdownServer();
-	void refreshServerList();
-	std::unique_ptr<sf::Thread> serverThread;
-	sf::TcpListener hosting;
-	sf::SocketSelector selector;
-	std::vector<sf::TcpSocket*> clients;
-
-	std::uint32_t LocalHostPlayerNum = 0;
-	std::vector<std::pair<sf::IpAddress, sf::Uint16>> localHostPlayers;
-	sf::Mutex mutex;
-	void updateLocalServerNum();
-	std::unique_ptr<sf::Thread> handleLocalPlayerNum;
 
 	struct talents
 	{

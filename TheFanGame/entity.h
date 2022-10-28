@@ -37,5 +37,5 @@ public:
 	animation m_animation;
 	float animationSpeed = 0.5f;
 private:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	virtual void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
 };

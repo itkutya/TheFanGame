@@ -34,7 +34,7 @@ const void window::update() noexcept { this->m_enigne.States->getState()->update
 const void window::ScreenShot() noexcept
 {
 	sf::Texture texture;
-	texture.create(this->m_window.getSize().x, this->m_window.getSize().y);
+	bool status = texture.create(sf::Vector2u(this->m_window.getSize().x, this->m_window.getSize().y));
 	texture.update(this->m_window);
 
 	std::time_t t = std::time(0);

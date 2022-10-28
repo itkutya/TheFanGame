@@ -14,8 +14,9 @@
 
 #if _WIN32 || _WIN64
 	#if _WIN64
-		#include "SFML64/System.hpp"
-		#include "SFML64/Network.hpp"
+		#include "SFML64/SFML/Graphics.hpp"
+		#include "SFML64/SFML/System.hpp"
+		#include "SFML64/SFML/Network.hpp"
 	#else
 		#include "SFML32/System.hpp"
 		#include "SFML32/Network.hpp"
@@ -51,7 +52,7 @@ public:
 		std::lock_guard<std::mutex> lock(this->m_mutex);
 		if (this->m_packet.getDataSize() > 0)
 		{
-			sf::Uint32 type;
+			std::uint32_t type;
 			this->m_packet >> type;
 			Network_MSG msg = static_cast<Network_MSG>(type);
 			switch (msg)
@@ -91,7 +92,7 @@ public:
 			return static_cast<T*>(nullptr);
 	};
 
-	inline const std::future<void>& keepAlive(const sf::Int64& thickRate) noexcept
+	inline const std::future<void>& keepAlive(const std::int64_t& thickRate) noexcept
 	{
 		return this->m_future.emplace_back(std::async(std::launch::async,
 			[&]()
@@ -108,22 +109,22 @@ public:
 						{
 							switch (this->m_socket.receive(this->m_packet))
 							{
-							case sf::Socket::Done:
+							case sf::Socket::Status::Done:
 								std::printf("Done\n");
 								break;
-							case sf::Socket::NotReady:
+							case sf::Socket::Status::NotReady:
 								std::printf("NotReady\n");
 								break;
-							case sf::Socket::Partial:
+							case sf::Socket::Status::Partial:
 								std::printf("Partial\n");
 								break;
-							case sf::Socket::Disconnected:
+							case sf::Socket::Status::Disconnected:
 							{
 								this->m_keepAlive = false;
 								this->m_socket.disconnect();
 								break;
 							}
-							case sf::Socket::Error:
+							case sf::Socket::Status::Error:
 								std::printf("Error\n");
 								break;
 							default:
@@ -136,10 +137,10 @@ public:
 			}));
 	};
 
-	inline const bool join(const sf::IpAddress& ip = sf::IpAddress::getLocalAddress(), const sf::Uint16& port = 52200, const sf::Time& timeout = sf::Time::Zero) noexcept
+	inline const bool join(const sf::IpAddress& ip = sf::IpAddress::getLocalAddress().value(), const std::uint16_t& port = 52200, const sf::Time& timeout = sf::Time::Zero) noexcept
 	{
 		this->disconnect();
-		if (this->m_socket.connect(ip, port, timeout) == sf::Socket::Done)
+		if (this->m_socket.connect(ip, port, timeout) == sf::Socket::Status::Done)
 			return true;
 		return false;
 	};
@@ -168,7 +169,7 @@ public:
 			{
 				std::lock_guard<std::mutex> lock(this->m_mutex);
 				this->makeSendPacket(firstArg, otherArg...);
-				this->m_socket.send(this->m_packet);
+				auto status = this->m_socket.send(this->m_packet);
 				this->m_packet.clear();
 			}, firstParam, otherParams...));
 	};
@@ -181,7 +182,7 @@ public:
 			{
 				std::lock_guard<std::mutex> lock(this->m_mutex);
 				this->makeSendPacket(firstArg, otherArg...);
-				this->m_socket.send(this->m_packet);
+				auto status = this->m_socket.send(this->m_packet);
 				this->m_packet.clear();
 			}, firstParam, otherParams...));
 	};
@@ -201,7 +202,7 @@ public:
 			[&]()
 			{
 				std::lock_guard<std::mutex> lock(this->m_mutex);
-				this->m_socket.receive(this->m_packet);
+				auto status = this->m_socket.receive(this->m_packet);
 				this->makeReceivePacket(firstParam, otherParams...);
 				this->m_packet.clear();
 			}));
@@ -243,11 +244,11 @@ private:
 
 	void localServer()
 	{
-		if (this->m_listener.listen(52200, sf::IpAddress::getLocalAddress()) != sf::Socket::Done)
+		if (this->m_listener.listen(52200, sf::IpAddress::getLocalAddress().value()) != sf::Socket::Status::Done)
 			std::printf("Error: Cannot start local server!\n");
 		else
 		{
-			std::printf("Success: Local server has been started on %s:%u\n", sf::IpAddress::getLocalAddress().toString().c_str(), this->m_listener.getLocalPort());
+			std::printf("Success: Local server has been started on %s:%u\n", sf::IpAddress::getLocalAddress().value().toString().c_str(), this->m_listener.getLocalPort());
 			this->m_selector.add(this->m_listener);
 
 			while (this->shouldRun)
@@ -257,9 +258,9 @@ private:
 					if (this->m_selector.isReady(this->m_listener))
 					{
 						std::unique_ptr<sf::TcpSocket> client = std::make_unique<sf::TcpSocket>();
-						if (this->m_listener.accept(*client) == sf::Socket::Done)
+						if (this->m_listener.accept(*client) == sf::Socket::Status::Done)
 						{
-							std::printf("Player connected: %s:%u\n", client->getRemoteAddress().toString().c_str(), client->getRemotePort());
+							std::printf("Player connected: %s:%u\n", client->getRemoteAddress().value().toString().c_str(), client->getRemotePort());
 							this->m_clients.push_back(std::move(client));
 							auto& newClient = (**(this->m_clients.end() - 1));
 							this->m_selector.add(newClient);
@@ -276,58 +277,33 @@ private:
 								sf::Packet packet;
 								switch (client.receive(packet))
 								{
-								case sf::Socket::Disconnected:
-									std::printf("Player disconnected: %s:%u\n", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
+								case sf::Socket::Status::Disconnected:
+									std::printf("Player disconnected: %s:%u\n", client.getRemoteAddress().value().toString().c_str(), client.getRemotePort());
 									disconnected.push_back(it);
 									this->m_selector.remove(client);
 									client.disconnect();
 									break;
-								case sf::Socket::Done:
+								case sf::Socket::Status::Done:
 								{
-									sf::Uint32 tempType;
-									packet >> tempType;
-									Network_MSG msg = static_cast<Network_MSG>(tempType);
-									switch (msg)
+									for (auto it2 = this->m_clients.begin(); it2 != this->m_clients.end(); ++it2)
 									{
-									case Network_MSG::LogInAttempt:
-									{
-										std::string temp_Un;
-										std::string temp_Pw;
-										packet >> temp_Un >> temp_Pw;
-										packet.clear();
-										//On real server we will store it in txt and undordered_map...
-										if (temp_Un == std::string("admin") && temp_Pw == std::string("admin"))
+										sf::TcpSocket& client2 = **it2;
+										if (it2 != it)
 										{
-											packet << true;
-											client.send(packet);
+											auto status = client.send(packet);
+											if (status != sf::Socket::Status::Done)
+												std::printf("Packet error...\n");
 										}
-										else
-										{
-											packet << false;
-											client.send(packet);
-										}
-										break;
-									}
-									default:
-									{
-										for (auto it2 = this->m_clients.begin(); it2 != this->m_clients.end(); ++it2)
-										{
-											sf::TcpSocket& client2 = **it2;
-											if (it2 != it)
-												client2.send(packet);
-										}
-										break;
-									}
 									}
 								}
 								break;
-								case sf::Socket::Error:
+								case sf::Socket::Status::Error:
 									std::printf("Error");
 									break;
-								case sf::Socket::NotReady:
+								case sf::Socket::Status::NotReady:
 									std::printf("NotReady");
 									break;
-								case sf::Socket::Partial:
+								case sf::Socket::Status::Partial:
 									std::printf("Partial");
 									break;
 								default:

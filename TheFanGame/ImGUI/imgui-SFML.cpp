@@ -1,19 +1,19 @@
 #include "imgui-SFML.h"
 #include "imgui.h"
 
-#include <Config.hpp>
-#include <Graphics/Color.hpp>
-#include <Graphics/RenderTarget.hpp>
-#include <Graphics/RenderTexture.hpp>
-#include <Graphics/RenderWindow.hpp>
-#include <Graphics/Sprite.hpp>
-#include <Graphics/Texture.hpp>
-#include <OpenGL.hpp>
-#include <Window/Clipboard.hpp>
-#include <Window/Cursor.hpp>
-#include <Window/Event.hpp>
-#include <Window/Touch.hpp>
-#include <Window/Window.hpp>
+#include <SFML/Config.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/OpenGL.hpp>
+#include <SFML/Window/Clipboard.hpp>
+#include <SFML/Window/Cursor.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Touch.hpp>
+#include <SFML/Window/Window.hpp>
 
 #include <cassert>
 #include <cmath> // abs
@@ -1376,7 +1376,7 @@ void setClipboardText(void* /*userData*/, const char* text) {
 }
 
 const char* getClipboardText(void* /*userData*/) {
-    std::basic_string<sf::Uint8> tmp = sf::Clipboard::getString().toUtf8();
+    std::basic_string<std::uint8_t> tmp = sf::Clipboard::getString().toUtf8();
     s_clipboardText = std::string(tmp.begin(), tmp.end());
     return s_clipboardText.c_str();
 }

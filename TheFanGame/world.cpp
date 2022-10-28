@@ -2,7 +2,7 @@
 
 world::world() noexcept
 {
-	this->m_vertices.setPrimitiveType(sf::PrimitiveType::Quads);
+	this->m_vertices.setPrimitiveType(sf::PrimitiveType::Points);
     this->m_vertices.resize(static_cast<std::size_t>(this->mapWidth * this->mapHeight) * 4);
 
     this->mapSize = { 4, 4 };
@@ -47,8 +47,8 @@ const std::uint8_t world::getMapTile(const int& x, const int& y) const noexcept
         return 0;
 }
 
-void world::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void world::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
 {
-    states.transform *= getTransform();
+    //states.transform *= getTransform();
     target.draw(this->m_vertices, states);
 }

@@ -2,7 +2,7 @@
 
 #if _WIN32 || _WIN64
 	#if _WIN64
-		#include "SFML64/Graphics.hpp"
+		#include "SFML64/SFML/Graphics.hpp"
 	#else
 		#include "SFML32/Graphics.hpp"
 	#endif
@@ -49,6 +49,6 @@ private:
 	};
 	sf::VertexArray m_vertices;
 
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	virtual void draw(sf::RenderTarget& target, const sf::RenderStates& states) const;
 };
 

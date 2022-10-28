@@ -23,7 +23,7 @@ const void game::init(sf::RenderWindow& window)
     this->spriteDistance.resize(this->m_entities.size());
     this->zBuffer.resize(window.getSize().x);
 
-    this->m_view.setSize((float)window.getSize().x, (float)window.getSize().y);
+    this->m_view.setSize(sf::Vector2f((float)window.getSize().x, (float)window.getSize().y));
 }
 
 const void game::processEvent(const sf::Event& event) noexcept 
@@ -63,7 +63,7 @@ const void game::processEvent(const sf::Event& event) noexcept
 
         this->zBuffer.resize(static_cast<std::size_t>(event.size.width));
         this->zBuffer.shrink_to_fit();
-        this->m_view.setSize((float)event.size.width, (float)event.size.height);
+        this->m_view.setSize(sf::Vector2f((float)event.size.width, (float)event.size.height));
     }
 }
 
@@ -90,7 +90,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
         sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
     }
 
-    this->m_view.setCenter((float)window.getSize().x / 2.f, (float)window.getSize().y / 2.f);
+    this->m_view.setCenter(sf::Vector2f((float)window.getSize().x / 2.f, (float)window.getSize().y / 2.f));
 
     this->m_ray->r_vertices[0].position = this->m_player->getPosition();
     for (std::uint32_t i = 0; i < window.getSize().x; ++i)

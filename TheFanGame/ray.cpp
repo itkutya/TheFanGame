@@ -112,9 +112,9 @@ const void ray::castRay(player& player, world& world, const sf::Vector2u& screen
 
     if (this->side)
     {
-        color.r = sf::Uint8(color.r / 2.5f);
-        color.g = sf::Uint8(color.g / 2.5f);
-        color.b = sf::Uint8(color.b / 2.5f);
+        color.r = std::uint8_t(color.r / 2.5f);
+        color.g = std::uint8_t(color.g / 2.5f);
+        color.b = std::uint8_t(color.b / 2.5f);
     }
 
     line[0].color = color;
@@ -144,9 +144,9 @@ const void ray::castRay(player& player, world& world, const sf::Vector2u& screen
     line[1].position = sf::Vector2f((float)i + 1.f, (float)draw.x);
 }
 
-void ray::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void ray::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
 {
-    states.transform *= getTransform();
+    //states.transform *= getTransform();
     target.draw(this->r_floors);
     target.draw(this->r_ceilings);
     target.draw(this->r_walls, states.texture);
