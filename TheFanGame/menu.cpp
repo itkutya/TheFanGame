@@ -4,7 +4,6 @@
 
 menu::menu(engine& e, window& w) noexcept : m_engine(e), m_window(w) 
 {
-	sf::Clock clock;
 	m_engine.Resources->add<sf::Music>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
 	m_engine.Resources->add<sf::Music>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
 	m_engine.Resources->add<sf::Texture>("WallTexture", "res/wolftextures.png");
@@ -15,10 +14,6 @@ menu::menu(engine& e, window& w) noexcept : m_engine(e), m_window(w)
 	m_engine.Resources->add<sf::Texture>("Resume", "res/MainMenu/Resume.png");
 	m_engine.Resources->add<sf::Texture>("CharacterTexture", "res/char.png");
 	m_engine.Resources->add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
-
-	while (m_engine.Resources->wait())
-		continue;
-	std::printf("Time: %f\n", clock.getElapsedTime().asSeconds());
 }
 
 menu::~menu() noexcept 
@@ -123,6 +118,8 @@ const void menu::init(sf::RenderWindow& window)
 	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
 	this->m_view.setSize(sf::Vector2f(window.getSize()));
 	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
+
+	while (m_engine.Resources->wait()) continue;
 
 	this->frontImage.setTexture(this->m_engine.Resources->c_get<sf::Texture>("FrontImage"));
 	this->frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * this->m_engine.Settings->m_currFrontPicture, 0), sf::Vector2i(600, 600)));
@@ -969,26 +966,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		}
 		case state::Login:
 		{
-			if (ImGui::Begin("Login", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground))
-			{
-				ImGui::SetWindowSize("Login", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
-				ImGui::SetWindowPos("Login", ImVec2(50.f, 50.f));
-
-				if (ImGui::InputTextWithHint("User Name:", "Enter your user name here...", &this->inputName, ImGuiInputTextFlags_EnterReturnsTrue))
-					this->login();
-				if (ImGui::InputTextWithHint("Password:", "Enter your password here...", &this->inputPW, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password))
-					this->login();
-
-				if (ImGui::Button("Create Account"))
-					this->createAccount();
-				ImGui::SameLine();
-				if (ImGui::Button("Login"))
-					this->login();
-
-				if (ImGui::Checkbox("Remember Me!", &this->rememberToStayLogedIn))
-					ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Info, 4000, "Ok will deffinenitly do that!"));
-				ImGui::End();
-			}
+			this->loginPanel(window, dt);
 			break;
 		}
 		default:
@@ -1036,20 +1014,60 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 	ImGui::SFML::Render(window);
 }
 
-/*
-* TODO: Fix bug where sent login info is not received correctly...
-*/
-const void menu::login() noexcept
+const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
+{
+	if (ImGui::Begin("Login", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground))
+	{
+		ImGui::SetWindowSize("Login", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
+		ImGui::SetWindowPos("Login", ImVec2(50.f, 50.f));
+
+		if (ImGui::InputTextWithHint("User Name:", "Enter your user name here...", &this->inputName, ImGuiInputTextFlags_EnterReturnsTrue))
+			this->login(this->inputName, this->inputPW);
+		if (ImGui::InputTextWithHint("Password:", "Enter your password here...", &this->inputPW, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password))
+			this->login(this->inputName, this->inputPW);
+
+		if (ImGui::Button("Create Account"))
+		{
+			this->createAccountPanel = true;
+			ImGui::OpenPopup("Create Account");
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Login"))
+			this->login(this->inputName, this->inputPW);
+
+		if (ImGui::Checkbox("Remember Me!", &this->rememberToStayLogedIn))
+			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Info, 4000, "Ok will deffinenitly do that!"));
+
+		if (ImGui::BeginPopupModal("Create Account", &this->createAccountPanel, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
+		{
+			ImGui::SetWindowPos("Create Account", ImVec2(window.getSize().x / 2.f - ImGui::GetWindowWidth() / 2.f,
+													     window.getSize().y / 2.f - ImGui::GetWindowHeight() / 2.f));
+
+			ImGui::Text("Create Account: ");
+			if (ImGui::InputTextWithHint("Email:", "Enter your email here...", &this->createAccountEmail, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank))
+				this->createAccount(this->createAccountName, this->createAccountPassword);
+			if (ImGui::InputTextWithHint("Username:", "Enter your name here...", &this->createAccountName, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank))
+				this->createAccount(this->createAccountName, this->createAccountPassword);
+			if (ImGui::InputTextWithHint("Password:", "Enter your password here...", &this->createAccountPassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank))
+				this->createAccount(this->createAccountName, this->createAccountPassword);
+			if (ImGui::Button("Create")) this->createAccount(this->createAccountName, this->createAccountPassword);
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+		}
+	}ImGui::End();
+}
+
+const void menu::login(const std::string& name, const std::string& password) noexcept
 {
 	this->m_client.join();
-	std::uint32_t type = static_cast<std::uint32_t>(Network_MSG::LogInAttempt);
-	this->m_client.send(type, this->inputName, this->inputPW).wait();
+	this->m_client.send(static_cast<std::uint32_t>(Network_MSG::LogInAttempt), name, password).wait();
 	bool resoult = false;
 	using namespace std::chrono_literals;
 	this->m_client.receive(resoult).wait_for(1s);
 	if (resoult)
 	{
-		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfuly loged in as %s", this->myAccount.account_name));
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfuly logged in as %s", this->myAccount.account_name));
 		this->logged_in = true;
 		this->m_State = state::MainMenu;
 	}
@@ -1058,10 +1076,10 @@ const void menu::login() noexcept
 	this->m_client.disconnect();
 }
 
-const void menu::createAccount() noexcept
+const void menu::createAccount(const std::string& name, const std::string& password) noexcept
 {
 	this->m_client.join();
-	this->m_client.send(static_cast<std::uint32_t>(Network_MSG::RegisterAttempt), std::string(this->inputName), std::string(this->inputPW)).wait();
+	this->m_client.send(static_cast<std::uint32_t>(Network_MSG::RegisterAttempt), name, password).wait();
 	bool resoult = false;
 	using namespace std::chrono_literals;
 	this->m_client.receive(resoult).wait_for(1s);

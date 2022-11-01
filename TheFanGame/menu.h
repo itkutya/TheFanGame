@@ -17,6 +17,21 @@ private:
 	window& m_window;
 	sf::View m_view;
 
+	const void loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
+
+	std::string inputName;
+	std::string inputPW;
+	//Move these to settings...
+	bool logged_in = false;
+	bool rememberToStayLogedIn = false;
+	const void login(const std::string& name, const std::string& password) noexcept;
+
+	bool createAccountPanel = false;
+	std::string createAccountEmail;
+	std::string createAccountName;
+	std::string createAccountPassword;
+	const void createAccount(const std::string& name, const std::string& password) noexcept;
+
 	localhost m_localhost;
 	client m_client;
 
@@ -44,14 +59,6 @@ private:
 	sf::RectangleShape xp_bar;
 	sf::RectangleShape curr_xp;
 	profile myAccount;
-
-	std::string inputName;
-	std::string inputPW;
-	//Move these to settings...
-	bool logged_in = false;
-	bool rememberToStayLogedIn = false;
-	const void login() noexcept;
-	const void createAccount() noexcept;
 
 	char InputIp[12] = "";
 	char InputPort[6] = "";

@@ -154,14 +154,6 @@ public:
 	};
 
 	template<typename T, typename... Args>
-	inline constexpr void makeSendPacket(T& firstParam, Args&... otherParams)
-	{
-		this->m_packet << firstParam;
-		if constexpr (sizeof...(otherParams) > 0)
-			this->makeSendPacket(otherParams...);
-	};
-
-	template<typename T, typename... Args>
 	inline const std::future<void>& send(T& firstParam, Args&... otherParams) noexcept
 	{
 		return this->m_future.emplace_back(std::async(std::launch::async,
@@ -188,14 +180,6 @@ public:
 	};
 
 	template<typename T, typename... Args>
-	inline constexpr void makeReceivePacket(T& firstParam, Args&... otherParams)
-	{
-		this->m_packet >> firstParam;
-		if constexpr (sizeof...(otherParams) > 0)
-			this->makeReceivePacket(otherParams...);
-	};
-
-	template<typename T, typename... Args>
 	inline const std::future<void>& receive(T& firstParam, Args&... otherParams) noexcept
 	{
 		return this->m_future.emplace_back(std::async(std::launch::async,
@@ -214,6 +198,22 @@ private:
 	std::mutex m_mutex;
 	sf::Packet m_packet;
 	std::unordered_map<Network_MSG, void*> m_data;
+
+	template<typename T, typename... Args>
+	inline constexpr void makeSendPacket(T& firstParam, Args&... otherParams)
+	{
+		this->m_packet << firstParam;
+		if constexpr (sizeof...(otherParams) > 0)
+			this->makeSendPacket(otherParams...);
+	};
+
+	template<typename T, typename... Args>
+	inline constexpr void makeReceivePacket(T& firstParam, Args&... otherParams)
+	{
+		this->m_packet >> firstParam;
+		if constexpr (sizeof...(otherParams) > 0)
+			this->makeReceivePacket(otherParams...);
+	};
 };
 
 class localhost
