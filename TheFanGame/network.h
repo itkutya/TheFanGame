@@ -87,7 +87,7 @@ public:
 	{
 		std::lock_guard<std::mutex> lock(this->m_mutex);
 		if (this->m_data[msg] != nullptr)
-			return static_cast<T*>(this->m_data.at(msg));
+			return static_cast<T*>(this->m_data[msg]);
 		else
 			return static_cast<T*>(nullptr);
 	};

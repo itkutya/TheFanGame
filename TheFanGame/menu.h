@@ -3,6 +3,8 @@
 #include "game.h"
 #include "profile.h"
 
+#include "ImGUI/imgui_stdlib.h"
+
 class menu : public state
 {
 public:
@@ -24,13 +26,13 @@ private:
 	//Move these to settings...
 	bool logged_in = false;
 	bool rememberToStayLogedIn = false;
-	const void login(const std::string& name, const std::string& password) noexcept;
+	const bool login(const std::string& name, const std::string& password) noexcept;
 
 	bool createAccountPanel = false;
 	std::string createAccountEmail;
 	std::string createAccountName;
 	std::string createAccountPassword;
-	const void createAccount(const std::string& name, const std::string& password) noexcept;
+	const bool createAccount(const std::string& name, const std::string& password, const std::string& email) noexcept;
 
 	localhost m_localhost;
 	client m_client;

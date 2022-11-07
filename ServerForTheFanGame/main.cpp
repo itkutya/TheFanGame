@@ -12,11 +12,9 @@
 
 #if _WIN32 || _WIN64
     #if _WIN64
-        #include "SFML64/System.hpp"
-		#include "SFML64/Graphics.hpp"
-        #include "SFML64/Network.hpp"
+		#include "SFML64/SFML/Graphics.hpp"
+        #include "SFML64/SFML/Network.hpp"
     #else
-        #include "SFML32/System.hpp"
 		#include "SFML32/Graphics.hpp"
         #include "SFML32/Network.hpp"
     #endif
@@ -49,15 +47,15 @@ static std::mutex mutex;
 
 static std::unordered_map<std::string, std::string> users;
 
-void startServer(const sf::Int64& thickRate = 0)
+void startServer(const std::uint64_t& thickRate = 0)
 {
-	if (listener.listen(52200, sf::IpAddress::getLocalAddress()) != sf::Socket::Done)
+	if (listener.listen(52200, sf::IpAddress::getLocalAddress().value()) != sf::Socket::Status::Done)
 	{
 		LOG_ERROR("Cannot start server!");
 	}
 	else
 	{
-		LOG_SUCCES("Server has been started! %s(%s:%u)", "\033[37m", sf::IpAddress::getLocalAddress().toString().c_str(), listener.getLocalPort());
+		LOG_SUCCES("Server has been started! %s(%s:%u)", "\033[37m", sf::IpAddress::getLocalAddress().value().toString().c_str(), listener.getLocalPort());
 		selector.add(listener);
 
 		while (shouldRun)
@@ -68,9 +66,9 @@ void startServer(const sf::Int64& thickRate = 0)
 				if (selector.isReady(listener))
 				{
 					auto client = std::make_unique<sf::TcpSocket>();
-					if (listener.accept(*client) == sf::Socket::Done)
+					if (listener.accept(*client) == sf::Socket::Status::Done)
 					{
-						LOG_SUCCES("Player connected: %s(%s:%u)", "\033[37m", client->getRemoteAddress().toString().c_str(), client->getRemotePort());
+						LOG_SUCCES("Player connected: %s(%s:%u)", "\033[37m", client->getRemoteAddress().value().toString().c_str(), client->getRemotePort());
 						clients.push_back(std::move(client));
 						auto& newClient = (**(clients.end() - 1));
 						selector.add(newClient);
@@ -87,15 +85,15 @@ void startServer(const sf::Int64& thickRate = 0)
 							sf::Packet packet;
 							switch (client.receive(packet))
 							{
-							case sf::Socket::Disconnected:
-								LOG_ERROR("Player disconnected: %s(%s:%u)", "\033[37m", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
+							case sf::Socket::Status::Disconnected:
+								LOG_ERROR("Player disconnected: %s(%s:%u)", "\033[37m", client.getRemoteAddress().value().toString().c_str(), client.getRemotePort());
 								disconnected.push_back(it);
 								selector.remove(client);
 								client.disconnect();
 								break;
-							case sf::Socket::Done:
+							case sf::Socket::Status::Done:
 							{
-								sf::Uint32 tempType;
+								std::uint32_t tempType;
 								packet >> tempType;
 								Network_MSG msg = static_cast<Network_MSG>(tempType);
 								switch (msg)
@@ -108,15 +106,15 @@ void startServer(const sf::Int64& thickRate = 0)
 									packet.clear();
 									if (users.contains(temp_Un) && users.at(temp_Un) == temp_Pw)
 									{
-										LOG_SUCCES("Player loged in: %s(%s:%u)", "\033[37m", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
+										LOG_SUCCES("Player loged in: %s(%s:%u)", "\033[37m", client.getRemoteAddress().value().toString().c_str(), client.getRemotePort());
 										packet << true;
-										client.send(packet);
+										auto temp = client.send(packet);
 									}
 									else
 									{
-										LOG_ERROR("Player failed to login: %s(%s:%u)", "\033[37m", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
+										LOG_ERROR("Player failed to login: %s(%s:%u)", "\033[37m", client.getRemoteAddress().value().toString().c_str(), client.getRemotePort());
 										packet << false;
-										client.send(packet);
+										auto temp = client.send(packet);
 									}
 									break;
 								}
@@ -124,27 +122,25 @@ void startServer(const sf::Int64& thickRate = 0)
 								{
 									std::string temp_Un;
 									std::string temp_Pw;
-									packet >> temp_Un >> temp_Pw;
+									std::string temp_Email;
+									packet >> temp_Un >> temp_Pw >> temp_Email;
 									packet.clear();
 									if (users.contains(temp_Un))
 									{
-										LOG_ERROR("Player failed to create account: %s(%s:%u)", "\033[37m", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
+										LOG_ERROR("Player failed to create account: %s(%s:%u)", "\033[37m", client.getRemoteAddress().value().toString().c_str(), client.getRemotePort());
 										packet << false;
-										client.send(packet);
+										auto temp = client.send(packet);
 									}
 									else
 									{
-										LOG_SUCCES("Player created an account: %s(%s:%u)", "\033[37m", client.getRemoteAddress().toString().c_str(), client.getRemotePort());
+										LOG_SUCCES("Player created an account: %s(%s:%u)", "\033[37m", client.getRemoteAddress().value().toString().c_str(), client.getRemotePort());
 										packet << true;
-										client.send(packet);
+										auto temp = client.send(packet);
 										users.insert({ temp_Un, temp_Pw });
 										std::ofstream file("users.ini", std::ios_base::app);
 										if (file.is_open())
 										{
-											file.write(temp_Un.c_str(), sizeof(temp_Un.c_str()));
-											file.write("\n", sizeof(char));
-											file.write(temp_Pw.c_str(), sizeof(temp_Pw.c_str()));
-											file.write("\n", sizeof(char));
+											file << temp_Un << '\n' << temp_Pw << '\n' << temp_Email << '\n';
 										}
 										else
 											LOG_ERROR("Cannot load user datas'...");
@@ -158,20 +154,20 @@ void startServer(const sf::Int64& thickRate = 0)
 									{
 										sf::TcpSocket& client2 = **it2;
 										if (it2 != it)
-											client2.send(packet);
+											auto temp = client2.send(packet);
 									}
 									break;
 								}
 								}
 							}
 							break;
-							case sf::Socket::Error:
+							case sf::Socket::Status::Error:
 								LOG_ERROR("ERROR");
 								break;
-							case sf::Socket::NotReady:
+							case sf::Socket::Status::NotReady:
 								LOG("NotReady");
 								break;
-							case sf::Socket::Partial:
+							case sf::Socket::Status::Partial:
 								LOG("Partial");
 								break;
 							default:
@@ -187,7 +183,7 @@ void startServer(const sf::Int64& thickRate = 0)
 			}
 		}
 	}
-	std::printf("Shutting down the server!\n");
+	LOG_SUCCES("Shutting down the server!\n");
 	clients.clear();
 	selector.clear();
 	listener.close();
@@ -195,25 +191,34 @@ void startServer(const sf::Int64& thickRate = 0)
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Server");
+    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(800, 600)), "Server");
     window.setFramerateLimit(60);
 
     ImGui::SFML::Init(window);
     ImGui::StyleColorsDark();
     auto& io = ImGui::GetIO();
     io.Fonts->Clear();
-    ImFont* font = io.Fonts->AddFontFromFileTTF("Gen Jyuu Gothic Monospace Bold.ttf", 25.0f, 0, io.Fonts->GetGlyphRangesJapanese());
+    ImFont* font = io.Fonts->AddFontFromFileTTF("tuffy.ttf", 25.0f, 0, io.Fonts->GetGlyphRangesJapanese());
     ImGui::SFML::UpdateFontTexture();
 
 	std::ifstream file("users.ini");
 	if (file.is_open())
 	{
-		std::string tempUN;
-		while (std::getline(file, tempUN))
+		std::string temp;
+		std::string un;
+		std::string pw;
+		int currLine = 1;
+		while (std::getline(file, temp))
 		{
-			std::string tempPW;
-			std::getline(file, tempPW);
-			users.insert({ tempUN, tempPW });
+			if (currLine == 1)
+				un = temp;
+			else if (currLine == 2)
+				pw = temp;
+			else if (currLine == 3)
+				users.insert({ un, pw });
+			++currLine;
+			if (currLine >= 4)
+				currLine = 1;
 		}
 	}
 	else
@@ -239,10 +244,22 @@ int main()
         {
 			std::lock_guard<std::mutex> lock(mutex);
             ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
+			ImGui::Text("Currently Connected Users: ");
 			for (auto& client : clients)
 			{
-				std::string text = client->getRemoteAddress().toString() + std::to_string(client->getRemotePort());
-				if (ImGui::BeginListBox("Connected clients"))
+				std::string text = client->getRemoteAddress().value().toString() + std::to_string(client->getRemotePort());
+				if (ImGui::BeginListBox("##Connected_clients"))
+				{
+					ImGui::Selectable(text.c_str());
+					ImGui::EndListBox();
+				}
+			}
+			ImGui::Separator();
+			ImGui::Text("Currently Registered Users: ");
+			for (auto& user : users)
+			{
+				std::string text = std::string("Username: ") + user.first + std::string(" Password: ") + user.second;
+				if (ImGui::BeginListBox("##Registered_users"))
 				{
 					ImGui::Selectable(text.c_str());
 					ImGui::EndListBox();

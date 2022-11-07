@@ -1,7 +1,5 @@
 ﻿#include "menu.h"
 
-#include "ImGUI/imgui_stdlib.h"
-
 menu::menu(engine& e, window& w) noexcept : m_engine(e), m_window(w) 
 {
 	m_engine.Resources->add<sf::Music>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
@@ -975,8 +973,8 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			ImGui::LogButtons();
 			if (ImGui::Button("Help me!"))
 				this->m_State = state::MainMenu;
+			break;
 		}
-		break;
 		}
 		ImGui::End();
 	}
@@ -1045,20 +1043,22 @@ const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexce
 
 			ImGui::Text("Create Account: ");
 			if (ImGui::InputTextWithHint("Email:", "Enter your email here...", &this->createAccountEmail, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank))
-				this->createAccount(this->createAccountName, this->createAccountPassword);
+				this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail);
 			if (ImGui::InputTextWithHint("Username:", "Enter your name here...", &this->createAccountName, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank))
-				this->createAccount(this->createAccountName, this->createAccountPassword);
+				this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail);
 			if (ImGui::InputTextWithHint("Password:", "Enter your password here...", &this->createAccountPassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank))
-				this->createAccount(this->createAccountName, this->createAccountPassword);
-			if (ImGui::Button("Create")) this->createAccount(this->createAccountName, this->createAccountPassword);
+				this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail);
+			if (ImGui::Button("Create")) 
+				this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail);
 			ImGui::SameLine();
-			if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+			if (ImGui::Button("Cancel")) 
+				ImGui::CloseCurrentPopup();
 			ImGui::EndPopup();
 		}
 	}ImGui::End();
 }
 
-const void menu::login(const std::string& name, const std::string& password) noexcept
+const bool menu::login(const std::string& name, const std::string& password) noexcept
 {
 	this->m_client.join();
 	this->m_client.send(static_cast<std::uint32_t>(Network_MSG::LogInAttempt), name, password).wait();
@@ -1074,20 +1074,28 @@ const void menu::login(const std::string& name, const std::string& password) noe
 	else
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect username or password!"));
 	this->m_client.disconnect();
+	return resoult;
 }
 
-const void menu::createAccount(const std::string& name, const std::string& password) noexcept
+const bool menu::createAccount(const std::string& name, const std::string& password, const std::string& email) noexcept
 {
 	this->m_client.join();
-	this->m_client.send(static_cast<std::uint32_t>(Network_MSG::RegisterAttempt), name, password).wait();
+	this->m_client.send(static_cast<std::uint32_t>(Network_MSG::RegisterAttempt), name, password, email).wait();
 	bool resoult = false;
 	using namespace std::chrono_literals;
 	this->m_client.receive(resoult).wait_for(1s);
 	if (resoult)
+	{
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Account succesfuly created!"));
+		this->inputName = this->createAccountName;
+		this->inputPW = this->createAccountPassword;
+		this->logged_in = true;
+		this->m_State = state::MainMenu;
+	}
 	else
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account with given detailes!"));
 	this->m_client.disconnect();
+	return resoult;
 }
 
 const void menu::giveXP(const float& amount) noexcept
