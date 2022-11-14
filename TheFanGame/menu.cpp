@@ -1,17 +1,20 @@
 ﻿#include "menu.h"
 
-menu::menu(engine& e, window& w) noexcept : m_engine(e), m_window(w) 
+menu::menu(window& w) noexcept : m_window(w) 
 {
-	m_engine.Resources->add<sf::Music>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
-	m_engine.Resources->add<sf::Music>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
-	m_engine.Resources->add<sf::Texture>("WallTexture", "res/wolftextures.png");
-	m_engine.Resources->add<sf::Texture>("Background", "res/MainMenu/Backgrounds.png");
-	m_engine.Resources->add<sf::Texture>("FrontImage", "res/MainMenu/FontImages.png");
-	m_engine.Resources->add<sf::Texture>("Icon", "res/MainMenu/Icons.png");
-	m_engine.Resources->add<sf::Texture>("Pause", "res/MainMenu/Pause.png");
-	m_engine.Resources->add<sf::Texture>("Resume", "res/MainMenu/Resume.png");
-	m_engine.Resources->add<sf::Texture>("CharacterTexture", "res/char.png");
-	m_engine.Resources->add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
+	sf::Clock clock;
+	resourceSystem::add<sf::Music>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
+	resourceSystem::add<sf::Music>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
+	resourceSystem::add<sf::Texture>("WallTexture", "res/wolftextures.png");
+	resourceSystem::add<sf::Texture>("Background", "res/MainMenu/Backgrounds.png");
+	resourceSystem::add<sf::Texture>("FrontImage", "res/MainMenu/FontImages.png");
+	resourceSystem::add<sf::Texture>("Icon", "res/MainMenu/Icons.png");
+	resourceSystem::add<sf::Texture>("Pause", "res/MainMenu/Pause.png");
+	resourceSystem::add<sf::Texture>("Resume", "res/MainMenu/Resume.png");
+	resourceSystem::add<sf::Texture>("CharacterTexture", "res/char.png");
+	resourceSystem::add<sf::Font>("JP_Font", "res/Gen Jyuu Gothic Monospace Bold.ttf");
+	resourceSystem::wait();
+	std::printf("%fs\n", clock.getElapsedTime().asSeconds());
 }
 
 menu::~menu() noexcept 
@@ -117,27 +120,25 @@ const void menu::init(sf::RenderWindow& window)
 	this->m_view.setSize(sf::Vector2f(window.getSize()));
 	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
 
-	while (m_engine.Resources->wait()) continue;
+	this->frontImage.setTexture(resourceSystem::c_get<sf::Texture>("FrontImage"));
+	this->frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0), sf::Vector2i(600, 600)));
 
-	this->frontImage.setTexture(this->m_engine.Resources->c_get<sf::Texture>("FrontImage"));
-	this->frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * this->m_engine.Settings->m_currFrontPicture, 0), sf::Vector2i(600, 600)));
+	this->icon.setTexture(resourceSystem::c_get<sf::Texture>("Icon"));
+	this->icon.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0), sf::Vector2i(100, 100)));
 
-	this->icon.setTexture(this->m_engine.Resources->c_get<sf::Texture>("Icon"));
-	this->icon.setTextureRect(sf::IntRect(sf::Vector2i(100 * this->m_engine.Settings->m_currProfilePicture, 0), sf::Vector2i(100, 100)));
-
-	this->backgroundImage.setTexture(&this->m_engine.Resources->c_get<sf::Texture>("Background"));
+	this->backgroundImage.setTexture(&resourceSystem::c_get<sf::Texture>("Background"));
 	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
-	this->backgroundImage.setTextureRect(sf::IntRect(sf::Vector2i(1920 * this->m_engine.Settings->m_currBackgroundPicture, 0),
+	this->backgroundImage.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
 													 sf::Vector2i(1920, 1080)));
 	this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
 
-	this->m_MainMusic = m_engine.Resources->get<std::unique_ptr<sf::Music>>(m_engine.Settings->m_currMusic).get();
+	this->m_MainMusic = resourceSystem::get<std::unique_ptr<sf::Music>>(settings::m_currMusic).get();
 	this->m_MainMusic->setLoop(true);
-	if (this->m_engine.Settings->m_MusicVolume > 0.f)
+	if (settings::m_MusicVolume > 0.f)
 		this->m_MainMusic->play();
-	this->m_MainMusic->setVolume(this->m_engine.Settings->m_MusicVolume);
+	this->m_MainMusic->setVolume(settings::m_MusicVolume);
 
-	if (this->rememberToStayLogedIn)
+	if (settings::rememberToStayLogedIn)
 		this->m_State = state::MainMenu;
 }
 
@@ -146,9 +147,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 	ImGui::SFML::Update(window, dt);
 	ImGui::PushFont(this->font);
 
-	if (this->m_engine.Settings->m_MusicVolume == 0.f)
+	if (settings::m_MusicVolume == 0.f)
 		this->m_MainMusic->pause();
-	else if (this->m_engine.Settings->m_MusicVolume > 0.f && (this->m_MainMusic->getStatus() == sf::SoundSource::Paused || this->m_MainMusic->getStatus() == sf::SoundSource::Stopped))
+	else if (settings::m_MusicVolume > 0.f && (this->m_MainMusic->getStatus() == sf::SoundSource::Paused || this->m_MainMusic->getStatus() == sf::SoundSource::Stopped))
 		this->m_MainMusic->play();
 
 	if (ImGui::Begin("Main Window", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus))
@@ -164,7 +165,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		vMax.x += ImGui::GetWindowPos().x;
 		vMax.y += ImGui::GetWindowPos().y;
 
-		if (this->m_engine.Settings->m_ShowFPS)
+		if (settings::m_ShowFPS)
 		{
 			ImGui::SetCursorPos(ImVec2(vMax.x * 0.9f, vMin.y));
 			ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
@@ -188,11 +189,11 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			ImGui::SetCursorPos(ImVec2(vMax.x - 750.f, vMin.y + 40.f));
 			if (this->m_MainMusic->getStatus() == sf::SoundSource::Playing)
 			{
-				if (ImGui::ImageButton(this->m_engine.Resources->c_get<sf::Texture>("Pause"), sf::Vector2f(35.f, 35.f)))
+				if (ImGui::ImageButton(resourceSystem::c_get<sf::Texture>("Pause"), sf::Vector2f(35.f, 35.f)))
 					this->m_MainMusic->pause();
 			}
 			else
-				if (ImGui::ImageButton(this->m_engine.Resources->c_get<sf::Texture>("Resume"), sf::Vector2f(35.f, 35.f)))
+				if (ImGui::ImageButton(resourceSystem::c_get<sf::Texture>("Resume"), sf::Vector2f(35.f, 35.f)))
 					this->m_MainMusic->play();
 			ImGui::SameLine();
 			WidgetPos = ImGui::GetCursorPos();
@@ -202,20 +203,20 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			WidgetPos = ImGui::GetCursorPos();
 			ImGui::SetNextItemWidth(500.f);
 			ImGui::SetCursorPos(ImVec2(WidgetPos.x - 15.f, WidgetPos.y + 5.f));
-			if (ImGui::BeginCombo("###MusicSelector", this->m_engine.Settings->m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
+			if (ImGui::BeginCombo("###MusicSelector", settings::m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
 			{
-				for (auto& music : this->m_engine.Settings->m_Music)
+				for (auto& music : settings::m_Music)
 				{
 					if (ImGui::Selectable(music))
 					{
-						if (this->m_engine.Settings->m_currMusic.c_str() != music)
+						if (settings::m_currMusic.c_str() != music)
 						{
-							this->m_engine.Settings->m_currMusic = music;
+							settings::m_currMusic = music;
 							this->m_MainMusic->stop();
-							//this->m_MainMusic = &this->m_engine.Resources->get<sf::Music>(this->m_engine.Settings->m_currMusic);
-							if (this->m_engine.Settings->m_MusicVolume > 0.f)
+							this->m_MainMusic = resourceSystem::get<std::unique_ptr<sf::Music>>(settings::m_currMusic).get();
+							if (settings::m_MusicVolume > 0.f)
 								this->m_MainMusic->play();
-							this->m_MainMusic->setVolume(this->m_engine.Settings->m_MusicVolume);
+							this->m_MainMusic->setVolume(settings::m_MusicVolume);
 						}
 					}
 				}
@@ -272,7 +273,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					this->m_PlaySelected = false;
 					this->m_State = state::Singleplayer;
 					this->m_MainMusic->stop();
-					this->m_engine.States->add<game>(this->m_engine, this->m_window);
+					stateSystem::add<game>(this->m_window);
 				}
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Starts the game state.");
@@ -304,8 +305,6 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetWindowSize("Settings", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
 				ImGui::SetWindowPos("Settings", ImVec2(50.f, 50.f));
 
-				inputSystem is;
-
 				if (this->m_ChangeKeybindigs)
 				{
 					if (ImGui::Begin("Change Keybindigs", &this->m_ChangeKeybindigs, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
@@ -316,7 +315,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						vMin = ImGui::GetWindowContentRegionMin();
 						vMax = ImGui::GetWindowContentRegionMax();
 
-						std::string text = "Change [" + is.keyToString(this->m_ToChange.second) + "] to [" + is.keyToString(this->key) + "]";
+						std::string text = "Change [" + inputSystem::keyToString(this->m_ToChange.second) + "] to [" + inputSystem::keyToString(this->key) + "]";
 						ImGui::TextColored(ImVec4(1, 0, 0, 1), text.c_str());
 						for (std::size_t i = 0; i < sf::Keyboard::KeyCount; ++i)
 						{
@@ -324,9 +323,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 							{
 								this->key.m_InputType = InputType::KeyboardInput;
 								this->key.m_KeyCode = static_cast<sf::Keyboard::Key>(i);
-								if (is.eventToString(this->m_ToChange.second) == "Press")
+								if (inputSystem::eventToString(this->m_ToChange.second) == "Press")
 									this->key.m_EventType = sf::Event::KeyPressed;
-								else if (is.eventToString(this->m_ToChange.second) == "Release")
+								else if (inputSystem::eventToString(this->m_ToChange.second) == "Release")
 									this->key.m_EventType = sf::Event::KeyReleased;
 								else
 									ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
@@ -338,11 +337,11 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 							{
 								this->key.m_InputType = InputType::MouseInput;
 								this->key.m_MouseButton = static_cast<sf::Mouse::Button>(i);
-								if (is.eventToString(this->m_ToChange.second) == "Press")
+								if (inputSystem::eventToString(this->m_ToChange.second) == "Press")
 									this->key.m_EventType = sf::Event::MouseButtonPressed;
-								else if (is.eventToString(this->m_ToChange.second) == "Release")
+								else if (inputSystem::eventToString(this->m_ToChange.second) == "Release")
 									this->key.m_EventType = sf::Event::MouseButtonReleased;
-								else if (is.eventToString(this->m_ToChange.second) == "Move")
+								else if (inputSystem::eventToString(this->m_ToChange.second) == "Move")
 									this->key.m_EventType = sf::Event::MouseMoved;
 								else
 									ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
@@ -360,11 +359,11 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 										{
 											this->key.m_InputType = InputType::JoystickButtonInput;
 											this->key.m_joystickButton = j;
-											if (is.eventToString(this->m_ToChange.second) == "Press")
+											if (inputSystem::eventToString(this->m_ToChange.second) == "Press")
 												this->key.m_EventType = sf::Event::JoystickButtonPressed;
-											else if (is.eventToString(this->m_ToChange.second) == "Release")
+											else if (inputSystem::eventToString(this->m_ToChange.second) == "Release")
 												this->key.m_EventType = sf::Event::JoystickButtonReleased;
-											else if (is.eventToString(this->m_ToChange.second) == "Move")
+											else if (inputSystem::eventToString(this->m_ToChange.second) == "Move")
 												this->key.m_EventType = sf::Event::JoystickMoved;
 											else
 												ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
@@ -378,11 +377,11 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 									{
 										this->key.m_InputType = InputType::JoystickAxisInput;
 										this->key.m_JoystickAxis = tempAxis;
-										if (is.eventToString(this->m_ToChange.second) == "Press")
+										if (inputSystem::eventToString(this->m_ToChange.second) == "Press")
 											this->key.m_EventType = sf::Event::JoystickButtonPressed;
-										else if (is.eventToString(this->m_ToChange.second) == "Release")
+										else if (inputSystem::eventToString(this->m_ToChange.second) == "Release")
 											this->key.m_EventType = sf::Event::JoystickButtonReleased;
-										else if (is.eventToString(this->m_ToChange.second) == "Move")
+										else if (inputSystem::eventToString(this->m_ToChange.second) == "Move")
 											this->key.m_EventType = sf::Event::JoystickMoved;
 										else
 											ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
@@ -398,7 +397,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 						{
 							this->m_ChangeKeybindigs = false;
-							this->m_engine.Inputs->saveInput({ this->m_ToChange.first, this->key });
+							inputSystem::saveInput({ this->m_ToChange.first, this->key });
 						}
 						ImGui::End();
 					}
@@ -439,12 +438,12 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 				case settingState::Input:
 				{
-					for (auto& it : is())
+					for (auto& it : inputSystem::getInputHandler())
 					{
 						ImGui::Text(it.first.c_str());
 						ImGui::SameLine();
-						ImGui::PushID(std::string(it.first + is.keyToString(it.second)).c_str());
-						if (ImGui::Button(is.keyToString(it.second).c_str(), ImVec2(300.f, 30.f)))
+						ImGui::PushID(std::string(it.first + inputSystem::keyToString(it.second)).c_str());
+						if (ImGui::Button(inputSystem::keyToString(it.second).c_str(), ImVec2(300.f, 30.f)))
 						{
 							this->m_ToChange = it;
 							this->m_ChangeKeybindigs = true;
@@ -453,7 +452,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						ImGui::SameLine();
 						ImGui::SetNextItemWidth(200.f);
 						ImGui::PushID(it.first.c_str() + static_cast<std::uint32_t>(it.second.m_InputType));
-						if (ImGui::BeginCombo("###PressOrRelease", is.eventToString(it.second).c_str(), ImGuiComboFlags_HeightSmall))
+						if (ImGui::BeginCombo("###PressOrRelease", inputSystem::eventToString(it.second).c_str(), ImGuiComboFlags_HeightSmall))
 						{
 							if (ImGui::Selectable("Press"))
 								std::cout << "Later...\n";
@@ -467,20 +466,20 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				}
 				case settingState::Graphics:
 				{
-					if (ImGui::Checkbox("Fullscreen: ", &this->m_engine.Settings->m_Fullscreen))
-						this->m_window.create(m_engine.Settings->m_Videomodes[m_engine.Settings->m_currVideomode], "Fan Game!", m_engine.Settings->m_Fullscreen, m_engine.Settings->m_FpsLimit, m_engine.Settings->m_Vsync);
+					if (ImGui::Checkbox("Fullscreen: ", &settings::m_Fullscreen))
+						this->m_window.create(settings::m_Videomodes[settings::m_currVideomode], "Fan Game!", settings::m_Fullscreen, settings::m_FpsLimit, settings::m_Vsync);
 
 					ImGui::SetNextItemWidth(300.f);
-					std::string preview = std::to_string(this->m_engine.Settings->m_Videomodes[this->m_engine.Settings->m_currVideomode].size.x) + "x" + std::to_string(this->m_engine.Settings->m_Videomodes[this->m_engine.Settings->m_currVideomode].size.y);
+					std::string preview = std::to_string(settings::m_Videomodes[settings::m_currVideomode].size.x) + "x" + std::to_string(settings::m_Videomodes[settings::m_currVideomode].size.y);
 					if (ImGui::BeginCombo("Resolution: ", preview.c_str(), ImGuiComboFlags_HeightSmall))
 					{
-						for (std::size_t i = 0; i < this->m_engine.Settings->m_Videomodes.size(); ++i)
+						for (std::size_t i = 0; i < settings::m_Videomodes.size(); ++i)
 						{
-							std::string text = std::to_string(this->m_engine.Settings->m_Videomodes[i].size.x) + "x" + std::to_string(this->m_engine.Settings->m_Videomodes[i].size.y);
+							std::string text = std::to_string(settings::m_Videomodes[i].size.x) + "x" + std::to_string(settings::m_Videomodes[i].size.y);
 							if (ImGui::Selectable(text.c_str()))
 							{
-								this->m_engine.Settings->m_currVideomode = (int)i;
-								this->m_window.create(m_engine.Settings->m_Videomodes[m_engine.Settings->m_currVideomode], "Fan Game!", m_engine.Settings->m_Fullscreen, m_engine.Settings->m_FpsLimit, m_engine.Settings->m_Vsync);
+								settings::m_currVideomode = (int)i;
+								this->m_window.create(settings::m_Videomodes[settings::m_currVideomode], "Fan Game!", settings::m_Fullscreen, settings::m_FpsLimit, settings::m_Vsync);
 								this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
 								this->m_view.setSize(sf::Vector2f(window.getSize()));
 								this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
@@ -488,74 +487,72 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						}
 						ImGui::EndCombo();
 					}
-					if (ImGui::Checkbox("Show FPS", &this->m_engine.Settings->m_ShowFPS))
+					if (ImGui::Checkbox("Show FPS", &settings::m_ShowFPS))
 						std::cout << "\n";
 
-					//
-					if (!this->m_engine.Settings->m_isFPSLimited)
-						if (ImGui::Checkbox("VSync: ", &this->m_engine.Settings->m_Vsync))
-							this->m_window.setVSync(this->m_engine.Settings->m_Vsync);
+					if (!settings::m_isFPSLimited)
+						if (ImGui::Checkbox("VSync: ", &settings::m_Vsync))
+							this->m_window.setVSync(settings::m_Vsync);
 
-					if (ImGui::Checkbox("FPS Limit: ", &this->m_engine.Settings->m_isFPSLimited))
+					if (ImGui::Checkbox("FPS Limit: ", &settings::m_isFPSLimited))
 					{
-						if (!this->m_engine.Settings->m_isFPSLimited)
-							this->m_engine.Settings->m_FpsLimit = 0;
-						this->m_window.setFramerateLimit(this->m_engine.Settings->m_FpsLimit);
+						if (!settings::m_isFPSLimited)
+							settings::m_FpsLimit = 0;
+						this->m_window.setFramerateLimit(settings::m_FpsLimit);
 					}
 
-					if (!this->m_engine.Settings->m_Vsync)
+					if (!settings::m_Vsync)
 					{
-						if (ImGui::SliderInt("##Limit: ", &this->m_engine.Settings->m_FpsLimit, 30, 240))
-							this->m_window.setFramerateLimit(this->m_engine.Settings->m_FpsLimit);
+						if (ImGui::SliderInt("##Limit: ", &settings::m_FpsLimit, 30, 240))
+							this->m_window.setFramerateLimit(settings::m_FpsLimit);
 					}
-					//
 					break;
 				}
 				case settingState::Game:
 				{
-					ImGui::SliderFloat("Vertical Sensivity: ", &this->m_engine.Settings->m_VerticalSensivity, 0.f, 20.f);
-					ImGui::SliderFloat("Horizontal Sensivity: ", &this->m_engine.Settings->m_HorizontalSensivity, 0.f, 20.f);
+					ImGui::SliderFloat("Vertical Sensivity: ", &settings::m_VerticalSensivity, 0.f, 20.f);
+					ImGui::SliderFloat("Horizontal Sensivity: ", &settings::m_HorizontalSensivity, 0.f, 20.f);
 					break;
 				}
 				case settingState::Mainmenu:
 				{
-					if (ImGui::SliderInt("Front image: ", &this->m_engine.Settings->m_currFrontPicture, 0, 0))
-						this->frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * this->m_engine.Settings->m_currFrontPicture, 0),
+					if (ImGui::SliderInt("Front image: ", &settings::m_currFrontPicture, 0, 0))
+						this->frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0),
 																	sf::Vector2i(600, 600)));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->frontImage.getTexture());
-						background.setTextureRect(sf::IntRect(sf::Vector2i(600 * this->m_engine.Settings->m_currFrontPicture, 0),
+						background.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0),
 															  sf::Vector2i(600, 600)));
 						ImGui::Image(background, ImVec2(300.f, 300.f));
 						ImGui::EndTooltip();
 					}
 
-					if (ImGui::SliderInt("Profile picture: ", &this->m_engine.Settings->m_currProfilePicture, 0, 3))
-						this->icon.setTextureRect(sf::IntRect(sf::Vector2i(100 * this->m_engine.Settings->m_currProfilePicture, 0),
+					if (ImGui::SliderInt("Profile picture: ", &settings::m_currProfilePicture, 0, 3))
+						this->icon.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0),
 															  sf::Vector2i(100, 100)));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->icon.getTexture());
-						background.setTextureRect(sf::IntRect(sf::Vector2i(100 * this->m_engine.Settings->m_currProfilePicture, 0),
+						background.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0),
 															  sf::Vector2i(100, 100)));
 						ImGui::Image(background, ImVec2(100.f, 100.f));
 						ImGui::EndTooltip();
 					}
 
-					if (ImGui::SliderInt("Background image: ", &this->m_engine.Settings->m_currBackgroundPicture, 0, 3))
-						this->backgroundImage.setTextureRect(sf::IntRect(sf::Vector2i(1920 * this->m_engine.Settings->m_currBackgroundPicture, 0),
+					if (ImGui::SliderInt("Background image: ", &settings::m_currBackgroundPicture, 0, 3))
+						this->backgroundImage.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
 																		 sf::Vector2i(1920, 1080)));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->backgroundImage.getTexture());
-						background.setTextureRect(sf::IntRect(sf::Vector2i(1920 * this->m_engine.Settings->m_currBackgroundPicture, 0),
+						background.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
 															  sf::Vector2i(1920, 1080)));
 						ImGui::Image(background, ImVec2(300.f, 300.f));
 						ImGui::EndTooltip();
@@ -569,28 +566,28 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					WidgetPos = ImGui::GetCursorPos();
 					ImGui::SetNextItemWidth(500.f);
 					ImGui::SetCursorPos(ImVec2(WidgetPos.x - 15.f, WidgetPos.y));
-					if (ImGui::BeginCombo("###MusicSelector", this->m_engine.Settings->m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
+					if (ImGui::BeginCombo("###MusicSelector", settings::m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
 					{
-						for (auto& music : this->m_engine.Settings->m_Music)
+						for (auto& music : settings::m_Music)
 						{
 							if (ImGui::Selectable(music))
 							{
-								if (this->m_engine.Settings->m_currMusic.c_str() != music)
+								if (settings::m_currMusic.c_str() != music)
 								{
-									this->m_engine.Settings->m_currMusic = music;
+									settings::m_currMusic = music;
 									this->m_MainMusic->stop();
-									//this->m_MainMusic = &this->m_engine.Resources->get<sf::Music>(this->m_engine.Settings->m_currMusic);
-									if (this->m_engine.Settings->m_MusicVolume > 0.f)
+									this->m_MainMusic = resourceSystem::get<std::unique_ptr<sf::Music>>(settings::m_currMusic).get();
+									if (settings::m_MusicVolume > 0.f)
 										this->m_MainMusic->play();
-									this->m_MainMusic->setVolume(this->m_engine.Settings->m_MusicVolume);
+									this->m_MainMusic->setVolume(settings::m_MusicVolume);
 								}
 							}
 						}
 						ImGui::EndCombo();
 					}
-					ImGui::SliderFloat("Game volume: ", &this->m_engine.Settings->m_GameVolume, 0.f, 100.f);
-					if (ImGui::SliderFloat("Music volume: ", &this->m_engine.Settings->m_MusicVolume, 0.f, 100.f))
-						this->m_MainMusic->setVolume(this->m_engine.Settings->m_MusicVolume);
+					ImGui::SliderFloat("Game volume: ", &settings::m_GameVolume, 0.f, 100.f);
+					if (ImGui::SliderFloat("Music volume: ", &settings::m_MusicVolume, 0.f, 100.f))
+						this->m_MainMusic->setVolume(settings::m_MusicVolume);
 					break;
 				}
 				default:
@@ -599,7 +596,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
 				if (ImGui::Button("Back & Save##Settings", ImVec2(300.f, 75.f)))
 				{
-					if (this->m_engine.Settings->saveSettings("res/Settings.ini"))
+					if (settings::saveSettings("res/Settings.ini"))
 						this->m_State = state::MainMenu;
 				}
 			}ImGui::End();
@@ -629,9 +626,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 						sf::Sprite temp;
 						if (!this->characters[i].unlocked)
-							temp.setTexture(this->m_engine.Resources->c_get<sf::Texture>("WallTexture"));
+							temp.setTexture(resourceSystem::c_get<sf::Texture>("WallTexture"));
 						else
-							temp.setTexture(this->m_engine.Resources->c_get<sf::Texture>("CharacterTexture"));
+							temp.setTexture(resourceSystem::c_get<sf::Texture>("CharacterTexture"));
 
 						temp.setTextureRect(sf::IntRect(sf::Vector2i(64 * (int)i, 0), sf::Vector2i(64, 64)));
 						ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + 25.f, ImGui::GetCursorPos().y));
@@ -641,7 +638,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						{
 							ImGui::BeginTooltip();
 							sf::Sprite ability;
-							ability.setTexture(this->m_engine.Resources->c_get<sf::Texture>("WallTexture"));
+							ability.setTexture(resourceSystem::c_get<sf::Texture>("WallTexture"));
 							ability.setTextureRect(sf::IntRect(sf::Vector2i(128, 0), sf::Vector2i(64, 64)));
 							ImGui::SetCursorPos(ImVec2(5.f, 5.f));
 							ImGui::Image(ability, sf::Vector2f(50.f, 50.f));
@@ -1003,59 +1000,65 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 {
 	window.setView(this->m_view);
 	window.draw(this->backgroundImage);
-	if (this->m_State == state::MainMenu && this->logged_in)
+	if (this->m_State == state::MainMenu && settings::logged_in)
 	{
 		window.draw(this->xp_bar);
 		window.draw(this->curr_xp);
 	}
 	window.setView(window.getDefaultView());
 	ImGui::SFML::Render(window);
+	window.draw(this->pS);
 }
 
 const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
-	if (ImGui::Begin("Login", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground))
+	panel loginPanel("Login", window);
+
+	static bool particleSystem = false;
+	if (ImGui::Button("Particle system test"))
 	{
-		ImGui::SetWindowSize("Login", ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
-		ImGui::SetWindowPos("Login", ImVec2(50.f, 50.f));
+		particleSystem = true;
+		ImGui::OpenPopup("Particle System");
+	}
+	ImGui::Button("World create test");
+	ImGui::Button("Animation test");
 
-		if (ImGui::InputTextWithHint("User Name:", "Enter your user name here...", &this->inputName, ImGuiInputTextFlags_EnterReturnsTrue))
-			this->login(this->inputName, this->inputPW);
-		if (ImGui::InputTextWithHint("Password:", "Enter your password here...", &this->inputPW, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password))
-			this->login(this->inputName, this->inputPW);
+	if (ImGui::InputTextWithHint("User Name:", "Enter your user name here...", &settings::ProfileNickname, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank) ||
+		ImGui::InputTextWithHint("Password:", "Enter your password here...", &settings::ProfilePassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank) ||
+		ImGui::Button("Login"))
+		this->login(settings::ProfileNickname, settings::ProfilePassword);
+	ImGui::SameLine();
+	if (ImGui::Button("Create Account"))
+	{
+		this->createAccountPanel = true;
+		ImGui::OpenPopup("Create Account");
+	}
+	ImGui::SameLine();
+	ImGui::Checkbox("Remember Me!", &settings::rememberToStayLogedIn);
 
-		if (ImGui::Button("Create Account"))
-		{
-			this->createAccountPanel = true;
-			ImGui::OpenPopup("Create Account");
-		}
+	if (ImGui::BeginPopupModal("Particle System", &particleSystem))
+	{
+		std::random_device rd;
+		std::uniform_real_distribution<float> dist(1.0, 3.0);
+		this->pS.createParticle(1, 1.f + dist(rd), sf::Color(std::uint8_t(85 * dist(rd)), std::uint8_t(85 * dist(rd)), std::uint8_t(85 * dist(rd))), sf::Vector2f(100.f, 100.f), sf::Vector2f(dist(rd), dist(rd)));
+		this->pS.update();
+		ImGui::Text("Number of particles: %u", this->pS.getSize());
+		ImGui::EndPopup();
+	}
+
+	if (this->m_gui.beginPopup("Create Account", this->createAccountPanel, window))
+	{
+		ImGui::Text("Create Account: ");
+		if (ImGui::InputTextWithHint("Email:", "Enter your email here...", &this->createAccountEmail, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank) ||
+			ImGui::InputTextWithHint("Username:", "Enter your name here...", &this->createAccountName, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank) ||
+			ImGui::InputTextWithHint("Password:", "Enter your password here...", &this->createAccountPassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank) ||
+			ImGui::Button("Create"))
+			this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail);
 		ImGui::SameLine();
-		if (ImGui::Button("Login"))
-			this->login(this->inputName, this->inputPW);
-
-		if (ImGui::Checkbox("Remember Me!", &this->rememberToStayLogedIn))
-			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Info, 4000, "Ok will deffinenitly do that!"));
-
-		if (ImGui::BeginPopupModal("Create Account", &this->createAccountPanel, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
-		{
-			ImGui::SetWindowPos("Create Account", ImVec2(window.getSize().x / 2.f - ImGui::GetWindowWidth() / 2.f,
-													     window.getSize().y / 2.f - ImGui::GetWindowHeight() / 2.f));
-
-			ImGui::Text("Create Account: ");
-			if (ImGui::InputTextWithHint("Email:", "Enter your email here...", &this->createAccountEmail, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank))
-				this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail);
-			if (ImGui::InputTextWithHint("Username:", "Enter your name here...", &this->createAccountName, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank))
-				this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail);
-			if (ImGui::InputTextWithHint("Password:", "Enter your password here...", &this->createAccountPassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank))
-				this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail);
-			if (ImGui::Button("Create")) 
-				this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail);
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel")) 
-				ImGui::CloseCurrentPopup();
-			ImGui::EndPopup();
-		}
-	}ImGui::End();
+		if (ImGui::Button("Cancel"))
+			ImGui::CloseCurrentPopup();
+		this->m_gui.endPopup();
+	}
 }
 
 const bool menu::login(const std::string& name, const std::string& password) noexcept
@@ -1068,7 +1071,7 @@ const bool menu::login(const std::string& name, const std::string& password) noe
 	if (resoult)
 	{
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfuly logged in as %s", this->myAccount.account_name));
-		this->logged_in = true;
+		settings::logged_in = true;
 		this->m_State = state::MainMenu;
 	}
 	else
@@ -1079,22 +1082,25 @@ const bool menu::login(const std::string& name, const std::string& password) noe
 
 const bool menu::createAccount(const std::string& name, const std::string& password, const std::string& email) noexcept
 {
-	this->m_client.join();
-	this->m_client.send(static_cast<std::uint32_t>(Network_MSG::RegisterAttempt), name, password, email).wait();
 	bool resoult = false;
-	using namespace std::chrono_literals;
-	this->m_client.receive(resoult).wait_for(1s);
-	if (resoult)
+	if (email.find('@') != std::string::npos && email.find('.') != std::string::npos)
 	{
-		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Account succesfuly created!"));
-		this->inputName = this->createAccountName;
-		this->inputPW = this->createAccountPassword;
-		this->logged_in = true;
-		this->m_State = state::MainMenu;
+		this->m_client.join();
+		this->m_client.send(static_cast<std::uint32_t>(Network_MSG::RegisterAttempt), name, password, email).wait();
+		using namespace std::chrono_literals;
+		this->m_client.receive(resoult).wait_for(1s);
+		if (resoult)
+		{
+			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Account succesfuly created!"));
+			settings::logged_in = true;
+			this->m_State = state::MainMenu;
+		}
+		else
+			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account with given detailes!"));
+		this->m_client.disconnect();
 	}
 	else
-		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account with given detailes!"));
-	this->m_client.disconnect();
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account, provided email is not valid!"));
 	return resoult;
 }
 

@@ -1,35 +1,8 @@
 #pragma once
 
-#include <iostream>
-#include <stack>
-#include <memory>
-#include <vector>
+#include "includes.h"
 
-#if _WIN32 || _WIN64
-    #if _WIN64
-        #include "SFML64/SFML/Graphics.hpp"
-    #else
-        #include "SFML32/Graphics.hpp"
-    #endif
-#endif
-
-class resourceSystem;
-class inputSystem;
-class stateSystem;
-class settings;
 class window;
-
-struct engine
-{
-    resourceSystem* const Resources;
-    inputSystem* const Inputs;
-    stateSystem* const States;
-    settings* const Settings;
-
-    explicit engine(resourceSystem* rs, inputSystem* is, stateSystem* ss, settings* s)
-        : Resources(rs), Inputs(is), States(ss), Settings(s) {};
-    virtual ~engine() = default;
-};
 
 class state
 {
@@ -45,36 +18,38 @@ public:
 class stateSystem
 {
 public:
-	stateSystem() = default;
+	stateSystem() = delete;
 	stateSystem(const stateSystem&) = delete;
 	stateSystem(const stateSystem&&) = delete;
     stateSystem& operator=(stateSystem& other) = delete;
     stateSystem& operator=(const stateSystem& other) = delete;
-	virtual ~stateSystem() noexcept 
+	virtual ~stateSystem() noexcept { cleanUp(); };
+    
+    template<typename T>
+    static inline const void add(window& w, const bool& replace = false) noexcept
+    {
+        m_add = true;
+        m_newState = std::move(std::make_unique<T>(w));
+        m_replace = replace;
+    };
+
+    static inline const void cleanUp() noexcept
     {
         std::size_t maxSize = getSize();
         for (std::size_t i = 0; i < maxSize; ++i)
-            if ((!this->m_stateStack.empty()))
-                this->m_stateStack.pop();
+            if ((!m_stateStack.empty()))
+                m_stateStack.pop();
     };
     
-    template<typename T>
-    inline const void add(engine& e, window& w, const bool& replace = false) noexcept
-    {
-        this->m_add = true;
-        this->m_newState = std::move(std::make_unique<T>(e, w));
-        this->m_replace = replace;
-    };
-    
-    const void popCurrent() noexcept;
-    const void processStateChange(sf::RenderWindow& window) noexcept;
-    const std::unique_ptr<state>& getState() noexcept;
-    const std::size_t getSize() noexcept;
+    static const void popCurrent() noexcept;
+    static const void processStateChange(sf::RenderWindow& window) noexcept;
+    static const std::unique_ptr<state>& getState() noexcept;
+    static const std::size_t getSize() noexcept;
 private:
-    std::stack<std::unique_ptr<state>> m_stateStack;
-    std::unique_ptr<state> m_newState;
+    static inline std::stack<std::unique_ptr<state>> m_stateStack;
+    static inline std::unique_ptr<state> m_newState;
 
-    bool m_add = false;
-    bool m_replace = false;
-    bool m_remove = false;
+    static inline bool m_add = false;
+    static inline bool m_replace = false;
+    static inline bool m_remove = false;
 };

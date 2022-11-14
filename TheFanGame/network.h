@@ -1,27 +1,6 @@
 #pragma once
 
-#include <memory>
-#include <stdlib.h>
-#include <stdio.h>
-#include <future>
-#include <chrono>
-#include <thread>
-#include <vector>
-#include <atomic>
-#include <utility>
-#include <unordered_map>
-#include <mutex>
-
-#if _WIN32 || _WIN64
-	#if _WIN64
-		#include "SFML64/SFML/Graphics.hpp"
-		#include "SFML64/SFML/System.hpp"
-		#include "SFML64/SFML/Network.hpp"
-	#else
-		#include "SFML32/System.hpp"
-		#include "SFML32/Network.hpp"
-	#endif
-#endif
+#include "includes.h"
 
 enum class Network_MSG
 {

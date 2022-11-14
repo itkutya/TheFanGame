@@ -1,31 +1,39 @@
 #include "settings.h"
 
-settings::settings(const char* filePath) noexcept : m_filePath(filePath)
+settings::~settings() noexcept { saveSettings(m_filePath); }
+
+const bool settings::loadSettings(const char* filePath) noexcept
 {
 	std::ifstream loadFile(filePath);
 	if (loadFile.is_open())
 	{
-		std::getline(loadFile, this->m_currMusic);
-		loadFile >> this->m_currVideomode >> this->m_Fullscreen >> this->m_FpsLimit >>
-			this->m_ShowFPS >> this->m_isFPSLimited >> this->m_Vsync >> this->m_VerticalSensivity >>
-			this->m_HorizontalSensivity >> this->m_GameVolume >> this->m_MusicVolume >> this->m_currProfilePicture >>
-			this->m_currFrontPicture >> this->m_currBackgroundPicture;
+		std::getline(loadFile, m_currMusic);
+		loadFile >> m_currVideomode >> m_Fullscreen >> m_FpsLimit >>
+			m_ShowFPS >> m_isFPSLimited >> m_Vsync >> m_VerticalSensivity >>
+			m_HorizontalSensivity >> m_GameVolume >> m_MusicVolume >> m_currProfilePicture >>
+			m_currFrontPicture >> m_currBackgroundPicture >> ProfileNickname >> ProfilePassword >> 
+			logged_in >> rememberToStayLogedIn;
+	}
+	else
+	{
+		loadFile.close();
+		return false;
 	}
 	loadFile.close();
+	return true;
 }
-
-settings::~settings() noexcept { this->saveSettings(this->m_filePath); }
 
 const bool settings::saveSettings(const char* filePath) noexcept
 {
 	std::ofstream saveFile(filePath, std::ios::out | std::ios::trunc);
 	if (saveFile.is_open())
 	{
-		saveFile << this->m_currMusic << '\n' << this->m_currVideomode << '\n' << this->m_Fullscreen << '\n' 
-			<< this->m_FpsLimit << '\n' << this->m_ShowFPS << '\n' << this->m_isFPSLimited << '\n'
-			<< this->m_Vsync << '\n' << this->m_VerticalSensivity << '\n' << this->m_HorizontalSensivity << '\n'
-			<< this->m_GameVolume << '\n' << this->m_MusicVolume << '\n' << this->m_currProfilePicture << '\n'
-			<< this->m_currFrontPicture << '\n' << this->m_currBackgroundPicture << '\n';
+		saveFile << m_currMusic << '\n' << m_currVideomode << '\n' << m_Fullscreen << '\n' 
+			<< m_FpsLimit << '\n' << m_ShowFPS << '\n' << m_isFPSLimited << '\n'
+			<< m_Vsync << '\n' << m_VerticalSensivity << '\n' << m_HorizontalSensivity << '\n'
+			<< m_GameVolume << '\n' << m_MusicVolume << '\n' << m_currProfilePicture << '\n'
+			<< m_currFrontPicture << '\n' << m_currBackgroundPicture << '\n' << ProfileNickname << '\n'
+			<< ProfilePassword << '\n' << logged_in << '\n' << rememberToStayLogedIn << '\n';
 	}
 	else
 	{

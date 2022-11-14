@@ -1,24 +1,15 @@
 #pragma once
 
-#include <ctime>
-#include <iomanip>
-#include <sstream>
-
-#include "ImGUI/imgui.h"
-#include "ImGUI/imgui-SFML.h"
-
-#include "ImGUI/imgui_notify.h"
-#include "ImGUI/tahoma.h"
-
 #include "stateSystem.h"
 #include "resourceSystem.h"
 #include "inputSystem.h"
 #include "settings.h"
+#include "gui.h"
 
 class window
 {
 public:
-	window(const sf::VideoMode& vm, const std::string& name, const bool& fs, const std::uint32_t& limit, const bool& vsync, engine& e) noexcept;
+	window(const sf::VideoMode& vm, const std::string& name, const bool& fs, const std::uint32_t& limit, const bool& vsync) noexcept;
 	virtual ~window() noexcept = default;
 
 	explicit operator const bool() const noexcept;
@@ -34,7 +25,6 @@ public:
 private:
 	sf::RenderWindow m_window;
 	sf::Clock deltaTime;
-	engine& m_enigne;
 
 	const void ScreenShot() noexcept;
 };

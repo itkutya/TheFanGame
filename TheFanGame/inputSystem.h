@@ -1,21 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <unordered_map>
-#include <string>
-#include <array>
-#include <vector>
-
-#if _WIN32 || _WIN64
-	#if _WIN64
-		#include "SFML64/SFML/Window.hpp"
-		#include "SFML64/SFML/Graphics.hpp"
-	#else
-		#include "SFML32/Window.hpp"
-		#include "SFML32/Graphics.hpp"
-	#endif
-#endif
+#include "includes.h"
 
 enum class InputType
 {
@@ -24,6 +9,7 @@ enum class InputType
 	JoystickButtonInput,
 	JoystickAxisInput
 };
+
 struct m_Keys
 {
 	InputType m_InputType;
@@ -37,16 +23,16 @@ struct m_Keys
 class inputSystem
 {
 public:
-	inputSystem();
+	inputSystem() = delete;
 	inputSystem(const inputSystem&) = delete;
 	inputSystem(const inputSystem&&) = delete;
     inputSystem& operator=(inputSystem& other) = delete;
     inputSystem& operator=(const inputSystem& other) = delete;
 	virtual ~inputSystem() = default;
 
-    inline const auto operator()() const noexcept { return m_Action; }
+    static inline const auto getInputHandler() noexcept { return m_Action; }
 
-    inline constexpr bool operator()(const std::string& action, sf::Event* event = nullptr) const noexcept
+    static inline constexpr bool checkForInput(const std::string& action, sf::Event* event = nullptr) noexcept
     {
         if (event == nullptr)
         {
@@ -85,9 +71,10 @@ public:
         return false;
     };
 
-	const void saveInput(const std::pair<std::string, m_Keys>& temp) noexcept;
+    static const void loadInput(const std::string& filePath);
+	static const void saveInput(const std::pair<std::string, m_Keys>& temp) noexcept;
 
-	inline constexpr std::string keyToString(const m_Keys& it) const noexcept
+	static inline constexpr std::string keyToString(const m_Keys& it) noexcept
 	{
         if (it.m_InputType == InputType::KeyboardInput)
         {
@@ -132,7 +119,7 @@ public:
         return "ERROR";
 	};
 
-    inline constexpr std::string eventToString(const m_Keys& it) noexcept
+    static inline constexpr std::string eventToString(const m_Keys& it) noexcept
     {
         if (it.m_EventType == sf::Event::KeyPressed || it.m_EventType == sf::Event::MouseButtonPressed || it.m_EventType == sf::Event::JoystickButtonPressed)
             return "Press";
@@ -144,6 +131,6 @@ public:
     };
 	
 private:
-	std::unordered_map<std::string, m_Keys> m_Action;
-	bool isJoystickConnected = false;
+    static inline std::unordered_map<std::string, m_Keys> m_Action;
+	static inline bool isJoystickConnected = false;
 };

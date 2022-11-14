@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 #if _WIN32 || _WIN64
 	#if _WIN64
 		#include "SFML64/SFML/Graphics.hpp"

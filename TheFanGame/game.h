@@ -10,7 +10,7 @@ class game : public state
 {
 public:
 	//Construct the main game class.
-	game(engine& e, window& w) noexcept;
+	game(window& w) noexcept;
 	//Defauilt destructor.
 	virtual ~game() noexcept;
 	//Init main game class.
@@ -22,7 +22,6 @@ public:
 	//Draw the main game objects.
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 private:
-	engine& m_engine;
 	window& m_window;
 	world m_map;
 

@@ -1,5 +1,3 @@
-#include <exception>
-
 #include "menu.h"
 
 int main()
@@ -7,18 +5,15 @@ int main()
 	std::srand((std::uint32_t)std::time(0));
 	try
 	{
-		resourceSystem rs;
-		inputSystem is;
-		stateSystem ss;
-		settings s("res/Settings.ini");
-		engine e = engine(&rs, &is, &ss, &s);
+		settings::loadSettings("res/Settings.ini");
+		inputSystem::loadInput("res/inputSettings.ini");
 
-		window mainWindow(s.m_Videomodes[s.m_currVideomode], "Fan Game!", s.m_Fullscreen, s.m_FpsLimit, s.m_Vsync, e);
-		ss.add<menu>(e, mainWindow);
+		window mainWindow(settings::m_Videomodes[settings::m_currVideomode], "Fan Game!", settings::m_Fullscreen, settings::m_FpsLimit, settings::m_Vsync);
+		stateSystem::add<menu>(mainWindow);
 
 		while (mainWindow)
 		{
-			ss.processStateChange(mainWindow);
+			stateSystem::processStateChange(mainWindow);
 			mainWindow.pollEvents();
 			mainWindow.update();
 			mainWindow.draw();
@@ -34,5 +29,7 @@ int main()
 		std::printf("\033[1;4;31mUnknown error, rethrowing...\n\033[0m");
 		throw;
 	}
+	stateSystem::cleanUp();
+	resourceSystem::cleanUp();
 	return 0;
 }

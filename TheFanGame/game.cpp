@@ -1,6 +1,6 @@
 #include "game.h"
 
-game::game(engine& e, window& w) noexcept : m_engine(e), m_window(w)
+game::game(window& w) noexcept : m_window(w)
 {
     this->m_texture = nullptr;
     this->m_char = nullptr;
@@ -10,8 +10,8 @@ game::~game() noexcept {}
 
 const void game::init(sf::RenderWindow& window) 
 {
-    this->m_texture = &this->m_engine.Resources->c_get<sf::Texture>("WallTexture");
-    this->m_char = &this->m_engine.Resources->c_get<sf::Texture>("CharacterTexture");
+    this->m_texture = &resourceSystem::c_get<sf::Texture>("WallTexture");
+    this->m_char = &resourceSystem::c_get<sf::Texture>("CharacterTexture");
     
     this->m_player = std::make_unique<player>(sf::Vector2f((float)this->m_map.mapSize.x / 2.f, (float)this->m_map.mapSize.y / 2.f), sf::Vector2f(20.f, 20.f), sf::Color::Blue);
     this->m_ray = std::make_unique<ray>(window.getSize().x);
@@ -31,7 +31,7 @@ const void game::processEvent(const sf::Event& event) noexcept
     ImGui::SFML::ProcessEvent(event);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-        this->m_engine.States->popCurrent();
+        stateSystem::popCurrent();
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::G))
     {

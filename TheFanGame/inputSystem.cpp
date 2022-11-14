@@ -1,10 +1,9 @@
 #include "inputSystem.h"
 
-inputSystem::inputSystem()
+const void inputSystem::loadInput(const std::string& filePath)
 {
     m_Keys key = m_Keys();
-
-    std::ifstream inputSettings("res/inputSettings.ini");
+    std::ifstream inputSettings(filePath);
     if (inputSettings.is_open())
     {
         std::uint32_t type;
@@ -27,7 +26,7 @@ inputSystem::inputSystem()
                 else if (pr == "R")
                     key.m_EventType = sf::Event::KeyReleased;
                 else
-                    std::cout << "Error! Unknown input type.\n";
+                    std::printf("Error! Unknown input type.\n");
 
                 key.m_KeyCode = static_cast<sf::Keyboard::Key>(temp);
                 m_Action[action] = key;
@@ -42,7 +41,7 @@ inputSystem::inputSystem()
                 else if (pr == "R")
                     key.m_EventType = sf::Event::MouseButtonReleased;
                 else
-                    std::cout << "Error! Unknown input type.\n";
+                    std::printf("Error! Unknown input type.\n");
 
                 key.m_MouseButton = static_cast<sf::Mouse::Button>(temp);
                 m_Action[action] = key;
@@ -113,7 +112,7 @@ const void inputSystem::saveInput(const std::pair<std::string, m_Keys>& temp) no
                     break;
                 default:
                     inputSettings << 0 << " " << it.first << " " << it.second.m_KeyCode << " P" << '\n';
-                    std::cout << "Error! While saveing input settings!\n";
+                    std::printf("Error! While saveing input settings!\n");
                     break;
                 }
                 break;
@@ -130,7 +129,7 @@ const void inputSystem::saveInput(const std::pair<std::string, m_Keys>& temp) no
                     inputSettings << 1 << " " << it.first << " " << it.second.m_MouseButton << " M" << '\n';
                     break;
                 default:
-                    std::cout << "Error! While saveing input settings!\n";
+                    std::printf("Error! While saveing input settings!\n");
                     break;
                 }
                 break;
@@ -147,7 +146,7 @@ const void inputSystem::saveInput(const std::pair<std::string, m_Keys>& temp) no
                     inputSettings << 2 << " " << it.first << " " << it.second.m_joystickButton << " M" << '\n';
                     break;
                 default:
-                    std::cout << "Error! While saveing input settings!\n";
+                    std::printf("Error! While saveing input settings!\n");
                     break;
                 }
                 break;
@@ -164,12 +163,12 @@ const void inputSystem::saveInput(const std::pair<std::string, m_Keys>& temp) no
                     inputSettings << 3 << " " << it.first << " " << it.second.m_JoystickAxis << " M" << '\n';
                     break;
                 default:
-                    std::cout << "Error! While saveing input settings!\n";
+                    std::printf("Error! While saveing input settings!\n");
                     break;
                 }
                 break;
             default:
-                std::cout << "Error! While saveing input settings!\n";
+                std::printf("Error! While saveing input settings!\n");
                 break;
             }
         }

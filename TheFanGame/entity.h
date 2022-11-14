@@ -1,12 +1,9 @@
 #pragma once
 
-#include <math.h>
-
 #include "resourceSystem.h"
 #include "animation.h"
 #include "world.h"
-
-#include "ImGUI/imgui.h"
+#include "gui.h"
 
 constexpr float PI = 3.141592653589793116f;
 

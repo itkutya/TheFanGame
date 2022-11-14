@@ -1,7 +1,6 @@
 #include "window.h"
 
-window::window(const sf::VideoMode& vm, const std::string& name, const bool& fs, const std::uint32_t& limit, const bool& vsync, engine& e) noexcept 
-	: m_enigne(e)
+window::window(const sf::VideoMode& vm, const std::string& name, const bool& fs, const std::uint32_t& limit, const bool& vsync) noexcept 
 {
 	this->create(vm, name, fs, limit, vsync);
 	this->deltaTime.restart();
@@ -12,12 +11,12 @@ const void window::pollEvents() noexcept
 	sf::Event event;
 	while (this->m_window.pollEvent(event))
 	{
-		this->m_enigne.States->getState()->processEvent(event);
+		stateSystem::getState()->processEvent(event);
 
 		if (event.type == sf::Event::Closed)
 			this->m_window.close();
 
-		if (this->m_enigne.Inputs->operator()("ScreenShot", &event))
+		if (inputSystem::checkForInput("ScreenShot", &event))
 			this->ScreenShot();
 	}
 }
@@ -25,11 +24,11 @@ const void window::pollEvents() noexcept
 const void window::draw() noexcept
 {
 	this->m_window.clear();
-	this->m_enigne.States->getState()->draw(this->m_window);
+	stateSystem::getState()->draw(this->m_window);
 	this->m_window.display();
 }
 
-const void window::update() noexcept { this->m_enigne.States->getState()->update(this->m_window, this->deltaTime.restart()); }
+const void window::update() noexcept { stateSystem::getState()->update(this->m_window, this->deltaTime.restart()); }
 
 const void window::ScreenShot() noexcept
 {

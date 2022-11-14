@@ -133,8 +133,9 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(SolutionDir)\ImGUI;$(ProjectDir)\SFML64;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile />
+      <PrecompiledHeaderFile>includes.h</PrecompiledHeaderFile>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -167,8 +168,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="gui.cpp" />
     <ClCompile Include="ImGUI\imgui_stdlib.cpp" />
     <ClCompile Include="network.cpp" />
+    <ClCompile Include="particleSystem.cpp" />
     <ClCompile Include="profile.cpp" />
     <ClCompile Include="animation.cpp" />
     <ClCompile Include="entity.cpp" />
@@ -193,12 +196,15 @@
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="gui.h" />
     <ClInclude Include="ImGUI\fa_solid_900.h" />
     <ClInclude Include="ImGUI\font_awesome_5.h" />
     <ClInclude Include="ImGUI\imgui_notify.h" />
     <ClInclude Include="ImGUI\imgui_stdlib.h" />
     <ClInclude Include="ImGUI\tahoma.h" />
+    <ClInclude Include="includes.h" />
     <ClInclude Include="network.h" />
+    <ClInclude Include="particleSystem.h" />
     <ClInclude Include="profile.h" />
     <ClInclude Include="animation.h" />
     <ClInclude Include="entity.h" />

@@ -3,29 +3,33 @@
 #include "game.h"
 #include "profile.h"
 
-#include "ImGUI/imgui_stdlib.h"
+#include "particleSystem.h"
 
 class menu : public state
 {
 public:
-	menu(engine& e, window& w) noexcept;
+	menu(window& w) noexcept;
 	virtual ~menu() noexcept;
 	virtual const void init(sf::RenderWindow& window) override;
 	virtual const void processEvent(const sf::Event& event) noexcept override;
 	virtual const void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 private:
-	engine& m_engine;
+	//TODO:
+	//Make style loading class
+	//World editor, loading etc...
+	//ERROR handleing system
+	//Audio system, Music, etc...
+	//Finish the menu
+	//etc...
+	particleSystem pS = particleSystem(100, sf::Color::Blue, sf::Vector2f(200.f, 200.f));
+
 	window& m_window;
 	sf::View m_view;
 
-	const void loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
+	gui m_gui;
 
-	std::string inputName;
-	std::string inputPW;
-	//Move these to settings...
-	bool logged_in = false;
-	bool rememberToStayLogedIn = false;
+	const void loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
 	const bool login(const std::string& name, const std::string& password) noexcept;
 
 	bool createAccountPanel = false;

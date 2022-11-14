@@ -1,26 +1,26 @@
 #include "stateSystem.h"
 
-const void stateSystem::popCurrent() noexcept { this->m_remove = true; }
+const void stateSystem::popCurrent() noexcept { m_remove = true; }
 
 const void stateSystem::processStateChange(sf::RenderWindow& window) noexcept
 {
-    if (this->m_remove && this->m_stateStack.size())
+    if (m_remove && m_stateStack.size())
     {
-        this->m_stateStack.pop();
-        this->m_remove = false;
+        m_stateStack.pop();
+        m_remove = false;
     }
 
-    if (this->m_add)
+    if (m_add)
     {
-        if (this->m_replace && this->m_stateStack.size())
+        if (m_replace && m_stateStack.size())
         {
-            this->m_stateStack.pop();
-            this->m_replace = false;
+            m_stateStack.pop();
+            m_replace = false;
         }
 
-        this->m_stateStack.push(std::move(this->m_newState));
-        this->m_stateStack.top()->init(window);
-        this->m_add = false;
+        m_stateStack.push(std::move(m_newState));
+        m_stateStack.top()->init(window);
+        m_add = false;
     }
 }
 
