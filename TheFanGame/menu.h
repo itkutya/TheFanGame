@@ -22,6 +22,7 @@ private:
 	//Audio system, Music, etc...
 	//Finish the menu
 	//etc...
+	//Ranem to particleEmmitter???
 	particleSystem pS = particleSystem(100, sf::Color::Blue, sf::Vector2f(200.f, 200.f));
 
 	window& m_window;
