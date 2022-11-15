@@ -1,13 +1,11 @@
 #include "particleSystem.h"
 
-particleSystem::particleSystem(const std::size_t& reserve, const sf::Color& color, const sf::Vector2f& position) noexcept
+particleEmitter::particleEmitter(const std::size_t& reserve) noexcept
 {
 	this->m_Particles.reserve(reserve);
-	this->m_ParticleColor = color;
-	this->m_SpawnPosition = position;
 }
 
-const void particleSystem::createParticle(const std::size_t& amount, const float& lifeTime, const sf::Color& color, const sf::Vector2f& position, const sf::Vector2f& force) noexcept
+const void particleEmitter::createParticle(const std::size_t& amount, const float& lifeTime, const sf::Color& color, const sf::Vector2f& position, const sf::Vector2f& force) noexcept
 {
 	for (std::size_t i = 0; i < amount; i++)
 	{
@@ -20,7 +18,7 @@ const void particleSystem::createParticle(const std::size_t& amount, const float
 	}
 }
 
-const void particleSystem::update() noexcept
+const void particleEmitter::update() noexcept
 {
 	this->m_Particles.erase(
 		std::remove_if(
@@ -37,18 +35,18 @@ const void particleSystem::update() noexcept
 	}
 }
 
-const void particleSystem::addForce(const sf::Vector2f& direction) noexcept
+const void particleEmitter::addForce(const sf::Vector2f& direction) noexcept
 {
 	for (auto& particle : this->m_Particles)
 		particle.m_Force = direction;
 }
 
-const std::size_t particleSystem::getSize() const noexcept
+const std::size_t particleEmitter::getSize() const noexcept
 {
 	return this->m_Particles.size();
 }
 
-void particleSystem::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void particleEmitter::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
 {
 	for (auto& particle : this->m_Particles)
 		target.draw(particle.m_shape);

@@ -16,14 +16,12 @@ public:
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 private:
 	//TODO:
-	//Make style loading class
 	//World editor, loading etc...
 	//ERROR handleing system
 	//Audio system, Music, etc...
 	//Finish the menu
 	//etc...
-	//Ranem to particleEmmitter???
-	particleSystem pS = particleSystem(100, sf::Color::Blue, sf::Vector2f(200.f, 200.f));
+	particleEmitter pS = particleEmitter(100);
 
 	window& m_window;
 	sf::View m_view;
@@ -57,7 +55,6 @@ private:
 		Graphics = 0, Game, Audio, Mainmenu, Input, Profile
 	};settingState m_SettingState = settingState::Graphics;
 	sf::Music* m_MainMusic;
-	ImFont* font;
 	
 	sf::Sprite icon;
 	sf::Sprite frontImage;

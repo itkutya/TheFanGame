@@ -20,6 +20,9 @@ public:
 	gui() noexcept = default;
 	virtual ~gui() noexcept = default;
 
+	static const void loadFont() noexcept;
+	static const void loadStyle() noexcept;
+
 	inline const bool beginPopup(const std::string& title, bool& isOpen, sf::RenderWindow& window) noexcept
 	{
 		if (ImGui::BeginPopupModal("Create Account", &isOpen, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
