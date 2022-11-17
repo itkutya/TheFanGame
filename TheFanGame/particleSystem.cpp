@@ -30,8 +30,14 @@ const void particleEmitter::update() noexcept
 	);
 	for (auto it = this->m_Particles.begin(); it != this->m_Particles.end(); ++it)
 	{
-		(*it).m_shape.move((*it).m_Force);
-		(*it).m_shape.setRadius(10.f * ((*it).m_LifeTime / ((*it).m_Clock.getElapsedTime().asSeconds() + (*it).m_LifeTime)));
+		auto& p = *it;
+		float age = ((p.m_LifeTime - p.m_Clock.getElapsedTime().asSeconds()) / p.m_LifeTime);
+		p.m_shape.move(p.m_Force);
+		p.m_shape.setRadius(10.f * age);
+		p.m_shape.setFillColor(sf::Color(p.m_shape.getFillColor().r, 
+										 p.m_shape.getFillColor().g, 
+										 p.m_shape.getFillColor().b,
+										 (std::uint8_t)(255 * age)));
 	}
 }
 

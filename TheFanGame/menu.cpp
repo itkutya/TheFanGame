@@ -30,18 +30,6 @@ const void menu::init(sf::RenderWindow& window)
 	this->m_view.setSize(sf::Vector2f(window.getSize()));
 	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
 
-	//Load when he connect to the account...
-	this->xp_bar.setPosition(sf::Vector2f(300.f, 85.f));
-	this->xp_bar.setSize(sf::Vector2f(350.f, 15.f));
-	this->xp_bar.setFillColor(sf::Color::White);
-	this->xp_bar.setOutlineThickness(2.f);
-	this->xp_bar.setOutlineColor(sf::Color::Black);
-
-	this->curr_xp.setPosition(this->xp_bar.getPosition());
-	this->curr_xp.setSize(sf::Vector2f(this->xp_bar.getSize().x * (this->myAccount.xp / this->myAccount.xp_cap), this->xp_bar.getSize().y));
-	this->curr_xp.setFillColor(sf::Color::Yellow);
-	this->curr_xp.setOutlineThickness(0.f);
-	this->curr_xp.setOutlineColor(sf::Color::Yellow);
 	//Load characters...
 	for (std::size_t i = 0; i < 5; ++i)
 		this->characters.emplace_back();
@@ -75,11 +63,6 @@ const void menu::init(sf::RenderWindow& window)
 const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
 	ImGui::SFML::Update(window, dt);
-
-	if (settings::m_MusicVolume == 0.f)
-		this->m_MainMusic->pause();
-	else if (settings::m_MusicVolume > 0.f && (this->m_MainMusic->getStatus() == sf::SoundSource::Paused || this->m_MainMusic->getStatus() == sf::SoundSource::Stopped))
-		this->m_MainMusic->play();
 
 	if (ImGui::Begin("Main Window", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus))
 	{
@@ -115,116 +98,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		{
 		case state::MainMenu:
 		{
-			ImGui::SetCursorPos(ImVec2(vMax.x - 750.f, vMin.y + 40.f));
-			if (this->m_MainMusic->getStatus() == sf::SoundSource::Playing)
-			{
-				if (ImGui::ImageButton(resourceSystem::c_get<sf::Texture>("Pause"), sf::Vector2f(35.f, 35.f)))
-					this->m_MainMusic->pause();
-			}
-			else
-				if (ImGui::ImageButton(resourceSystem::c_get<sf::Texture>("Resume"), sf::Vector2f(35.f, 35.f)))
-					this->m_MainMusic->play();
-			ImGui::SameLine();
-			WidgetPos = ImGui::GetCursorPos();
-			ImGui::SetCursorPos(ImVec2(WidgetPos.x, WidgetPos.y + 5.f));
-			ImGui::Text("Currently playing: ");
-			ImGui::SameLine();
-			WidgetPos = ImGui::GetCursorPos();
-			ImGui::SetNextItemWidth(500.f);
-			ImGui::SetCursorPos(ImVec2(WidgetPos.x - 15.f, WidgetPos.y + 5.f));
-			if (ImGui::BeginCombo("###MusicSelector", settings::m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
-			{
-				for (auto& music : settings::m_Music)
-				{
-					if (ImGui::Selectable(music))
-					{
-						if (settings::m_currMusic.c_str() != music)
-						{
-							settings::m_currMusic = music;
-							this->m_MainMusic->stop();
-							this->m_MainMusic = resourceSystem::get<std::unique_ptr<sf::Music>>(settings::m_currMusic).get();
-							if (settings::m_MusicVolume > 0.f)
-								this->m_MainMusic->play();
-							this->m_MainMusic->setVolume(settings::m_MusicVolume);
-						}
-					}
-				}
-				ImGui::EndCombo();
-			}
-
-			ImGui::SetCursorPos(ImVec2(ImGui::GetWindowContentRegionMin().x + 600.f, ImGui::GetWindowContentRegionMin().y + 100.f));
-			ImGui::Image(this->frontImage, sf::Vector2f(ImGui::GetWindowContentRegionMax().x / 1.6f, ImGui::GetWindowContentRegionMax().y / 1.3f));
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("This is the front image!");
-
-			ImGui::SetCursorPos(ImVec2(vMin.x + 25.f, vMin.y + 5.f));
-			ImGui::Image(this->icon, sf::Vector2f(100.f, 100.f));
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("This is the profile picture!");
-
-			ImGui::SameLine();
-			ImGui::Text("Account: %s\nXP: %0.f / %0.f\nLevel: %i\nCoverCoin: %i$",
-				this->myAccount.account_name,
-				this->myAccount.xp, this->myAccount.xp_cap,
-				this->myAccount.account_lvl,
-				this->myAccount.currency);
-
-			ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + 75.f));
-			WidgetPos = ImGui::GetCursorPos();
-			if (ImGui::Button("Play", ImVec2(300.f, 75.f)))
-				this->m_PlaySelected ? this->m_PlaySelected = false : this->m_PlaySelected = true;
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Start playing the game RIGHT NOW!");
-
-			ImGui::SetCursorPos(ImVec2(WidgetPos.x, WidgetPos.y + 125.f));
-			if (ImGui::Button("Characters", ImVec2(300.f, 75.f)))
-				this->m_State = state::Characters;
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Unlocked characters and the character shop, etc...");
-
-			ImGui::SetCursorPos(ImVec2(WidgetPos.x, WidgetPos.y + 250.f));
-			if (ImGui::Button("Settings", ImVec2(300.f, 75.f)))
-				this->m_State = state::Settings;
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Opens the setting menu.");
-
-			ImGui::SetCursorPos(ImVec2(WidgetPos.x, WidgetPos.y + 375.f));
-			if (ImGui::Button("Quit", ImVec2(300.f, 75.f)))
-				window.close();
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Goodbye!");
-
-			if (this->m_PlaySelected)
-			{
-				ImGui::SetCursorPos(ImVec2(WidgetPos.x + 305.f, WidgetPos.y - 15.f));
-				if (ImGui::Button("Singleplayer", ImVec2(200.f, 50.f)))
-				{
-					this->m_PlaySelected = false;
-					this->m_State = state::Singleplayer;
-					this->m_MainMusic->stop();
-					stateSystem::add<game>(this->m_window);
-				}
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip("Starts the game state.");
-
-				ImGui::SetCursorPos(ImVec2(WidgetPos.x + 305.f, WidgetPos.y + 45.f));
-				if (ImGui::Button("Multiplayer", ImVec2(200.f, 50.f)))
-				{
-					/*
-					if (this->socket.connect(this->serverIP, this->serverPort, sf::seconds(3.f)) != sf::Socket::Done)
-					{
-						this->m_PlaySelected = false;
-						this->m_ServerError = true;
-					}
-					else
-					{
-						this->m_PlaySelected = false;
-						this->refreshServerList();
-						this->m_State = state::Multiplayer;
-					}
-					*/
-				}
-			}
+			this->mainmenuPanel(window, dt);
 			break;
 		}
 		case state::Settings:
@@ -447,42 +321,42 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				{
 					if (ImGui::SliderInt("Front image: ", &settings::m_currFrontPicture, 0, 0))
 						this->frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0),
-																	sf::Vector2i(600, 600)));
+							sf::Vector2i(600, 600)));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->frontImage.getTexture());
 						background.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0),
-															  sf::Vector2i(600, 600)));
+							sf::Vector2i(600, 600)));
 						ImGui::Image(background, ImVec2(300.f, 300.f));
 						ImGui::EndTooltip();
 					}
 
 					if (ImGui::SliderInt("Profile picture: ", &settings::m_currProfilePicture, 0, 3))
 						this->icon.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0),
-															  sf::Vector2i(100, 100)));
+							sf::Vector2i(100, 100)));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->icon.getTexture());
 						background.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0),
-															  sf::Vector2i(100, 100)));
+							sf::Vector2i(100, 100)));
 						ImGui::Image(background, ImVec2(100.f, 100.f));
 						ImGui::EndTooltip();
 					}
 
 					if (ImGui::SliderInt("Background image: ", &settings::m_currBackgroundPicture, 0, 3))
 						this->backgroundImage.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
-																		 sf::Vector2i(1920, 1080)));
+							sf::Vector2i(1920, 1080)));
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite background;
 						background.setTexture(*this->backgroundImage.getTexture());
 						background.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
-															  sf::Vector2i(1920, 1080)));
+							sf::Vector2i(1920, 1080)));
 						ImGui::Image(background, ImVec2(300.f, 300.f));
 						ImGui::EndTooltip();
 					}
@@ -704,7 +578,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				if (ImGui::Button("Refress"))
 					//this->refreshServerList();
 
-				ImGui::SetCursorPos(ImVec2(vMin.x, vMax.y - 175.f));
+					ImGui::SetCursorPos(ImVec2(vMin.x, vMax.y - 175.f));
 				ImGui::Text("Server IP: ");
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(window.getSize().x / 5.f);
@@ -928,14 +802,131 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 {
 	window.setView(this->m_view);
 	window.draw(this->backgroundImage);
-	if (this->m_State == state::MainMenu && settings::logged_in)
-	{
-		window.draw(this->xp_bar);
-		window.draw(this->curr_xp);
-	}
 	window.setView(window.getDefaultView());
 	ImGui::SFML::Render(window);
 	window.draw(this->pS);
+}
+
+const void menu::mainmenuPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
+{
+	if (ImGui::BeginTable("MainMenu", 2))
+	{
+		ImGui::TableNextColumn();
+		if (ImGui::BeginTable("MainMenuProfile", 2, ImGuiTableFlags_SizingFixedFit))
+		{
+			ImGui::TableNextColumn();
+			ImGui::Image(this->icon, sf::Vector2f(100.f, 100.f));
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("This is the profile picture!");
+			ImGui::TableNextColumn();
+			ImGui::Text("Account: %s\nXP: %0.f / %0.f\nLevel: %i\nCoverCoin: %i$",
+				this->myAccount.account_name,
+				this->myAccount.xp, this->myAccount.xp_cap,
+				this->myAccount.account_lvl,
+				this->myAccount.currency);
+			ImGui::Dummy(ImVec2(ImGui::GetContentRegionMax().x, 0.f));
+			ImGui::ProgressBar(this->myAccount.xp / this->myAccount.xp_cap);
+			ImGui::EndTable();
+		}
+		ImGui::TableNextColumn();
+		if (this->m_MainMusic->getStatus() == sf::SoundSource::Playing)
+		{
+			if (ImGui::ImageButton(resourceSystem::c_get<sf::Texture>("Pause"), sf::Vector2f(35.f, 35.f)))
+				this->m_MainMusic->pause();
+		}
+		else
+			if (ImGui::ImageButton(resourceSystem::c_get<sf::Texture>("Resume"), sf::Vector2f(35.f, 35.f)))
+				this->m_MainMusic->play();
+		ImGui::SameLine();
+		ImGui::Text("Currently playing: ");
+		ImGui::SameLine();
+		if (ImGui::BeginCombo("###MusicSelector", settings::m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
+		{
+			for (auto& music : settings::m_Music)
+			{
+				if (ImGui::Selectable(music))
+				{
+					if (settings::m_currMusic.c_str() != music)
+					{
+						settings::m_currMusic = music;
+						this->m_MainMusic->stop();
+						this->m_MainMusic = resourceSystem::get<std::unique_ptr<sf::Music>>(settings::m_currMusic).get();
+						if (settings::m_MusicVolume > 0.f)
+							this->m_MainMusic->play();
+						this->m_MainMusic->setVolume(settings::m_MusicVolume);
+					}
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::TableNextColumn();
+		ImGui::Dummy(ImVec2(0.f, 100.f));
+
+		if (ImGui::BeginTable("MainMenuButtons", 1, ImGuiTableFlags_SizingFixedFit))
+		{
+			ImGui::TableNextRow(0, 100.f);
+			ImGui::TableNextColumn();
+			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
+
+			if (ImGui::Button("Play", ImVec2(300.f, 75.f)))
+			{
+				this->m_PlaySelected = true;
+				ImGui::OpenPopup("PlaySelected", ImGuiPopupFlags_NoOpenOverExistingPopup);
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Start playing the game RIGHT NOW!");
+			if (ImGui::BeginPopupModal("PlaySelected", &this->m_PlaySelected, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
+			{
+				if (ImGui::Button("Singleplayer", ImVec2(200.f, 50.f)))
+				{
+					this->m_PlaySelected = false;
+					this->m_State = state::Singleplayer;
+					this->m_MainMusic->stop();
+					stateSystem::add<game>(this->m_window);
+				}
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Starts the game state.");
+
+				if (ImGui::Button("Multiplayer", ImVec2(200.f, 50.f)))
+					std::printf("SoonTM, again...\n");
+				ImGui::EndPopup();
+			}
+
+			ImGui::TableNextRow(0, 100.f);
+			ImGui::TableNextColumn();
+			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
+
+			if (ImGui::Button("Characters", ImVec2(300.f, 75.f)))
+				this->m_State = state::Characters;
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Unlocked characters and the character shop, etc...");
+
+			ImGui::TableNextRow(0, 100.f);
+			ImGui::TableNextColumn();
+			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
+
+			if (ImGui::Button("Settings", ImVec2(300.f, 75.f)))
+				this->m_State = state::Settings;
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Opens the setting menu.");
+
+			ImGui::TableNextRow(0, 100.f);
+			ImGui::TableNextColumn();
+			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
+
+			if (ImGui::Button("Quit", ImVec2(300.f, 75.f)))
+				window.close();
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Goodbye!");
+			ImGui::EndTable();
+		}
+		ImGui::TableNextColumn();
+		ImGui::Image(this->frontImage, sf::Vector2f(ImGui::GetContentRegionAvail().x - 5.f, ImGui::GetContentRegionAvail().y - 5.f));
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("This is the front image!");
+		ImGui::EndTable();
+	}
 }
 
 const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
@@ -963,6 +954,8 @@ const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexce
 	}
 	ImGui::SameLine();
 	ImGui::Checkbox("Remember Me!", &settings::rememberToStayLogedIn);
+	if (ImGui::Button("Login as guest"))
+		this->m_State = state::MainMenu;
 
 	if (ImGui::BeginPopupModal("Particle System", &particleSystem))
 	{
@@ -1051,5 +1044,4 @@ const void menu::giveXP(const float& amount) noexcept
 		this->myAccount.xp_cap += (10.f * this->myAccount.account_lvl);
 		++this->myAccount.account_lvl;
 	}
-	this->curr_xp.setSize(sf::Vector2f(this->xp_bar.getSize().x * (this->myAccount.xp / this->myAccount.xp_cap), this->xp_bar.getSize().y));
 }

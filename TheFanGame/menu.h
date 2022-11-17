@@ -16,6 +16,7 @@ public:
 	virtual const void draw(sf::RenderWindow& window) noexcept override;
 private:
 	//TODO:
+	//Make current panels into modals...
 	//World editor, loading etc...
 	//ERROR handleing system
 	//Audio system, Music, etc...
@@ -27,6 +28,8 @@ private:
 	sf::View m_view;
 
 	gui m_gui;
+
+	const void mainmenuPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
 
 	const void loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
 	const bool login(const std::string& name, const std::string& password) noexcept;
@@ -59,9 +62,7 @@ private:
 	sf::Sprite icon;
 	sf::Sprite frontImage;
 	sf::RectangleShape backgroundImage;
-	
-	sf::RectangleShape xp_bar;
-	sf::RectangleShape curr_xp;
+
 	profile myAccount;
 
 	char InputIp[12] = "";
