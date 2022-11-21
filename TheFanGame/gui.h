@@ -45,8 +45,8 @@ public:
 	{
 		if (ImGui::Begin(title.c_str(), 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground))
 		{
-			ImGui::SetWindowSize(title.c_str(), ImVec2((float)window.getSize().x / 1.2f, (float)window.getSize().y / 1.2f));
-			ImGui::SetWindowPos(title.c_str(), ImVec2(50.f, 50.f));
+			ImGui::SetWindowSize(title.c_str(), ImVec2((float)window.getSize().x, (float)window.getSize().y));
+			ImGui::SetWindowPos(title.c_str(), ImVec2(0.f, 0.f));
 		}
 	};
 	virtual ~panel() noexcept
