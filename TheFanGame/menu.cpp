@@ -758,7 +758,7 @@ const void menu::draw(sf::RenderWindow& window) noexcept
 	window.draw(this->backgroundImage);
 	window.setView(window.getDefaultView());
 	ImGui::SFML::Render(window);
-	window.draw(this->pS);
+	this->pS.draw(window);
 }
 
 const void menu::mainmenuPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
@@ -913,22 +913,25 @@ const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexce
 
 	if (ImGui::BeginPopupModal("Particle System", &particleSystem))
 	{
-		static float angle_x = 1.f;
-		static float angle_y = 1.f;
+		static float angle_x = 100.f;
+		static float angle_y = 100.f;
 		static float randomNess = 3.f;
-		ImGui::DragFloat("AngleX: ", &angle_x, 0.1f, -1.f, 1.f);
-		ImGui::DragFloat("AngleY: ", &angle_y, 0.1f, -1.f, 1.f);
+		static int maxParticles = 1;
+		ImGui::DragFloat("AngleX: ", &angle_x, 1.f, -100.f, 100.f);
+		ImGui::DragFloat("AngleY: ", &angle_y, 1.f, -100.f, 100.f);
 		ImGui::DragFloat("Randomness: ", &randomNess, 0.1f, 1.f, 10.f);
+		ImGui::DragInt("Max particles: ", &maxParticles, 1, 0, 1000);
 		ImGui::Text("Number of particles: %u", this->pS.getSize());
 		ImVec2 pos = ImGui::GetCursorScreenPos();
 		std::random_device rd;
 		std::uniform_real_distribution<float> dist(0.f, randomNess);
-		this->pS.createParticle(1, 1.f + dist(rd), 
-								sf::Color(std::uint8_t(85 * dist(rd)), std::uint8_t(85 * dist(rd)), std::uint8_t(85 * dist(rd))), 
-								sf::Vector2f(pos.x, pos.y), sf::Vector2f(angle_x * dist(rd), angle_y * dist(rd)));
-		this->pS.update();
+		if (this->pS.getSize() < maxParticles)
+			this->pS.createParticle(1, 1.f + dist(rd),
+				sf::Color(std::uint8_t(85 * dist(rd)), std::uint8_t(85 * dist(rd)), std::uint8_t(85 * dist(rd))),
+				sf::Vector2f(pos.x + 50.f, pos.y + 50.f), sf::Vector2f(angle_x * dist(rd), angle_y * dist(rd)));
 		ImGui::EndPopup();
 	}
+	this->pS.update(dt);
 
 	if (this->m_gui.beginPopup("Create Account", this->createAccountPanel, window))
 	{

@@ -9,10 +9,16 @@
 </head>
 <body>
     <h1>
+        <div>
         <?php
             echo "Hello";
+        ?>
+        </div>
+        <div>
+        <?php
             echo date('j-m-y, h:i:s');
         ?>
+        </div>
     </h1>
 </body>
 </html>
