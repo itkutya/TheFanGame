@@ -899,7 +899,8 @@ const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexce
 	if (ImGui::InputTextWithHint("User Name:", "Enter your user name here...", &settings::ProfileNickname, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank) ||
 		ImGui::InputTextWithHint("Password:", "Enter your password here...", &settings::ProfilePassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank) ||
 		ImGui::Button("Login"))
-		this->login(settings::ProfileNickname, settings::ProfilePassword);
+		if (this->login(settings::ProfileNickname, settings::ProfilePassword))
+			this->m_State = state::MainMenu;
 	ImGui::SameLine();
 	if (ImGui::Button("Create Account"))
 	{
@@ -950,25 +951,34 @@ const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexce
 
 const bool menu::login(const std::string& name, const std::string& password) noexcept
 {
-	this->m_client.join();
-	this->m_client.send(static_cast<std::uint32_t>(Network_MSG::LogInAttempt), name, password).wait();
-	bool resoult = false;
-	using namespace std::chrono_literals;
-	this->m_client.receive(resoult).wait_for(1s);
-	if (resoult)
+	sf::Http::Request request("/login.php", sf::Http::Request::Method::Post);
+
+	std::ostringstream stream;
+	stream << "username=" << name << "&password=" << password;
+	request.setBody(stream.str());
+
+	sf::Http http("thefangamedb.000webhostapp.com");
+	sf::Http::Response response = http.sendRequest(request);
+
+	if (response.getStatus() == sf::Http::Response::Status::Ok)
 	{
-		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfuly logged in as %s", this->myAccount.account_name));
-		settings::logged_in = true;
-		this->m_State = state::MainMenu;
+		if (response.getBody() == std::string("Success."))
+		{
+			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));
+			return true;
+		}
+		else
+			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect login details!"));
 	}
 	else
-		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect username or password!"));
-	this->m_client.disconnect();
-	return resoult;
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
+	return false;
 }
 
 const bool menu::createAccount(const std::string& name, const std::string& password, const std::string& email) noexcept
 {
+	//TODO:
+	//Make it so the php server handels this...
 	bool resoult = false;
 	if (email.find('@') != std::string::npos && email.find('.') != std::string::npos)
 	{

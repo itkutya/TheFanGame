@@ -24,6 +24,8 @@ particleEmitter::particleEmitter(const std::size_t& reserve) noexcept
 	}
 	else
 		std::printf("Shaders are not available...\n");
+	if (!this->m_ParticleTexture.create(sf::Vector2u(1920, 1080)))
+		std::printf("Cannot create particleTexture...\n");
 }
 
 const void particleEmitter::createParticle(const std::size_t& amount, const float& lifeTime, const sf::Color& color, const sf::Vector2f& position, const sf::Vector2f& force) noexcept
@@ -40,13 +42,11 @@ const void particleEmitter::createParticle(const std::size_t& amount, const floa
 
 const void particleEmitter::update(const sf::Time& dt) noexcept
 {
-	if (this->m_ParticleTexture.create(sf::Vector2u(1920, 1080)))
-		this->m_ParticleTexture.clear(sf::Color::Transparent);
-
 	sf::RenderStates state;
 	state.blendMode = sf::BlendAdd;
 	state.shader = &this->m_ParticleShader;
 
+	this->m_ParticleTexture.clear(sf::Color::Transparent);
 	for (auto it = this->m_Particles.begin(); it != this->m_Particles.end(); ++it)
 	{
 		auto& p = *it;
@@ -96,6 +96,8 @@ const void particleEmitter::update(const sf::Time& dt) noexcept
 		if (!this->m_vertexBuffer.update(vertecies, 6, (std::uint32_t)i))
 			std::printf("Failed to update buffer!\n");
 
+		//TODO:
+		//Optimize it a bit more...
 		this->m_ParticleShader.setUniform("center", sf::Glsl::Vec2(p.m_Position));
 		this->m_ParticleShader.setUniform("radius", p.m_radius);
 		this->m_ParticleTexture.draw(this->m_vertexBuffer, i, 6, state);
@@ -127,8 +129,6 @@ const void particleEmitter::draw(sf::RenderTarget& target) noexcept
 {
 	if (this->m_Particles.size() > 0)
 	{
-		//TODO:
-		//Optimize it a bit more...
 		sf::Sprite final(this->m_ParticleTexture.getTexture());
 		target.draw(final, sf::BlendAdd);
 	}
