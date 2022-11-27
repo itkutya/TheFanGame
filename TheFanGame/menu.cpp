@@ -941,7 +941,11 @@ const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexce
 			ImGui::InputTextWithHint("Username:", "Enter your name here...", &this->createAccountName, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank) ||
 			ImGui::InputTextWithHint("Password:", "Enter your password here...", &this->createAccountPassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank) ||
 			ImGui::Button("Create"))
-			this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail);
+			if (this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail))
+			{
+				ImGui::CloseCurrentPopup();
+				this->m_State = state::MainMenu;
+			}
 		ImGui::SameLine();
 		if (ImGui::Button("Cancel"))
 			ImGui::CloseCurrentPopup();
@@ -965,6 +969,8 @@ const bool menu::login(const std::string& name, const std::string& password) noe
 		if (response.getBody() == std::string("Success."))
 		{
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));
+			//TODO:
+			//if login was succesful && remember me -> generate buffer so it will remember it next time...
 			return true;
 		}
 		else
@@ -977,28 +983,33 @@ const bool menu::login(const std::string& name, const std::string& password) noe
 
 const bool menu::createAccount(const std::string& name, const std::string& password, const std::string& email) noexcept
 {
-	//TODO:
-	//Make it so the php server handels this...
-	bool resoult = false;
 	if (email.find('@') != std::string::npos && email.find('.') != std::string::npos)
 	{
-		this->m_client.join();
-		this->m_client.send(static_cast<std::uint32_t>(Network_MSG::RegisterAttempt), name, password, email).wait();
-		using namespace std::chrono_literals;
-		this->m_client.receive(resoult).wait_for(1s);
-		if (resoult)
+		sf::Http::Request request("/register.php", sf::Http::Request::Method::Post);
+
+		std::ostringstream stream;
+		stream << "username=" << name << "&password=" << password << "&email=" << email;
+		request.setBody(stream.str());
+
+		sf::Http http("thefangamedb.000webhostapp.com");
+		sf::Http::Response response = http.sendRequest(request);
+
+		if (response.getStatus() == sf::Http::Response::Status::Ok)
 		{
-			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Account succesfuly created!"));
-			settings::logged_in = true;
-			this->m_State = state::MainMenu;
+			if (response.getBody() == std::string("Success."))
+			{
+				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully created an account!"));
+				return true;
+			}
+			else
+				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to create an account!"));
 		}
 		else
-			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account with given detailes!"));
-		this->m_client.disconnect();
+			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
 	}
 	else
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account, provided email is not valid!"));
-	return resoult;
+	return false;
 }
 
 const void menu::giveXP(const float& amount) noexcept

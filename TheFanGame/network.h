@@ -4,7 +4,7 @@
 
 enum class Network_MSG
 {
-	None, Error, Test, LogInAttempt, LogInResult, RegisterAttempt, RegisterResult, Count
+	None, Error, Test, Count
 };
 
 class client
@@ -45,13 +45,6 @@ public:
 				std::string temp;
 				this->m_packet >> temp;
 				this->m_data[msg] = new std::string(temp);
-				break;
-			}
-			case Network_MSG::LogInResult:
-			{
-				bool tempResult;
-				this->m_packet >> tempResult;
-				this->m_data[msg] = new bool(tempResult);
 				break;
 			}
 			default:
