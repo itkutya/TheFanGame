@@ -957,6 +957,11 @@ const bool menu::login(const std::string& name, const std::string& password) noe
 {
 	sf::Http::Request request("/login.php", sf::Http::Request::Method::Post);
 
+	if (settings::rememberToStayLogedIn)
+		std::printf("Do the magic...");
+	//TODO:
+	//if login was succesful && remember me -> generate buffer so it will remember it next time...
+
 	std::ostringstream stream;
 	stream << "username=" << name << "&password=" << password;
 	request.setBody(stream.str());
@@ -966,11 +971,22 @@ const bool menu::login(const std::string& name, const std::string& password) noe
 
 	if (response.getStatus() == sf::Http::Response::Status::Ok)
 	{
-		if (response.getBody() == std::string("Success."))
+		if (response.getBody().find("Success.") != std::string::npos)
 		{
+			std::stringstream ss(response.getBody());
+			std::string line;
+			int x = 0;
+			while (std::getline(ss, line, '#'))
+			{
+				if(x == 1)
+					this->myAccount.account_lvl = std::stoi(line);
+				if (x == 2)
+					this->myAccount.xp = std::stof(line);
+				if (x == 3)
+					this->myAccount.xp_cap = std::stof(line);
+				++x;
+			}
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));
-			//TODO:
-			//if login was succesful && remember me -> generate buffer so it will remember it next time...
 			return true;
 		}
 		else
@@ -996,7 +1012,7 @@ const bool menu::createAccount(const std::string& name, const std::string& passw
 
 		if (response.getStatus() == sf::Http::Response::Status::Ok)
 		{
-			if (response.getBody() == std::string("Success."))
+			if (response.getBody().find("Success.") != std::string::npos)
 			{
 				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully created an account!"));
 				return true;

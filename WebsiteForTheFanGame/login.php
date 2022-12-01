@@ -4,18 +4,30 @@ $user = "id19916612_thefangameadmindb";
 $password = "jOsW@15=7W{{csr<";
 $db = "id19916612_thefangamedb";
 
-$mysql = mysqli_connect($host, $user, $password, $db);
+$mysqli = new mysqli($host, $user, $password, $db);
 if(mysqli_connect_errno())
-    echo mysqli_connect_errno();
+    echo $mysqli->connect_error;
 else
 {
-    $name = $_POST['username'];
-    $pw = $_POST['password'];
-    $resoult = mysqli_query($mysql, "SELECT * FROM `TheFanGameAccounts` WHERE Username = '$name' AND Password = '$pw'");
-    if(mysqli_num_rows($resoult))
-        echo "Success.";
-    else
-        echo "Failed.";
+    if(isset($_POST['username']) && isset($_POST['password']))
+    {
+        $name = $_POST['username'];
+        $pw = $_POST['password'];
+        $query = "SELECT * FROM TheFanGameAccountsInfo INNER JOIN TheFanGameAccounts ON TheFanGameAccountsInfo.Username = TheFanGameAccounts.Username WHERE TheFanGameAccounts.Username = '$name' AND TheFanGameAccounts.Password = '$pw'";  
+        $resoult = $mysqli->query($query);
+        if($resoult->num_rows)
+        {
+            echo "Success.#";
+            if($row = $resoult->fetch_array(MYSQLI_ASSOC))
+            {
+                echo $row["Level"]."#";
+                echo $row["CurrentXP"]."#";
+                echo $row["MaxXP"];
+            }
+        }
+        else
+            echo "Failed.";
+    }
 }
 exit();
 ?>

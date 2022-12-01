@@ -4,24 +4,29 @@ $user = "id19916612_thefangameadmindb";
 $password = "jOsW@15=7W{{csr<";
 $db = "id19916612_thefangamedb";
 
-$mysql = mysqli_connect($host, $user, $password, $db);
-if(mysqli_connect_errno())
-    echo mysqli_connect_errno();
+$mysqli = new mysqli($host, $user, $password, $db);
+if($mysqli->connect_error)
+    echo $mysqli->connect_error;
 else
 {
-    $name = $_POST['username'];
-    $pw = $_POST['password'];
-    $email = $_POST['email'];
-    $checkUsername = mysqli_query($mysql, "SELECT * FROM `TheFanGameAccounts` WHERE Username = '$name'");
-    if(mysqli_num_rows($checkUsername))
-        echo "Name already exists.";
-    else
+    if(isset($_POST['username']) && isset($_POST['password']) && isset($_POST['email']))
     {
-        $resoult = mysqli_query($mysql, "INSERT INTO `TheFanGameAccounts` (`Username`, `Password`, `Email`, `LoginBuffer`) VALUES ('$name', '$pw', '$email', '')");
-        if(mysqli_affected_rows($mysql))
-            echo "Success.";
+        $name = $_POST['username'];
+        $pw = $_POST['password'];
+        $email = $_POST['email'];
+        $query ="INSERT INTO `TheFanGameAccounts` (`Username`, `Password`, `Email`, `LoginBuffer`) VALUES ('$name', '$pw', '$email', '')";
+        $resoult = $mysqli->query($query);
+        if($resoult)
+        {
+            $query = "INSERT INTO `TheFanGameAccountsInfo` (`Username`, `Level`, `CurrentXP`, `MaxXP`) VALUES ('$name', '0', '0', '0')";
+            $resoult = $mysqli->query($query);
+            if($resoult)
+                echo "Success.";
+            else
+                echo "Failed.";
+        }
         else
-            echo "Failed.";
+            echo "Name already exists or query failed.";
     }
 }
 exit();
