@@ -9,23 +9,16 @@
 class game : public state
 {
 public:
-	//Construct the main game class.
-	game(window& w) noexcept;
-	//Defauilt destructor.
+	game() noexcept;
 	virtual ~game() noexcept;
-	//Init main game class.
-	virtual const void init(sf::RenderWindow& window) override;
-	//Process event in the main game class.
+
+	virtual const void init(window& window) override;
 	virtual const void processEvent(const sf::Event& event) noexcept override;
-	//Update the main game class.
-	virtual const void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
-	//Draw the main game objects.
-	virtual const void draw(sf::RenderWindow& window) noexcept override;
+	virtual const void update(window& window, const sf::Time& dt) noexcept override;
+	virtual const void draw(window& window) noexcept override;
 private:
-	window& m_window;
 	world m_map;
 
-	sf::View m_view;
 	const sf::Texture* m_texture;
 	const sf::Texture* m_char;
 

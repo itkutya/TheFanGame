@@ -11,24 +11,41 @@ const void window::pollEvents() noexcept
 	sf::Event event;
 	while (this->m_window.pollEvent(event))
 	{
-		stateSystem::getState()->processEvent(event);
+		if (stateSystem::getSize())
+			stateSystem::getState()->processEvent(event);
 
 		if (event.type == sf::Event::Closed)
 			this->m_window.close();
 
-		if (inputSystem::checkForInput("ScreenShot", &event))
+		inputSystem is;
+		if (is.checkForInput("ScreenShot", event))
 			this->ScreenShot();
+
+		if (event.type == sf::Event::Resized)
+		{
+			this->m_view.setSize(sf::Vector2f((float)event.size.width, (float)event.size.height));
+			this->m_view.setCenter(sf::Vector2f(event.size.width / 2.f, event.size.height / 2.f));
+		}
 	}
 }
 
 const void window::draw() noexcept
 {
 	this->m_window.clear();
-	stateSystem::getState()->draw(this->m_window);
+	if (stateSystem::getSize())
+		stateSystem::getState()->draw(*this);
 	this->m_window.display();
 }
 
-const void window::update() noexcept { stateSystem::getState()->update(this->m_window, this->deltaTime.restart()); }
+const void window::update() noexcept 
+{
+	if (stateSystem::getSize())
+		stateSystem::getState()->update(*this, this->deltaTime.restart());
+}
+
+const sf::View& window::getView() noexcept { return this->m_view; }
+
+sf::RenderWindow& window::getWindow() noexcept { return this->m_window; }
 
 const void window::ScreenShot() noexcept
 {
@@ -49,10 +66,6 @@ const void window::ScreenShot() noexcept
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Yay! Your screenshot can be found at\nscreenshots/%s.png", str.c_str()));
 }
 
-window::operator const bool() const noexcept { return this->m_window.isOpen(); }
-
-window::operator sf::RenderWindow&() noexcept { return this->m_window; }
-
 const void window::setFramerateLimit(const std::uint32_t& limit) noexcept 
 {
 	if (limit > 0)
@@ -71,4 +84,6 @@ const void window::create(const sf::VideoMode& vm, const std::string& name, cons
 {
 	fs ? this->m_window.create(vm, name, sf::Style::Fullscreen) : this->m_window.create(vm, name);
 	limit ? setFramerateLimit(limit) : setVSync(vsync);
+	this->m_view.setSize(sf::Vector2f(this->m_window.getSize()));
+	this->m_view.setCenter(sf::Vector2f((float)this->m_window.getSize().x / 2.f, (float)this->m_window.getSize().y / 2.f));
 }

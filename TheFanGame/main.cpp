@@ -6,12 +6,14 @@ int main()
 	try
 	{
 		settings::loadSettings("res/Settings.ini");
-		inputSystem::loadInput("res/inputSettings.ini");
+		inputSystem is;
+		if (!is.loadInput("res/inputSettings.ini"))
+			return 1;
 
 		window mainWindow(settings::m_Videomodes[settings::m_currVideomode], "Fan Game!", settings::m_Fullscreen, settings::m_FpsLimit, settings::m_Vsync);
-		stateSystem::add<menu>(mainWindow);
+		stateSystem::add<menu>();
 
-		while (mainWindow)
+		while (mainWindow.getWindow().isOpen())
 		{
 			stateSystem::processStateChange(mainWindow);
 			mainWindow.pollEvents();

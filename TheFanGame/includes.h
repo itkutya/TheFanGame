@@ -1,5 +1,9 @@
 #pragma once
 
+//TODO:
+//c++23 make it into a modular include...
+//Inlcude only those that this need...
+
 #include <unordered_map>
 #include <chrono>
 #include <string>
@@ -18,6 +22,7 @@
 #include <math.h>
 #include <random>
 #include <exception>
+#include <optional>
 
 #include <ctime>
 #include <iomanip>

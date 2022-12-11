@@ -8,12 +8,12 @@
 class menu : public state
 {
 public:
-	menu(window& w) noexcept;
+	menu() noexcept;
 	virtual ~menu() noexcept;
-	virtual const void init(sf::RenderWindow& window) override;
+	virtual const void init(window& window) override;
 	virtual const void processEvent(const sf::Event& event) noexcept override;
-	virtual const void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
-	virtual const void draw(sf::RenderWindow& window) noexcept override;
+	virtual const void update(window& window, const sf::Time& dt) noexcept override;
+	virtual const void draw(window& window) noexcept override;
 private:
 	//TODO:
 	//Make current panels into modals...
@@ -22,19 +22,15 @@ private:
 	//Audio system, Music, etc...
 	//Finish the menu
 	//etc...
-	particleEmitter pS = particleEmitter(100);
-
-	window& m_window;
-	sf::View m_view;
-
-	gui m_gui;
-
-	const void mainmenuPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
-
+	const void mainmenuPanel(window& window, const sf::Time& dt) noexcept;
 	const void loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
-	const bool login(const std::string& name, const std::string& password) noexcept;
 
-	bool createAccountPanel = false;
+	bool settingsPopUpShouldBeOpen = false;
+	const void settingsPanel(window& window, const sf::Time& dt) noexcept;
+	const void multiplayerPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
+	const void charactersPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
+
+	const bool login(const std::string& name, const std::string& password) noexcept;
 	std::string createAccountEmail;
 	std::string createAccountName;
 	std::string createAccountPassword;
@@ -49,14 +45,11 @@ private:
 	};state m_State = state::Login;
 	bool m_PlaySelected = false;
 	bool m_ServerError = false;
-	bool m_ChangeKeybindigs = false;
-	std::pair<std::string, m_Keys> m_ToChange;
-	m_Keys key = m_Keys();
 
 	enum class settingState
 	{
 		Graphics = 0, Game, Audio, Mainmenu, Input, Profile
-	};settingState m_SettingState = settingState::Graphics;
+	};
 	sf::Music* m_MainMusic;
 	
 	sf::Sprite icon;

@@ -297,3 +297,45 @@ private:
 		this->m_listener.close();
 	}
 };
+
+class request
+{
+public:
+	request(const std::string& server, const std::string& php) noexcept
+	{
+		this->m_request.setMethod(sf::Http::Request::Method::Post);
+		this->m_request.setUri(php);
+		this->m_http.setHost(server);
+	};
+	virtual ~request() = default;
+
+	template<typename T, typename... Args>
+	[[nodiscard]] inline constexpr std::ostringstream setParams(const T& firstParam, const Args&... otherParams) noexcept
+	{
+		std::ostringstream stream;
+		stream << firstParam;
+		if constexpr (sizeof...(otherParams) > 0)
+			stream << this->setParams(otherParams...).str();
+		return stream;
+	};
+
+	//TODO:
+	//Make this threaded so it won't block main thread...
+	const bool sendRequest(const std::string& stream, const sf::Time& timeout = sf::Time::Zero) noexcept
+	{
+		this->m_request.setBody(stream);
+		this->m_response = this->m_http.sendRequest(this->m_request, timeout);
+		if (this->m_response.getStatus() == sf::Http::Response::Status::Ok)
+			return true;
+		return false;
+	};
+
+	[[nodiscard]] const sf::Http::Response& getResponse() const noexcept
+	{
+		return this->m_response;
+	};
+private:
+	sf::Http::Request m_request;
+	sf::Http m_http;
+	sf::Http::Response m_response;
+};

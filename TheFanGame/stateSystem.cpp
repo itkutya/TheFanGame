@@ -1,8 +1,18 @@
 #include "stateSystem.h"
 
+stateSystem::~stateSystem() noexcept { cleanUp(); }
+
+const void stateSystem::cleanUp() noexcept
+{
+    std::size_t maxSize = getSize();
+    for (std::size_t i = 0; i < maxSize; ++i)
+        if ((!m_stateStack.empty()))
+            m_stateStack.pop();
+}
+
 const void stateSystem::popCurrent() noexcept { m_remove = true; }
 
-const void stateSystem::processStateChange(sf::RenderWindow& window) noexcept
+const void stateSystem::processStateChange(window& window) noexcept
 {
     if (m_remove && m_stateStack.size())
     {

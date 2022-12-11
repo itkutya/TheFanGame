@@ -1,6 +1,6 @@
 ﻿#include "menu.h"
 
-menu::menu(window& w) noexcept : m_window(w) 
+menu::menu() noexcept
 {
 	resourceSystem::add<sf::Music>("Blackbird - Cecile Corbel", "res/MainMenu/Blackbird - Cecile Corbel.wav");
 	resourceSystem::add<sf::Music>("Sakakibara Yui - Koi no Honoo", "res/MainMenu/Sakakibara Yui - Koi no Honoo.wav");
@@ -21,22 +21,15 @@ menu::~menu() noexcept
 	ImGui::SFML::Shutdown();
 }
 
-const void menu::init(sf::RenderWindow& window)
+const void menu::init(window& window)
 {
-	ImGui::SFML::Init(window);
+	ImGui::SFML::Init(window.getWindow());
 	gui::loadStyle();
 	gui::loadFont();
-
-	this->m_view.setSize(sf::Vector2f(window.getSize()));
-	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
 
 	//Load characters...
 	for (std::size_t i = 0; i < 5; ++i)
 		this->characters.emplace_back();
-
-	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
-	this->m_view.setSize(sf::Vector2f(window.getSize()));
-	this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
 
 	this->frontImage.setTexture(resourceSystem::c_get<sf::Texture>("FrontImage"));
 	this->frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0), sf::Vector2i(600, 600)));
@@ -45,9 +38,8 @@ const void menu::init(sf::RenderWindow& window)
 	this->icon.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0), sf::Vector2i(100, 100)));
 
 	this->backgroundImage.setTexture(&resourceSystem::c_get<sf::Texture>("Background"));
-	this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
-	this->backgroundImage.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
-													 sf::Vector2i(1920, 1080)));
+	this->backgroundImage.setTextureRect(sf::IntRect({ 1920 * settings::m_currBackgroundPicture, 0 }, { 1920, 1080 }));
+	this->backgroundImage.setSize(window.getView().getSize());
 	this->backgroundImage.setFillColor(sf::Color(255, 255, 255, 200));
 
 	this->m_MainMusic = resourceSystem::get<std::unique_ptr<sf::Music>>(settings::m_currMusic).get();
@@ -60,11 +52,11 @@ const void menu::init(sf::RenderWindow& window)
 		this->m_State = state::MainMenu;
 }
 
-const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
+const void menu::update(window& window, const sf::Time& dt) noexcept
 {
-	ImGui::SFML::Update(window, dt);
+	ImGui::SFML::Update(window.getWindow(), dt);
 
-	panel mainWindowPanel("Main Window", window);
+	panel mainWindowPanel("Main Window", window.getWindow());
 	ImVec2 WidgetPos;
 	ImVec2 vMin = ImGui::GetWindowContentRegionMin();
 	ImVec2 vMax = ImGui::GetWindowContentRegionMax();
@@ -75,8 +67,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 	if (settings::m_ShowFPS)
 	{
-		ImGui::SetCursorPos(ImVec2(vMax.x * 0.9f, vMin.y));
-		ImGui::Text("FPS: %.3f", 1.f / dt.asSeconds());
+		ImGui::SetCursorPos(ImVec2(vMax.x * 0.85f, vMin.y));
+		auto& io = ImGui::GetIO();
+		ImGui::Text("%.2f fps (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 	}
 
 	switch (this->m_State)
@@ -86,308 +79,9 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		this->mainmenuPanel(window, dt);
 		break;
 	}
-	case state::Settings:
-	{
-		panel settingsPanel("Settings", window);
-		if (this->m_ChangeKeybindigs)
-		{
-			if (ImGui::Begin("Change Keybindigs", &this->m_ChangeKeybindigs, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
-			{
-				ImGui::SetWindowFocus("Change Keybindigs");
-				ImGui::SetWindowSize("Change Keybindigs", ImVec2(300.f, 200.f));
-
-				vMin = ImGui::GetWindowContentRegionMin();
-				vMax = ImGui::GetWindowContentRegionMax();
-
-				std::string text = "Change [" + inputSystem::keyToString(this->m_ToChange.second) + "] to [" + inputSystem::keyToString(this->key) + "]";
-				ImGui::TextColored(ImVec4(1, 0, 0, 1), text.c_str());
-				for (std::size_t i = 0; i < sf::Keyboard::KeyCount; ++i)
-				{
-					if (sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(i)) && !(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)))
-					{
-						this->key.m_InputType = InputType::KeyboardInput;
-						this->key.m_KeyCode = static_cast<sf::Keyboard::Key>(i);
-						if (inputSystem::eventToString(this->m_ToChange.second) == "Press")
-							this->key.m_EventType = sf::Event::KeyPressed;
-						else if (inputSystem::eventToString(this->m_ToChange.second) == "Release")
-							this->key.m_EventType = sf::Event::KeyReleased;
-						else
-							ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
-					}
-				}
-				for (std::size_t i = 0; i < sf::Mouse::ButtonCount; ++i)
-				{
-					if (sf::Mouse::isButtonPressed(static_cast<sf::Mouse::Button>(i)) && !sf::Mouse::isButtonPressed(sf::Mouse::Left))
-					{
-						this->key.m_InputType = InputType::MouseInput;
-						this->key.m_MouseButton = static_cast<sf::Mouse::Button>(i);
-						if (inputSystem::eventToString(this->m_ToChange.second) == "Press")
-							this->key.m_EventType = sf::Event::MouseButtonPressed;
-						else if (inputSystem::eventToString(this->m_ToChange.second) == "Release")
-							this->key.m_EventType = sf::Event::MouseButtonReleased;
-						else if (inputSystem::eventToString(this->m_ToChange.second) == "Move")
-							this->key.m_EventType = sf::Event::MouseMoved;
-						else
-							ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
-					}
-				}
-				for (std::uint32_t i = 0; i < sf::Joystick::Count; ++i)
-				{
-					if (sf::Joystick::isConnected(i))
-					{
-						for (std::uint32_t j = 0; j < sf::Joystick::ButtonCount; ++j)
-						{
-							if (sf::Joystick::isButtonPressed(i, j))
-							{
-								if (this->m_ToChange.second.m_InputType == InputType::JoystickButtonInput)
-								{
-									this->key.m_InputType = InputType::JoystickButtonInput;
-									this->key.m_joystickButton = j;
-									if (inputSystem::eventToString(this->m_ToChange.second) == "Press")
-										this->key.m_EventType = sf::Event::JoystickButtonPressed;
-									else if (inputSystem::eventToString(this->m_ToChange.second) == "Release")
-										this->key.m_EventType = sf::Event::JoystickButtonReleased;
-									else if (inputSystem::eventToString(this->m_ToChange.second) == "Move")
-										this->key.m_EventType = sf::Event::JoystickMoved;
-									else
-										ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
-								}
-							}
-						}
-						for (std::size_t j = 0; j < sf::Joystick::AxisCount; ++j)
-						{
-							sf::Joystick::Axis tempAxis = static_cast<sf::Joystick::Axis>(j);
-							if (sf::Joystick::getAxisPosition(i, tempAxis) > 0.f)
-							{
-								this->key.m_InputType = InputType::JoystickAxisInput;
-								this->key.m_JoystickAxis = tempAxis;
-								if (inputSystem::eventToString(this->m_ToChange.second) == "Press")
-									this->key.m_EventType = sf::Event::JoystickButtonPressed;
-								else if (inputSystem::eventToString(this->m_ToChange.second) == "Release")
-									this->key.m_EventType = sf::Event::JoystickButtonReleased;
-								else if (inputSystem::eventToString(this->m_ToChange.second) == "Move")
-									this->key.m_EventType = sf::Event::JoystickMoved;
-								else
-									ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error));
-							}
-						}
-					}
-				}
-
-				ImGui::SetCursorPos(ImVec2(vMin.x, vMax.y - 30.f));
-				if (ImGui::Button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-					this->m_ChangeKeybindigs = false;
-				ImGui::SetCursorPos(ImVec2(vMax.x - 100.f, vMax.y - 30.f));
-				if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
-				{
-					this->m_ChangeKeybindigs = false;
-					inputSystem::saveInput({ this->m_ToChange.first, this->key });
-				}
-				ImGui::End();
-			}
-		}
-
-		vMin = ImGui::GetWindowContentRegionMin();
-		vMax = ImGui::GetWindowContentRegionMax();
-		vMin.x += ImGui::GetWindowPos().x;
-		vMin.y += ImGui::GetWindowPos().y;
-		vMax.x += ImGui::GetWindowPos().x;
-		vMax.y += ImGui::GetWindowPos().y;
-
-		if (ImGui::BeginMenuBar())
-		{
-			if (ImGui::MenuItem("Mainmenu"))
-				this->m_SettingState = settingState::Mainmenu;
-			if (ImGui::MenuItem("Profile"))
-				this->m_SettingState = settingState::Profile;
-			if (ImGui::MenuItem("Game"))
-				this->m_SettingState = settingState::Game;
-			if (ImGui::MenuItem("Graphics"))
-				this->m_SettingState = settingState::Graphics;
-			if (ImGui::MenuItem("Input"))
-				this->m_SettingState = settingState::Input;
-			if (ImGui::MenuItem("Audio"))
-				this->m_SettingState = settingState::Audio;
-			ImGui::EndMenuBar();
-		}
-		switch (this->m_SettingState)
-		{
-		case settingState::Profile:
-		{
-			if (ImGui::InputText("Account name: ", this->myAccount.account_name, MAX_CHAR_SIZE, ImGuiInputTextFlags_EnterReturnsTrue))
-				std::cout << "New account name: " << this->myAccount.account_name << '\n';
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Set your account name here.\nYou can just type it and it will be automaticaly saved.\nMaximum characters that are allowed is 16.");
-			break;
-		}
-		case settingState::Input:
-		{
-			for (auto& it : inputSystem::getInputHandler())
-			{
-				ImGui::Text(it.first.c_str());
-				ImGui::SameLine();
-				ImGui::PushID(std::string(it.first + inputSystem::keyToString(it.second)).c_str());
-				if (ImGui::Button(inputSystem::keyToString(it.second).c_str(), ImVec2(300.f, 30.f)))
-				{
-					this->m_ToChange = it;
-					this->m_ChangeKeybindigs = true;
-				}
-				ImGui::PopID();
-				ImGui::SameLine();
-				ImGui::SetNextItemWidth(200.f);
-				ImGui::PushID(it.first.c_str() + static_cast<std::uint32_t>(it.second.m_InputType));
-				if (ImGui::BeginCombo("###PressOrRelease", inputSystem::eventToString(it.second).c_str(), ImGuiComboFlags_HeightSmall))
-				{
-					if (ImGui::Selectable("Press"))
-						std::cout << "Later...\n";
-					if (ImGui::Selectable("Release"))
-						std::cout << "Later...\n";
-					ImGui::EndCombo();
-				}
-				ImGui::PopID();
-			}
-			break;
-		}
-		case settingState::Graphics:
-		{
-			if (ImGui::Checkbox("Fullscreen: ", &settings::m_Fullscreen))
-				this->m_window.create(settings::m_Videomodes[settings::m_currVideomode], "Fan Game!", settings::m_Fullscreen, settings::m_FpsLimit, settings::m_Vsync);
-
-			ImGui::SetNextItemWidth(300.f);
-			std::string preview = std::to_string(settings::m_Videomodes[settings::m_currVideomode].size.x) + "x" + std::to_string(settings::m_Videomodes[settings::m_currVideomode].size.y);
-			if (ImGui::BeginCombo("Resolution: ", preview.c_str(), ImGuiComboFlags_HeightSmall))
-			{
-				for (std::size_t i = 0; i < settings::m_Videomodes.size(); ++i)
-				{
-					std::string text = std::to_string(settings::m_Videomodes[i].size.x) + "x" + std::to_string(settings::m_Videomodes[i].size.y);
-					if (ImGui::Selectable(text.c_str()))
-					{
-						settings::m_currVideomode = (int)i;
-						this->m_window.create(settings::m_Videomodes[settings::m_currVideomode], "Fan Game!", settings::m_Fullscreen, settings::m_FpsLimit, settings::m_Vsync);
-						this->backgroundImage.setSize(sf::Vector2f(window.getSize()));
-						this->m_view.setSize(sf::Vector2f(window.getSize()));
-						this->m_view.setCenter(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
-					}
-				}
-				ImGui::EndCombo();
-			}
-			if (ImGui::Checkbox("Show FPS", &settings::m_ShowFPS))
-				std::cout << "\n";
-
-			if (!settings::m_isFPSLimited)
-				if (ImGui::Checkbox("VSync: ", &settings::m_Vsync))
-					this->m_window.setVSync(settings::m_Vsync);
-
-			if (ImGui::Checkbox("FPS Limit: ", &settings::m_isFPSLimited))
-			{
-				if (!settings::m_isFPSLimited)
-					settings::m_FpsLimit = 0;
-				this->m_window.setFramerateLimit(settings::m_FpsLimit);
-			}
-
-			if (!settings::m_Vsync)
-			{
-				if (ImGui::SliderInt("##Limit: ", &settings::m_FpsLimit, 30, 240))
-					this->m_window.setFramerateLimit(settings::m_FpsLimit);
-			}
-			break;
-		}
-		case settingState::Game:
-		{
-			ImGui::SliderFloat("Vertical Sensivity: ", &settings::m_VerticalSensivity, 0.f, 20.f);
-			ImGui::SliderFloat("Horizontal Sensivity: ", &settings::m_HorizontalSensivity, 0.f, 20.f);
-			break;
-		}
-		case settingState::Mainmenu:
-		{
-			if (ImGui::SliderInt("Front image: ", &settings::m_currFrontPicture, 0, 0))
-				this->frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0),
-					sf::Vector2i(600, 600)));
-			if (ImGui::IsItemHovered())
-			{
-				ImGui::BeginTooltip();
-				sf::Sprite background;
-				background.setTexture(*this->frontImage.getTexture());
-				background.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0),
-					sf::Vector2i(600, 600)));
-				ImGui::Image(background, ImVec2(300.f, 300.f));
-				ImGui::EndTooltip();
-			}
-
-			if (ImGui::SliderInt("Profile picture: ", &settings::m_currProfilePicture, 0, 3))
-				this->icon.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0),
-					sf::Vector2i(100, 100)));
-			if (ImGui::IsItemHovered())
-			{
-				ImGui::BeginTooltip();
-				sf::Sprite background;
-				background.setTexture(*this->icon.getTexture());
-				background.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0),
-					sf::Vector2i(100, 100)));
-				ImGui::Image(background, ImVec2(100.f, 100.f));
-				ImGui::EndTooltip();
-			}
-
-			if (ImGui::SliderInt("Background image: ", &settings::m_currBackgroundPicture, 0, 3))
-				this->backgroundImage.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
-					sf::Vector2i(1920, 1080)));
-			if (ImGui::IsItemHovered())
-			{
-				ImGui::BeginTooltip();
-				sf::Sprite background;
-				background.setTexture(*this->backgroundImage.getTexture());
-				background.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
-					sf::Vector2i(1920, 1080)));
-				ImGui::Image(background, ImVec2(300.f, 300.f));
-				ImGui::EndTooltip();
-			}
-			break;
-		}
-		case settingState::Audio:
-		{
-			ImGui::Text("Currently playing: ");
-			ImGui::SameLine();
-			WidgetPos = ImGui::GetCursorPos();
-			ImGui::SetNextItemWidth(500.f);
-			ImGui::SetCursorPos(ImVec2(WidgetPos.x - 15.f, WidgetPos.y));
-			if (ImGui::BeginCombo("###MusicSelector", settings::m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
-			{
-				for (auto& music : settings::m_Music)
-				{
-					if (ImGui::Selectable(music))
-					{
-						if (settings::m_currMusic.c_str() != music)
-						{
-							settings::m_currMusic = music;
-							this->m_MainMusic->stop();
-							this->m_MainMusic = resourceSystem::get<std::unique_ptr<sf::Music>>(settings::m_currMusic).get();
-							if (settings::m_MusicVolume > 0.f)
-								this->m_MainMusic->play();
-							this->m_MainMusic->setVolume(settings::m_MusicVolume);
-						}
-					}
-				}
-				ImGui::EndCombo();
-			}
-			ImGui::SliderFloat("Game volume: ", &settings::m_GameVolume, 0.f, 100.f);
-			if (ImGui::SliderFloat("Music volume: ", &settings::m_MusicVolume, 0.f, 100.f))
-				this->m_MainMusic->setVolume(settings::m_MusicVolume);
-			break;
-		}
-		default:
-			break;
-		}
-		ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
-		if (ImGui::Button("Back & Save##Settings", ImVec2(300.f, 75.f)))
-		{
-			if (settings::saveSettings("res/Settings.ini"))
-				this->m_State = state::MainMenu;
-		}
-		break;
-	}
 	case state::Characters:
 	{
-		panel CharactersPanel("Characters", window);
+		panel CharactersPanel("Characters", window.getWindow());
 
 		vMin = ImGui::GetWindowContentRegionMin();
 		vMax = ImGui::GetWindowContentRegionMax();
@@ -493,7 +187,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 	}
 	case state::Multiplayer:
 	{
-		panel MultiplayerPanel("Multiplayer", window);
+		panel MultiplayerPanel("Multiplayer", window.getWindow());
 
 		vMin = ImGui::GetWindowContentRegionMin();
 		vMax = ImGui::GetWindowContentRegionMax();
@@ -554,13 +248,13 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			ImGui::SetCursorPos(ImVec2(vMin.x, vMax.y - 175.f));
 		ImGui::Text("Server IP: ");
 		ImGui::SameLine();
-		ImGui::SetNextItemWidth(window.getSize().x / 5.f);
+		ImGui::SetNextItemWidth(window.getWindow().getSize().x / 5.f);
 		if (ImGui::InputTextWithHint("##ServerIP", "127.0.0.0", this->InputIp, 12, ImGuiInputTextFlags_EnterReturnsTrue))
 			std::cout << this->InputIp << "\n";
 		ImGui::SameLine();
 		ImGui::Text("Port: ");
 		ImGui::SameLine();
-		ImGui::SetNextItemWidth(window.getSize().x / 8.f);
+		ImGui::SetNextItemWidth(window.getWindow().getSize().x / 8.f);
 		if (ImGui::InputTextWithHint("##Port", "52420", this->InputPort, 6, ImGuiInputTextFlags_EnterReturnsTrue))
 			std::cout << this->InputPort << "\n";
 		ImGui::SameLine();
@@ -620,12 +314,12 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 	}
 	case state::Singleplayer:
 	{
-		panel SinglePlayerPanel("Singleplayer", window);
+		panel SinglePlayerPanel("Singleplayer", window.getWindow());
 		break;
 	}
 	case state::MultiLobby:
 	{
-		panel MultiLobbyPanel("MultiLobby", window);
+		panel MultiLobbyPanel("MultiLobby", window.getWindow());
 		vMin = ImGui::GetWindowContentRegionMin();
 		vMax = ImGui::GetWindowContentRegionMax();
 		vMin.x += ImGui::GetWindowPos().x;
@@ -726,7 +420,7 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 	}
 	case state::Login:
 	{
-		this->loginPanel(window, dt);
+		this->loginPanel(window.getWindow(), dt);
 		break;
 	}
 	default:
@@ -743,25 +437,19 @@ const void menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 const void menu::processEvent(const sf::Event& event) noexcept 
 { 
 	ImGui::SFML::ProcessEvent(event);
-
 	if (event.type == sf::Event::Resized)
-	{
 		this->backgroundImage.setSize(sf::Vector2f((float)event.size.width, (float)event.size.height));
-		this->m_view.setSize(sf::Vector2f((float)event.size.width, (float)event.size.height));
-		this->m_view.setCenter(sf::Vector2f((float)event.size.width / 2.f, (float)event.size.height / 2.f));
-	}
 }
 
-const void menu::draw(sf::RenderWindow& window) noexcept 
+const void menu::draw(window& window) noexcept 
 {
-	window.setView(this->m_view);
-	window.draw(this->backgroundImage);
-	window.setView(window.getDefaultView());
-	ImGui::SFML::Render(window);
-	this->pS.draw(window);
+	window.getWindow().setView(window.getView());
+	window.getWindow().draw(this->backgroundImage);
+	window.getWindow().setView(window.getWindow().getDefaultView());
+	ImGui::SFML::Render(window.getWindow());
 }
 
-const void menu::mainmenuPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
+const void menu::mainmenuPanel(window& window, const sf::Time& dt) noexcept
 {
 	if (ImGui::BeginTable("MainMenu", 2))
 	{
@@ -837,7 +525,7 @@ const void menu::mainmenuPanel(sf::RenderWindow& window, const sf::Time& dt) noe
 					this->m_PlaySelected = false;
 					this->m_State = state::Singleplayer;
 					this->m_MainMusic->stop();
-					stateSystem::add<game>(this->m_window);
+					//stateSystem::add<game>(window);
 				}
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Starts the game state.");
@@ -861,16 +549,17 @@ const void menu::mainmenuPanel(sf::RenderWindow& window, const sf::Time& dt) noe
 			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
 
 			if (ImGui::Button("Settings", ImVec2(300.f, 75.f)))
-				this->m_State = state::Settings;
+				this->settingsPopUpShouldBeOpen = true;
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("Opens the setting menu.");
+			this->settingsPanel(window, dt);
 
 			ImGui::TableNextRow(0, 100.f);
 			ImGui::TableNextColumn();
 			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
 
 			if (ImGui::Button("Quit", ImVec2(300.f, 75.f)))
-				window.close();
+				window.getWindow().close();
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("Goodbye!");
 			ImGui::EndTable();
@@ -886,94 +575,289 @@ const void menu::mainmenuPanel(sf::RenderWindow& window, const sf::Time& dt) noe
 const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
 	panel loginPanel("Login", window);
-
-	static bool particleSystem = false;
-	if (ImGui::Button("Particle system test"))
-	{
-		particleSystem = true;
-		ImGui::OpenPopup("Particle System");
-	}
-	ImGui::Button("World create test");
-	ImGui::Button("Animation test");
-
-	if (ImGui::InputTextWithHint("User Name:", "Enter your user name here...", &settings::ProfileNickname, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank) ||
-		ImGui::InputTextWithHint("Password:", "Enter your password here...", &settings::ProfilePassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank) ||
-		ImGui::Button("Login"))
+	if (loginPanel.input("User Name:", "Enter your user name here...", settings::ProfileNickname) ||
+		loginPanel.input("Password:", "Enter your password here...", settings::ProfilePassword, ImGuiInputTextFlags_Password) ||
+		loginPanel.button("Login"))
 		if (this->login(settings::ProfileNickname, settings::ProfilePassword))
 			this->m_State = state::MainMenu;
 	ImGui::SameLine();
-	if (ImGui::Button("Create Account"))
-	{
-		this->createAccountPanel = true;
-		ImGui::OpenPopup("Create Account");
-	}
+	static bool createAccountPanel = false;
+	if (loginPanel.button("Create Account"))
+		createAccountPanel = true;
 	ImGui::SameLine();
 	ImGui::Checkbox("Remember Me!", &settings::rememberToStayLogedIn);
-	if (ImGui::Button("Login as guest"))
-		this->m_State = state::MainMenu;
 
-	if (ImGui::BeginPopupModal("Particle System", &particleSystem))
+	popup createAccount("Create Account", window, createAccountPanel);
+	if(createAccountPanel)
 	{
-		static float angle_x = 100.f;
-		static float angle_y = 100.f;
-		static float randomNess = 3.f;
-		static int maxParticles = 1;
-		ImGui::DragFloat("AngleX: ", &angle_x, 1.f, -100.f, 100.f);
-		ImGui::DragFloat("AngleY: ", &angle_y, 1.f, -100.f, 100.f);
-		ImGui::DragFloat("Randomness: ", &randomNess, 0.1f, 1.f, 10.f);
-		ImGui::DragInt("Max particles: ", &maxParticles, 1, 0, 1000);
-		ImGui::Text("Number of particles: %u", this->pS.getSize());
-		ImVec2 pos = ImGui::GetCursorScreenPos();
-		std::random_device rd;
-		std::uniform_real_distribution<float> dist(0.f, randomNess);
-		if (this->pS.getSize() < maxParticles)
-			this->pS.createParticle(1, 1.f + dist(rd),
-				sf::Color(std::uint8_t(85 * dist(rd)), std::uint8_t(85 * dist(rd)), std::uint8_t(85 * dist(rd))),
-				sf::Vector2f(pos.x + 50.f, pos.y + 50.f), sf::Vector2f(angle_x * dist(rd), angle_y * dist(rd)));
-		ImGui::EndPopup();
-	}
-	this->pS.update(dt);
-
-	if (this->m_gui.beginPopup("Create Account", this->createAccountPanel, window))
-	{
-		ImGui::Text("Create Account: ");
-		if (ImGui::InputTextWithHint("Email:", "Enter your email here...", &this->createAccountEmail, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank) ||
-			ImGui::InputTextWithHint("Username:", "Enter your name here...", &this->createAccountName, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank) ||
-			ImGui::InputTextWithHint("Password:", "Enter your password here...", &this->createAccountPassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank) ||
-			ImGui::Button("Create"))
+		if (createAccount.input("Email:", "Enter your email here...", this->createAccountEmail) ||
+			createAccount.input("Username:", "Enter your name here...", this->createAccountName) ||
+			createAccount.input("Password:", "Enter your password here...", this->createAccountPassword, ImGuiInputTextFlags_Password) ||
+			createAccount.button("Create"))
 			if (this->createAccount(this->createAccountName, this->createAccountPassword, this->createAccountEmail))
 			{
-				ImGui::CloseCurrentPopup();
+				createAccount.close();
 				this->m_State = state::MainMenu;
+				settings::ProfileNickname = this->createAccountName;
 			}
 		ImGui::SameLine();
-		if (ImGui::Button("Cancel"))
-			ImGui::CloseCurrentPopup();
-		this->m_gui.endPopup();
+		if (createAccount.button("Cancel"))
+			createAccount.close();
 	}
+}
+
+const void menu::settingsPanel(window& window, const sf::Time& dt) noexcept
+{
+	popup settingsPopUp("Settings", window.getWindow(), this->settingsPopUpShouldBeOpen, ImGuiWindowFlags_MenuBar);
+	if (this->settingsPopUpShouldBeOpen)
+	{
+		static settingState settingState = settingState::Graphics;
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::MenuItem("Mainmenu"))
+				settingState = settingState::Mainmenu;
+			if (ImGui::MenuItem("Profile"))
+				settingState = settingState::Profile;
+			if (ImGui::MenuItem("Game"))
+				settingState = settingState::Game;
+			if (ImGui::MenuItem("Graphics"))
+				settingState = settingState::Graphics;
+			if (ImGui::MenuItem("Input"))
+				settingState = settingState::Input;
+			if (ImGui::MenuItem("Audio"))
+				settingState = settingState::Audio;
+			ImGui::EndMenuBar();
+		}
+		switch (settingState)
+		{
+		case settingState::Profile:
+		{
+			//TODO:
+			//Change name
+			//Pw
+			//Etc...
+			break;
+		}
+		case settingState::Input:
+		{
+			inputSystem is;
+			static bool changeKeyBindings = false;
+			static std::pair<std::string, Input> toChange;
+			for (auto& it : is.getInputHandler())
+			{
+				ImGui::Text(it.first.c_str());
+				ImGui::SameLine();
+				ImGui::PushID(std::string(it.first + is.keyToString(it.second)).c_str());
+				if (settingsPopUp.button(is.keyToString(it.second).c_str(), ImVec2(300.f, 30.f)))
+				{
+					toChange = it;
+					changeKeyBindings = true;
+				}
+				ImGui::PopID();
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(200.f);
+				ImGui::PushID(it.first.c_str() + static_cast<std::uint32_t>(it.second.m_InputType));
+				if (ImGui::BeginCombo("###PressOrRelease", is.eventToString(it.second).c_str(), ImGuiComboFlags_HeightSmall))
+				{
+					if (ImGui::Selectable("Press"))
+						std::cout << "Later...\n";
+					if (ImGui::Selectable("Release"))
+						std::cout << "Later...\n";
+					ImGui::EndCombo();
+				}
+				ImGui::PopID();
+			}
+			popup keyBindChanger("Change Keybindigs", window.getWindow(), changeKeyBindings);
+			if (changeKeyBindings)
+			{
+				static Input key = Input();
+				std::string text = "Change [" + is.keyToString(toChange.second) + "] to [" + is.keyToString(key) + "]";
+				ImGui::TextColored(ImVec4(1, 0, 0, 1), text.c_str());
+
+				if (is.checkForAnyInput())
+				{
+					if (is.checkForAnyKeyboardInput().has_value() && is.checkForAnyKeyboardInput().value().m_KeyCode != sf::Keyboard::Enter)
+						key = is.checkForAnyKeyboardInput().value();
+
+					if (is.checkForAnyMouseInput().has_value() && is.checkForAnyMouseInput().value().m_MouseButton != sf::Mouse::Left)
+						key = is.checkForAnyMouseInput().value();
+
+					if (is.checkForAnyJoystickInput().has_value())
+						key = is.checkForAnyJoystickInput().value();
+				}
+
+				if (keyBindChanger.button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+					keyBindChanger.close();
+				ImGui::SameLine();
+				if (keyBindChanger.button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+				{
+					if (!is.saveInput({ toChange.first, key }))
+						ImGui::InsertNotification({ ImGuiToastType_Error, "Failed to save changes..." });
+					else
+						keyBindChanger.close();
+				}
+			}
+			break;
+		}
+		case settingState::Graphics:
+		{
+			if (ImGui::Checkbox("Fullscreen: ", &settings::m_Fullscreen))
+				window.create(settings::m_Videomodes[settings::m_currVideomode], "Fan Game!", settings::m_Fullscreen, settings::m_FpsLimit, settings::m_Vsync);
+
+			ImGui::SetNextItemWidth(300.f);
+			std::string preview = std::to_string(settings::m_Videomodes[settings::m_currVideomode].size.x) + "x" + std::to_string(settings::m_Videomodes[settings::m_currVideomode].size.y);
+			if (ImGui::BeginCombo("Resolution: ", preview.c_str(), ImGuiComboFlags_HeightSmall))
+			{
+				for (std::size_t i = 0; i < settings::m_Videomodes.size(); ++i)
+				{
+					std::string text = std::to_string(settings::m_Videomodes[i].size.x) + "x" + std::to_string(settings::m_Videomodes[i].size.y);
+					if (ImGui::Selectable(text.c_str()))
+					{
+						settings::m_currVideomode = (int)i;
+						window.create(settings::m_Videomodes[settings::m_currVideomode], "Fan Game!", settings::m_Fullscreen, settings::m_FpsLimit, settings::m_Vsync);
+						this->backgroundImage.setSize(window.getView().getSize());
+					}
+				}
+				ImGui::EndCombo();
+			}
+			ImGui::Checkbox("Show FPS", &settings::m_ShowFPS);
+
+			if (!settings::m_isFPSLimited)
+				if (ImGui::Checkbox("VSync: ", &settings::m_Vsync))
+					window.setVSync(settings::m_Vsync);
+
+			if (!settings::m_Vsync)
+			{
+				if (ImGui::Checkbox("FPS Limit: ", &settings::m_isFPSLimited))
+				{
+					if (!settings::m_isFPSLimited)
+						settings::m_FpsLimit = 0;
+					window.setFramerateLimit(settings::m_FpsLimit);
+				}
+				if (ImGui::SliderInt("##Limit: ", &settings::m_FpsLimit, 30, 240))
+					window.setFramerateLimit(settings::m_FpsLimit);
+			}
+			break;
+		}
+		case settingState::Game:
+		{
+			ImGui::SliderFloat("Vertical Sensivity: ", &settings::m_VerticalSensivity, 0.f, 20.f);
+			ImGui::SliderFloat("Horizontal Sensivity: ", &settings::m_HorizontalSensivity, 0.f, 20.f);
+			break;
+		}
+		case settingState::Mainmenu:
+		{
+			if (ImGui::SliderInt("Front image: ", &settings::m_currFrontPicture, 0, 0))
+				this->frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0), sf::Vector2i(600, 600)));
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				sf::Sprite background;
+				background.setTexture(*this->frontImage.getTexture());
+				background.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0),
+					sf::Vector2i(600, 600)));
+				ImGui::Image(background, ImVec2(300.f, 300.f));
+				ImGui::EndTooltip();
+			}
+
+			if (ImGui::SliderInt("Profile picture: ", &settings::m_currProfilePicture, 0, 3))
+				this->icon.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0),
+					sf::Vector2i(100, 100)));
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				sf::Sprite background;
+				background.setTexture(*this->icon.getTexture());
+				background.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0),
+					sf::Vector2i(100, 100)));
+				ImGui::Image(background, ImVec2(100.f, 100.f));
+				ImGui::EndTooltip();
+			}
+
+			if (ImGui::SliderInt("Background image: ", &settings::m_currBackgroundPicture, 0, 3))
+				this->backgroundImage.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
+					sf::Vector2i(1920, 1080)));
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				sf::Sprite background;
+				background.setTexture(*this->backgroundImage.getTexture());
+				background.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
+					sf::Vector2i(1920, 1080)));
+				ImGui::Image(background, ImVec2(300.f, 300.f));
+				ImGui::EndTooltip();
+			}
+			break;
+		}
+		case settingState::Audio:
+		{
+			ImGui::Text("Currently playing: ");
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(500.f);
+			if (ImGui::BeginCombo("###MusicSelector", settings::m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
+			{
+				for (auto& music : settings::m_Music)
+				{
+					if (ImGui::Selectable(music))
+					{
+						if (settings::m_currMusic.c_str() != music)
+						{
+							settings::m_currMusic = music;
+							this->m_MainMusic->stop();
+							this->m_MainMusic = resourceSystem::get<std::unique_ptr<sf::Music>>(settings::m_currMusic).get();
+							if (settings::m_MusicVolume > 0.f)
+								this->m_MainMusic->play();
+							this->m_MainMusic->setVolume(settings::m_MusicVolume);
+						}
+					}
+				}
+				ImGui::EndCombo();
+			}
+			ImGui::SliderFloat("Game volume: ", &settings::m_GameVolume, 0.f, 100.f);
+			if (ImGui::SliderFloat("Music volume: ", &settings::m_MusicVolume, 0.f, 100.f))
+				this->m_MainMusic->setVolume(settings::m_MusicVolume);
+			break;
+		}
+		default:
+			break;
+		}
+		if (settingsPopUp.button("Back & Save##Settings", ImVec2(300.f, 75.f)))
+		{
+			if (settings::saveSettings("res/Settings.ini"))
+				settingsPopUp.close();
+		}
+	}
+}
+
+const void menu::multiplayerPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
+{
+	return void();
+}
+
+const void menu::charactersPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
+{
+	return void();
 }
 
 const bool menu::login(const std::string& name, const std::string& password) noexcept
 {
-	sf::Http::Request request("/login.php", sf::Http::Request::Method::Post);
-
-	if (settings::rememberToStayLogedIn)
-		std::printf("Do the magic...");
 	//TODO:
 	//if login was succesful && remember me -> generate buffer so it will remember it next time...
+	if (settings::rememberToStayLogedIn)
+		std::printf("Do the magic...");
 
-	std::ostringstream stream;
-	stream << "username=" << name << "&password=" << password;
-	request.setBody(stream.str());
+	request loginRequest("thefangamedb.000webhostapp.com", "/login.php");
+	std::ostringstream stream = loginRequest.setParams<std::string>("username=", name, "&password=", password);
 
-	sf::Http http("thefangamedb.000webhostapp.com");
-	sf::Http::Response response = http.sendRequest(request);
-
-	if (response.getStatus() == sf::Http::Response::Status::Ok)
+	if (!loginRequest.sendRequest(stream.str(), sf::seconds(3)))
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
+	else
 	{
-		if (response.getBody().find("Success.") != std::string::npos)
+		if (loginRequest.getResponse().getBody().find("Success.") == std::string::npos)
+			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect login details!"));
+		else
 		{
-			std::stringstream ss(response.getBody());
+			std::stringstream ss(loginRequest.getResponse().getBody());
 			std::string line;
 			int x = 0;
 			while (std::getline(ss, line, '#'))
@@ -989,42 +873,32 @@ const bool menu::login(const std::string& name, const std::string& password) noe
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));
 			return true;
 		}
-		else
-			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect login details!"));
 	}
-	else
-		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
 	return false;
 }
 
 const bool menu::createAccount(const std::string& name, const std::string& password, const std::string& email) noexcept
 {
-	if (email.find('@') != std::string::npos && email.find('.') != std::string::npos)
+	if (email.find('@') == std::string::npos && email.find('.') == std::string::npos)
+		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account, provided email is not valid!"));
+	else
 	{
-		sf::Http::Request request("/register.php", sf::Http::Request::Method::Post);
+		request createProfile("thefangamedb.000webhostapp.com", "/register.php");
+		std::ostringstream stream = createProfile.setParams<std::string>("username=", name, "&password=", password, "&email=", email);
 
-		std::ostringstream stream;
-		stream << "username=" << name << "&password=" << password << "&email=" << email;
-		request.setBody(stream.str());
-
-		sf::Http http("thefangamedb.000webhostapp.com");
-		sf::Http::Response response = http.sendRequest(request);
-
-		if (response.getStatus() == sf::Http::Response::Status::Ok)
+		if (!createProfile.sendRequest(stream.str(), sf::seconds(3)))
+			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
+		else
 		{
-			if (response.getBody().find("Success.") != std::string::npos)
+			if (createProfile.getResponse().getBody().find("Success.") == std::string::npos)
+				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to create an account!"));
+			else
 			{
 				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully created an account!"));
 				return true;
 			}
-			else
-				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to create an account!"));
 		}
-		else
-			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
 	}
-	else
-		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account, provided email is not valid!"));
 	return false;
 }
 

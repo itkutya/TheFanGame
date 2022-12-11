@@ -1,6 +1,6 @@
 #include "game.h"
 
-game::game(window& w) noexcept : m_window(w)
+game::game() noexcept
 {
     this->m_texture = nullptr;
     this->m_char = nullptr;
@@ -8,22 +8,20 @@ game::game(window& w) noexcept : m_window(w)
 
 game::~game() noexcept {}
 
-const void game::init(sf::RenderWindow& window) 
+const void game::init(window& window) 
 {
     this->m_texture = &resourceSystem::c_get<sf::Texture>("WallTexture");
     this->m_char = &resourceSystem::c_get<sf::Texture>("CharacterTexture");
     
     this->m_player = std::make_unique<player>(sf::Vector2f((float)this->m_map.mapSize.x / 2.f, (float)this->m_map.mapSize.y / 2.f), sf::Vector2f(20.f, 20.f), sf::Color::Blue);
-    this->m_ray = std::make_unique<ray>(window.getSize().x);
+    this->m_ray = std::make_unique<ray>(window.getWindow().getSize().x);
 
     for (std::size_t i = 0; i < 10; ++i)
         this->m_entities.push_back(entity(sf::Vector2f((float)this->m_map.mapSize.x / 2.f, (float)this->m_map.mapSize.y / 2.f), sf::Vector2f(10.f + (std::rand() % 50), 10.f + (std::rand() % 50)), sf::Color::Green));
 
     this->spriteOrder.resize(this->m_entities.size());
     this->spriteDistance.resize(this->m_entities.size());
-    this->zBuffer.resize(window.getSize().x);
-
-    this->m_view.setSize(sf::Vector2f((float)window.getSize().x, (float)window.getSize().y));
+    this->zBuffer.resize(window.getWindow().getSize().x);
 }
 
 const void game::processEvent(const sf::Event& event) noexcept 
@@ -63,13 +61,12 @@ const void game::processEvent(const sf::Event& event) noexcept
 
         this->zBuffer.resize(static_cast<std::size_t>(event.size.width));
         this->zBuffer.shrink_to_fit();
-        this->m_view.setSize(sf::Vector2f((float)event.size.width, (float)event.size.height));
     }
 }
 
-const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
+const void game::update(window& window, const sf::Time& dt) noexcept
 {
-    ImGui::SFML::Update(window, dt);
+    ImGui::SFML::Update(window.getWindow(), dt);
     ImGui::Begin("FPS Counter", 0, ImGuiWindowFlags_NoCollapse);
     ImGui::Text("FPS: %f", 1.f / dt.asSeconds());
     ImGui::Text("Ammo: %i %c %i", this->m_player->ak47.w_currAmmo, '//', this->m_player->ak47.w_maxAmmoCap);
@@ -83,19 +80,17 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     }
     ImGui::End();
 
-    if (window.hasFocus() && !sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
+    if (window.getWindow().hasFocus() && !sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
     {
-        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        this->m_player->update(this->m_map, mousePos, window.getSize(), this->m_entities, dt);
-        sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window.getWindow());
+        this->m_player->update(this->m_map, mousePos, window.getWindow().getSize(), this->m_entities, dt);
+        sf::Mouse::setPosition(sf::Vector2i(window.getWindow().getSize().x / 2, window.getWindow().getSize().y / 2), window.getWindow());
     }
 
-    this->m_view.setCenter(sf::Vector2f((float)window.getSize().x / 2.f, (float)window.getSize().y / 2.f));
-
     this->m_ray->r_vertices[0].position = this->m_player->getPosition();
-    for (std::uint32_t i = 0; i < window.getSize().x; ++i)
+    for (std::uint32_t i = 0; i < window.getWindow().getSize().x; ++i)
     {
-        this->m_ray->castRay(*this->m_player, this->m_map, window.getSize(), i);
+        this->m_ray->castRay(*this->m_player, this->m_map, window.getWindow().getSize(), i);
         this->zBuffer[i] = this->m_ray->perpWallDist * ((this->m_map.mapSize.x + this->m_map.mapSize.y) / 2.f);
     }
 
@@ -108,7 +103,7 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     
     for (std::vector<entity>::iterator it = this->m_entities.begin(); it != this->m_entities.end(); ++it)
     {
-        it->update(*this->m_player, window.getSize(), this->zBuffer);
+        it->update(*this->m_player, window.getWindow().getSize(), this->zBuffer);
         if (it->health <= 0)
         {
             this->m_entities.erase(it);
@@ -127,17 +122,17 @@ const void game::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
     }
 }
 
-const void game::draw(sf::RenderWindow& window) noexcept
+const void game::draw(window& window) noexcept
 {
-    window.setView(this->m_view);
-    window.draw(*this->m_ray, this->m_texture);
-    window.draw(this->m_map);
+    window.getWindow().setView(window.getView());
+    window.getWindow().draw(*this->m_ray, this->m_texture);
+    window.getWindow().draw(this->m_map);
     for (std::uint32_t i = 0; i < this->m_entities.size(); ++i)
-        window.draw(this->m_entities[this->spriteOrder[i]], this->m_char);
-    window.draw(*this->m_player);
+        window.getWindow().draw(this->m_entities[this->spriteOrder[i]], this->m_char);
+    window.getWindow().draw(*this->m_player);
 
-    window.setView(window.getDefaultView());
-    ImGui::SFML::Render(window);
+    window.getWindow().setView(window.getWindow().getDefaultView());
+    ImGui::SFML::Render(window.getWindow());
 }
 
 const void game::sortSprites(std::vector<int>& order, std::vector<float>& dist, const std::size_t& amount) noexcept
@@ -155,17 +150,3 @@ const void game::sortSprites(std::vector<int>& order, std::vector<float>& dist, 
         order[i] = sprites[amount - i - 1].second;
     }
 }
-
-/*
-* "Special effect"...
-sf::CircleShape light(300.f);
-light.setOrigin(sf::Vector2f(light.getGlobalBounds().width / 2.f, light.getGlobalBounds().height / 2.f));
-light.setPosition(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
-ImGui::Begin("Alpha");
-ImGui::Text("Alpha: %f", alpha);
-ImGui::SliderFloat("Aplha ", &alpha, 0.f, 255.f);
-ImGui::ColorEdit3("Color: ", color);
-ImGui::End();
-light.setFillColor(sf::Color(color[0] * 255, color[1] * 255, color[2] * 255, alpha));
-window.draw(light, sf::BlendMultiply);
-*/
