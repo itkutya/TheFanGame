@@ -56,21 +56,12 @@ const void menu::update(window& window, const sf::Time& dt) noexcept
 {
 	ImGui::SFML::Update(window.getWindow(), dt);
 
-	panel mainWindowPanel("Main Window", window.getWindow());
-
 	ImVec2 vMin = ImGui::GetWindowContentRegionMin();
 	ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 	vMin.x += ImGui::GetWindowPos().x;
 	vMin.y += ImGui::GetWindowPos().y;
 	vMax.x += ImGui::GetWindowPos().x;
 	vMax.y += ImGui::GetWindowPos().y;
-
-	if (settings::m_ShowFPS)
-	{
-		ImGui::SetCursorPos(ImVec2(vMax.x * 0.85f, vMin.y));
-		auto& io = ImGui::GetIO();
-		ImGui::Text("%.2f fps (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
-	}
 
 	switch (this->m_State)
 	{
@@ -338,6 +329,22 @@ const void menu::draw(window& window) noexcept
 
 const void menu::mainmenuPanel(window& window, const sf::Time& dt) noexcept
 {
+	panel mainWindowPanel("Main Window", window.getWindow());
+
+	ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+	ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+	vMin.x += ImGui::GetWindowPos().x;
+	vMin.y += ImGui::GetWindowPos().y;
+	vMax.x += ImGui::GetWindowPos().x;
+	vMax.y += ImGui::GetWindowPos().y;
+
+	if (settings::m_ShowFPS)
+	{
+		ImGui::SetCursorPos(ImVec2(vMax.x * 0.85f, vMin.y));
+		auto& io = ImGui::GetIO();
+		ImGui::Text("%.2f fps (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
+	}
+
 	if (ImGui::BeginTable("MainMenu", 2))
 	{
 		ImGui::TableNextColumn();
