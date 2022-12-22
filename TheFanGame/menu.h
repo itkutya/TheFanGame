@@ -23,12 +23,13 @@ private:
 	//Finish the menu
 	//etc...
 	const void mainmenuPanel(window& window, const sf::Time& dt) noexcept;
-	const void loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
+	const void loginPanel(window& window, const sf::Time& dt) noexcept;
 
 	bool settingsPopUpShouldBeOpen = false;
 	const void settingsPanel(window& window, const sf::Time& dt) noexcept;
-	const void multiplayerPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
-	const void charactersPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept;
+	const void multiplayerPanel(window& window, const sf::Time& dt) noexcept;
+	bool characterPopUpShouldBeOpen = false;
+	const void charactersPanel(window& window, const sf::Time& dt) noexcept;
 
 	const bool login(const std::string& name, const std::string& password) noexcept;
 	std::string createAccountEmail;
@@ -41,7 +42,7 @@ private:
 
 	enum class state
 	{
-		Login = -1, MainMenu = 0, Settings, Characters, Singleplayer, Multiplayer, MultiLobby
+		Login = -1, MainMenu = 0, Singleplayer, Multiplayer, MultiLobby
 	};state m_State = state::Login;
 	bool m_PlaySelected = false;
 	bool m_ServerError = false;

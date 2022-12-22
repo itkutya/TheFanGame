@@ -57,7 +57,7 @@ const void menu::update(window& window, const sf::Time& dt) noexcept
 	ImGui::SFML::Update(window.getWindow(), dt);
 
 	panel mainWindowPanel("Main Window", window.getWindow());
-	ImVec2 WidgetPos;
+
 	ImVec2 vMin = ImGui::GetWindowContentRegionMin();
 	ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 	vMin.x += ImGui::GetWindowPos().x;
@@ -77,112 +77,6 @@ const void menu::update(window& window, const sf::Time& dt) noexcept
 	case state::MainMenu:
 	{
 		this->mainmenuPanel(window, dt);
-		break;
-	}
-	case state::Characters:
-	{
-		panel CharactersPanel("Characters", window.getWindow());
-
-		vMin = ImGui::GetWindowContentRegionMin();
-		vMax = ImGui::GetWindowContentRegionMax();
-		vMin.x += ImGui::GetWindowPos().x;
-		vMin.y += ImGui::GetWindowPos().y;
-		vMax.x += ImGui::GetWindowPos().x;
-		vMax.y += ImGui::GetWindowPos().y;
-
-		if (ImGui::BeginChild("##CharSet", ImVec2(0, ImGui::GetWindowContentRegionMax().y - 200.f), true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar))
-		{
-			ImGui::Columns(static_cast<int>(this->characters.size() / 2) + 1, "Characters");
-			for (std::size_t i = 0; i < this->characters.size(); ++i)
-			{
-				if (i != 0 && !(i % 2))
-					ImGui::NextColumn();
-
-				sf::Sprite temp;
-				if (!this->characters[i].unlocked)
-					temp.setTexture(resourceSystem::c_get<sf::Texture>("WallTexture"));
-				else
-					temp.setTexture(resourceSystem::c_get<sf::Texture>("CharacterTexture"));
-
-				temp.setTextureRect(sf::IntRect(sf::Vector2i(64 * (int)i, 0), sf::Vector2i(64, 64)));
-				ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + 25.f, ImGui::GetCursorPos().y));
-				ImGui::Image(temp, sf::Vector2f(150.f, 150.f));
-
-				if (ImGui::IsItemHovered())
-				{
-					ImGui::BeginTooltip();
-					sf::Sprite ability;
-					ability.setTexture(resourceSystem::c_get<sf::Texture>("WallTexture"));
-					ability.setTextureRect(sf::IntRect(sf::Vector2i(128, 0), sf::Vector2i(64, 64)));
-					ImGui::SetCursorPos(ImVec2(5.f, 5.f));
-					ImGui::Image(ability, sf::Vector2f(50.f, 50.f));
-					ImGui::SameLine();
-					ImGui::TextColored(ImVec4(1.f, 0.0f, 0.1f, 1.f), "Can be an image of any ability or something like that.");
-					ImGui::TextColored(ImVec4(0.f, 0.8f, 0.1f, 1.f), "This will be updated later so it displays information\nabout the charater that is currently being hoverd.");
-					ImGui::EndTooltip();
-				}
-				ImGui::SameLine();
-				ImGui::Text("Some information\nabout the\ncharacter that is\nbeing displayed\ncan go here.");
-
-				if (!this->characters[i].unlocked)
-				{
-					ImGui::PushID("CharacterUnlock" + i);
-					if (ImGui::Button("Unlock", ImVec2(200.f, 50.f)))
-					{
-						if (this->myAccount.currency > this->characters[i].price)
-						{
-							this->myAccount.currency -= this->characters[i].price;
-							this->characters[i].unlocked = true;
-						}
-					}
-					if (ImGui::IsItemHovered())
-					{
-						if (this->myAccount.currency < this->characters[i].price)
-						{
-							ImGui::BeginTooltip();
-							ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Not enough currency, come back later.\nAnd put some usefull information here later...");
-							ImGui::EndTooltip();
-						}
-						else
-						{
-							ImGui::BeginTooltip();
-							ImGui::TextColored(ImVec4(0.f, 1.f, 0.4f, 1.f), reinterpret_cast<const char*>(u8"This item costs 690$."));
-							ImGui::EndTooltip();
-						}
-					}
-					ImGui::PopID();
-				}
-			}
-		}ImGui::EndChild();
-
-		ImGui::SetCursorPos(ImVec2(vMin.x, vMax.y - 125.f));
-		if (ImGui::Button("Open loot box", ImVec2(300.f, 75.f)))
-		{
-			if (this->myAccount.currency >= 420)
-			{
-				this->myAccount.currency -= 420;
-				std::cout << "Will do it later... But this will cost lem_SettingState than stuff above...\n";
-			}
-		}
-		if (ImGui::IsItemHovered())
-		{
-			if (this->myAccount.currency < 420)
-			{
-				ImGui::BeginTooltip();
-				ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Not enough currency, come back later.\nAnd put some usefull information here later...");
-				ImGui::EndTooltip();
-			}
-			else
-			{
-				ImGui::BeginTooltip();
-				ImGui::TextColored(ImVec4(0.f, 1.f, 0.4f, 1.f), "This item costs 420c.");
-				ImGui::EndTooltip();
-			}
-		}
-
-		ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
-		if (ImGui::Button("Back##Characters", ImVec2(300.f, 75.f)))
-			this->m_State = state::MainMenu;
 		break;
 	}
 	case state::Multiplayer:
@@ -258,7 +152,7 @@ const void menu::update(window& window, const sf::Time& dt) noexcept
 		if (ImGui::InputTextWithHint("##Port", "52420", this->InputPort, 6, ImGuiInputTextFlags_EnterReturnsTrue))
 			std::cout << this->InputPort << "\n";
 		ImGui::SameLine();
-		WidgetPos = ImGui::GetCursorPos();
+		ImVec2 WidgetPos = ImGui::GetCursorPos();
 		ImGui::SetCursorPos(ImVec2(WidgetPos.x, WidgetPos.y - 10.f));
 		if (ImGui::Button("Join", ImVec2(200.f, 50.f)))
 		{
@@ -302,14 +196,7 @@ const void menu::update(window& window, const sf::Time& dt) noexcept
 
 		ImGui::SetCursorPos(ImVec2(vMax.x - 350.f, vMax.y - 125.f));
 		if (ImGui::Button("Back##Multiplayer", ImVec2(300.f, 75.f)))
-		{
-			/*
-			this->shutdownServer();
-			this->servers.clear();
-			this->socket.disconnect();
-			*/
 			this->m_State = state::MainMenu;
-		}
 		break;
 	}
 	case state::Singleplayer:
@@ -420,7 +307,7 @@ const void menu::update(window& window, const sf::Time& dt) noexcept
 	}
 	case state::Login:
 	{
-		this->loginPanel(window.getWindow(), dt);
+		this->loginPanel(window, dt);
 		break;
 	}
 	default:
@@ -522,6 +409,8 @@ const void menu::mainmenuPanel(window& window, const sf::Time& dt) noexcept
 			{
 				if (ImGui::Button("Singleplayer", ImVec2(200.f, 50.f)))
 				{
+					//TODO:
+					//Popup...
 					this->m_PlaySelected = false;
 					this->m_State = state::Singleplayer;
 					this->m_MainMusic->stop();
@@ -540,9 +429,10 @@ const void menu::mainmenuPanel(window& window, const sf::Time& dt) noexcept
 			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
 
 			if (ImGui::Button("Characters", ImVec2(300.f, 75.f)))
-				this->m_State = state::Characters;
+				this->characterPopUpShouldBeOpen = true;
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("Unlocked characters and the character shop, etc...");
+			this->charactersPanel(window, dt);
 
 			ImGui::TableNextRow(0, 100.f);
 			ImGui::TableNextColumn();
@@ -572,9 +462,9 @@ const void menu::mainmenuPanel(window& window, const sf::Time& dt) noexcept
 	}
 }
 
-const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
+const void menu::loginPanel(window& window, const sf::Time& dt) noexcept
 {
-	panel loginPanel("Login", window);
+	panel loginPanel("Login", window.getWindow());
 	if (loginPanel.input("User Name:", "Enter your user name here...", settings::ProfileNickname) ||
 		loginPanel.input("Password:", "Enter your password here...", settings::ProfilePassword, ImGuiInputTextFlags_Password) ||
 		loginPanel.button("Login"))
@@ -587,7 +477,7 @@ const void menu::loginPanel(sf::RenderWindow& window, const sf::Time& dt) noexce
 	ImGui::SameLine();
 	ImGui::Checkbox("Remember Me!", &settings::rememberToStayLogedIn);
 
-	popup createAccount("Create Account", window, createAccountPanel);
+	popup createAccount("Create Account", window.getWindow(), createAccountPanel);
 	if(createAccountPanel)
 	{
 		if (createAccount.input("Email:", "Enter your email here...", this->createAccountEmail) ||
@@ -642,7 +532,7 @@ const void menu::settingsPanel(window& window, const sf::Time& dt) noexcept
 		{
 			inputSystem is;
 			static bool changeKeyBindings = false;
-			static std::pair<std::string, Input> toChange;
+			static std::pair<std::string, Input>* toChange;
 			for (auto& it : is.getInputHandler())
 			{
 				ImGui::Text(it.first.c_str());
@@ -650,7 +540,7 @@ const void menu::settingsPanel(window& window, const sf::Time& dt) noexcept
 				ImGui::PushID(std::string(it.first + is.keyToString(it.second)).c_str());
 				if (settingsPopUp.button(is.keyToString(it.second).c_str(), ImVec2(300.f, 30.f)))
 				{
-					toChange = it;
+					toChange = &it;
 					changeKeyBindings = true;
 				}
 				ImGui::PopID();
@@ -671,8 +561,8 @@ const void menu::settingsPanel(window& window, const sf::Time& dt) noexcept
 			if (changeKeyBindings)
 			{
 				static Input key = Input();
-				std::string text = "Change [" + is.keyToString(toChange.second) + "] to [" + is.keyToString(key) + "]";
-				ImGui::TextColored(ImVec4(1, 0, 0, 1), text.c_str());
+				std::string text = "Change [" + is.keyToString(toChange->second) + "] to [" + is.keyToString(key) + "]";
+				keyBindChanger.text(text.c_str(), ImVec4(1, 0, 0, 1));
 
 				if (is.checkForAnyInput())
 				{
@@ -691,7 +581,8 @@ const void menu::settingsPanel(window& window, const sf::Time& dt) noexcept
 				ImGui::SameLine();
 				if (keyBindChanger.button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 				{
-					if (!is.saveInput({ toChange.first, key }))
+					toChange->second = key;
+					if (!is.saveInput("res/inputSettings.ini"))
 						ImGui::InsertNotification({ ImGuiToastType_Error, "Failed to save changes..." });
 					else
 						keyBindChanger.close();
@@ -829,14 +720,75 @@ const void menu::settingsPanel(window& window, const sf::Time& dt) noexcept
 	}
 }
 
-const void menu::multiplayerPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
+const void menu::multiplayerPanel(window& window, const sf::Time& dt) noexcept
 {
 	return void();
 }
 
-const void menu::charactersPanel(sf::RenderWindow& window, const sf::Time& dt) noexcept
+const void menu::charactersPanel(window& window, const sf::Time& dt) noexcept
 {
-	return void();
+	popup CharactersPanel("Characters", window.getWindow(), this->characterPopUpShouldBeOpen);
+	if (this->characterPopUpShouldBeOpen)
+	{
+		if (ImGui::BeginChild("##CharSet", ImVec2(600.f, 300.f), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar))
+		{
+			for (std::size_t i = 0; i < this->characters.size(); ++i)
+			{
+				sf::Sprite temp;
+				if (!this->characters[i].unlocked)
+					temp.setTexture(resourceSystem::c_get<sf::Texture>("WallTexture"));
+				else
+					temp.setTexture(resourceSystem::c_get<sf::Texture>("CharacterTexture"));
+
+				temp.setTextureRect(sf::IntRect(sf::Vector2i(64 * (int)i, 0), sf::Vector2i(64, 64)));
+				ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + 25.f, ImGui::GetCursorPos().y));
+				ImGui::Image(temp, sf::Vector2f(150.f, 150.f));
+
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					sf::Sprite ability;
+					ability.setTexture(resourceSystem::c_get<sf::Texture>("WallTexture"));
+					ability.setTextureRect(sf::IntRect(sf::Vector2i(128, 0), sf::Vector2i(64, 64)));
+					ImGui::SetCursorPos(ImVec2(5.f, 5.f));
+					ImGui::Image(ability, sf::Vector2f(50.f, 50.f));
+					ImGui::SameLine();
+					CharactersPanel.text("Can be an image of any ability or something like that.", ImVec4(1.f, 0.0f, 0.1f, 1.f));
+					CharactersPanel.text("This will be updated later so it displays information about the charater that is currently being hoverd.", ImVec4(0.f, 0.8f, 0.1f, 1.f));
+					ImGui::EndTooltip();
+				}
+				ImGui::SameLine();
+				CharactersPanel.text("Some information about the character that is being displayed can go here.");
+
+				if (!this->characters[i].unlocked)
+				{
+					ImGui::PushID("CharacterUnlock" + i);
+					if (CharactersPanel.button("Unlock", ImVec2(200.f, 50.f)) && this->myAccount.currency > this->characters[i].price)
+					{
+						this->myAccount.currency -= this->characters[i].price;
+						this->characters[i].unlocked = true;
+					}
+					ImGui::PopID();
+					if (this->myAccount.currency < this->characters[i].price)
+						CharactersPanel.tooltip("Not enough currency, come back later.\nAnd put some usefull information here later...", ImVec4(1.f, 0.f, 0.f, 1.f));
+					else
+						CharactersPanel.tooltip(reinterpret_cast<const char*>(u8"This item costs 690$."), ImVec4(0.f, 1.f, 0.4f, 1.f));
+				}
+			}
+			ImGui::EndChild();
+		}
+
+		if (CharactersPanel.button("Open loot box", ImVec2(300.f, 75.f)) && this->myAccount.currency >= 420)
+			this->myAccount.currency -= 420;
+
+		if (this->myAccount.currency < 420)
+			CharactersPanel.tooltip("Not enough currency, come back later.\nAnd put some usefull information here later...", ImVec4(1.f, 0.f, 0.f, 1.f));
+		else
+			CharactersPanel.tooltip("This item costs 420c.", ImVec4(0.f, 1.f, 0.4f, 1.f));
+
+		if (ImGui::Button("Back##Characters", ImVec2(300.f, 75.f)))
+			CharactersPanel.close();
+	}
 }
 
 const bool menu::login(const std::string& name, const std::string& password) noexcept

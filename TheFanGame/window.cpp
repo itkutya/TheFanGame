@@ -18,7 +18,7 @@ const void window::pollEvents() noexcept
 			this->m_window.close();
 
 		inputSystem is;
-		if (is.checkForInput("ScreenShot", event))
+		if (is.checkForInput(Input_::Screenshot, event))
 			this->ScreenShot();
 
 		if (event.type == sf::Event::Resized)

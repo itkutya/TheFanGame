@@ -6,41 +6,46 @@ inputSystem::inputSystem() noexcept
         this->m_isAnyJoystickConnected |= sf::Joystick::isConnected(i);
 }
 
-const bool inputSystem::checkForInput(const std::string& action) const noexcept
+const bool inputSystem::checkForInput(const Input_& action) const noexcept
 {
-    if (sf::Keyboard::isKeyPressed(inputSystem::m_Action[action].m_KeyCode))
+    if (inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_InputType == InputType::KeyboardInput && 
+        sf::Keyboard::isKeyPressed(inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_KeyCode))
         return true;
-    if (sf::Mouse::isButtonPressed(inputSystem::m_Action[action].m_MouseButton))
+    if (inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_InputType == InputType::MouseInput && 
+        sf::Mouse::isButtonPressed(inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_MouseButton))
         return true;
     if (this->m_isAnyJoystickConnected)
     {
         for (std::uint32_t i = 0; i < sf::Joystick::Count; ++i)
         {
-            if (sf::Joystick::isButtonPressed(i, inputSystem::m_Action[action].m_joystickButton) || 
-                sf::Joystick::getAxisPosition(i, inputSystem::m_Action[action].m_JoystickAxis))
+            if (inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_InputType == InputType::JoystickButtonInput && 
+                sf::Joystick::isButtonPressed(i, inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_joystickButton))
+                return true;
+            if (inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_InputType == InputType::JoystickAxisInput &&
+                sf::Joystick::getAxisPosition(i, inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_JoystickAxis))
                 return true;
         }
     }
     return false;
 }
 
-const bool inputSystem::checkForInput(const std::string& action, sf::Event& event) const noexcept
+const bool inputSystem::checkForInput(const Input_& action, sf::Event& event) const noexcept
 {
-    if (inputSystem::m_Action[action].m_InputType == InputType::MouseInput &&
-        inputSystem::m_Action[action].m_EventType == event.type &&
-        inputSystem::m_Action[action].m_MouseButton == event.mouseButton.button)
+    if (inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_InputType == InputType::MouseInput &&
+        inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_EventType == event.type &&
+        inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_MouseButton == event.mouseButton.button)
         return true;
-    if (inputSystem::m_Action[action].m_InputType == InputType::KeyboardInput &&
-        inputSystem::m_Action[action].m_EventType == event.type &&
-        inputSystem::m_Action[action].m_KeyCode == event.key.code)
+    if (inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_InputType == InputType::KeyboardInput &&
+        inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_EventType == event.type &&
+        inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_KeyCode == event.key.code)
         return true;
-    if (inputSystem::m_Action[action].m_InputType == InputType::JoystickButtonInput &&
-        inputSystem::m_Action[action].m_EventType == event.type &&
-        inputSystem::m_Action[action].m_KeyCode == event.key.code)
+    if (inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_InputType == InputType::JoystickButtonInput &&
+        inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_EventType == event.type &&
+        inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_KeyCode == event.key.code)
         return true;
-    if (inputSystem::m_Action[action].m_InputType == InputType::JoystickAxisInput &&
-        inputSystem::m_Action[action].m_EventType == event.type &&
-        inputSystem::m_Action[action].m_KeyCode == event.key.code)
+    if (inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_InputType == InputType::JoystickAxisInput &&
+        inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_EventType == event.type &&
+        inputSystem::m_Action[static_cast<std::size_t>(action)].second.m_KeyCode == event.key.code)
         return true;
     return false;
 }
@@ -51,6 +56,7 @@ const bool inputSystem::loadInput(const std::string& filePath) noexcept
     std::ifstream inputSettings(filePath);
     if (inputSettings.is_open())
     {
+        std::size_t pos = 0;
         std::uint32_t type;
         std::string action;
         std::uint32_t temp;
@@ -77,7 +83,6 @@ const bool inputSystem::loadInput(const std::string& filePath) noexcept
                 }
 
                 key.m_KeyCode = static_cast<sf::Keyboard::Key>(temp);
-                inputSystem::m_Action[action] = key;
                 break;
             }
             case InputType::MouseInput:
@@ -95,7 +100,6 @@ const bool inputSystem::loadInput(const std::string& filePath) noexcept
                 }
 
                 key.m_MouseButton = static_cast<sf::Mouse::Button>(temp);
-                inputSystem::m_Action[action] = key;
                 break;
             }
             case InputType::JoystickButtonInput:
@@ -115,7 +119,6 @@ const bool inputSystem::loadInput(const std::string& filePath) noexcept
                 }
 
                 key.m_joystickButton = temp;
-                inputSystem::m_Action[action] = key;
                 break;
             }
             case InputType::JoystickAxisInput:
@@ -135,12 +138,13 @@ const bool inputSystem::loadInput(const std::string& filePath) noexcept
                 }
 
                 key.m_JoystickAxis = static_cast<sf::Joystick::Axis>(temp);
-                inputSystem::m_Action[action] = key;
                 break;
             }
             default:
                 break;
             }
+            inputSystem::m_Action[pos] = { action, key };
+            ++pos;
         }
         inputSettings.close();
         return true;
@@ -149,10 +153,9 @@ const bool inputSystem::loadInput(const std::string& filePath) noexcept
     return false;
 }
 
-const bool inputSystem::saveInput(const std::pair<std::string, Input>& temp)const noexcept
+const bool inputSystem::saveInput(const std::string& filePath) const noexcept
 {
-    inputSystem::m_Action[temp.first] = temp.second;
-    std::ofstream inputSettings("res/inputSettings.ini", std::ios::trunc);
+    std::ofstream inputSettings(filePath, std::ios::trunc);
     if (inputSettings.is_open())
     {
         for (auto& it : m_Action)

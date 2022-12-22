@@ -62,12 +62,41 @@ public:
 		this->tooltip(tip);
 		return isPushed;
 	};
+	const void text(const char* t) noexcept
+	{
+		ImGui::Text(t);
+	};
+	template<typename... Args>
+	const void text(const char* t, Args... args) noexcept
+	{
+		ImGui::Text(t, args...);
+	};
+	const void text(const char* t, const ImVec4& color) noexcept
+	{
+		ImGui::TextColored(color, t);
+	};
+	template<typename... Args>
+	const void text(const char* t, Args... args, const ImVec4& color) noexcept
+	{
+		ImGui::TextColored(color, t, args...);
+	};
 	const bool tooltip(const char* tip) noexcept
 	{
 		if (ImGui::IsItemHovered())
 		{
 			ImGui::BeginTooltip();
-			ImGui::Text(tip);
+			this->text(tip);
+			ImGui::EndTooltip();
+			return true;
+		}
+		return false;
+	};
+	const bool tooltip(const char* tip, const ImVec4& color) noexcept
+	{
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			this->text(tip, color);
 			ImGui::EndTooltip();
 			return true;
 		}
