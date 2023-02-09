@@ -61,8 +61,13 @@ private:
 
 	char InputIp[12] = "";
 	char InputPort[6] = "";
+	std::uint32_t ServerNum;
 	std::vector<std::pair<sf::IpAddress, std::uint16_t>> servers;
-	std::uint32_t activeServerNum;
+	client network;
+	localhost host;
+
+	const void refresLocal() noexcept;
+	const void refresPublic() noexcept;
 
 	struct talents
 	{

@@ -325,6 +325,9 @@ public:
 	{
 		this->m_request.setBody(stream);
 		this->m_response = this->m_http.sendRequest(this->m_request, timeout);
+		//For testing leave it here
+		//Sometimes it just error's???
+		std::printf("%zu", static_cast<std::size_t>(this->m_response.getStatus()));
 		if (this->m_response.getStatus() == sf::Http::Response::Status::Ok)
 			return true;
 		return false;

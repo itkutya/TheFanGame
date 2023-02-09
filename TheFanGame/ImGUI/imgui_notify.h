@@ -161,15 +161,15 @@ public:
 	{
 		const auto elapsed = get_elapsed_time();
 
-		if (elapsed > NOTIFY_FADE_IN_OUT_TIME + this->dismiss_time + NOTIFY_FADE_IN_OUT_TIME)
+		if (elapsed > static_cast<const unsigned long long>(NOTIFY_FADE_IN_OUT_TIME) + this->dismiss_time + static_cast<const unsigned long long>(NOTIFY_FADE_IN_OUT_TIME))
 		{
 			return ImGuiToastPhase_Expired;
 		}
-		else if (elapsed > NOTIFY_FADE_IN_OUT_TIME + this->dismiss_time)
+		else if (elapsed > static_cast<const unsigned long long>(NOTIFY_FADE_IN_OUT_TIME) + this->dismiss_time)
 		{
 			return ImGuiToastPhase_FadeOut;
 		}
-		else if (elapsed > NOTIFY_FADE_IN_OUT_TIME)
+		else if (elapsed > static_cast<const unsigned long long>(NOTIFY_FADE_IN_OUT_TIME))
 		{
 			return ImGuiToastPhase_Wait;
 		}
