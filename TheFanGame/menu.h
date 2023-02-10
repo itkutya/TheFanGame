@@ -5,6 +5,8 @@
 
 #include "particleSystem.h"
 
+#include "settingsPanel.h"
+
 class menu : public state
 {
 public:
@@ -22,11 +24,11 @@ private:
 	//Audio system, Music, etc...
 	//Finish the menu
 	//etc...
+	settingsPanel settingsPanel;
+
 	const void mainmenuPanel(window& window, const sf::Time& dt) noexcept;
 	const void loginPanel(window& window, const sf::Time& dt) noexcept;
 
-	bool settingsPopUpShouldBeOpen = false;
-	const void settingsPanel(window& window, const sf::Time& dt) noexcept;
 	const void multiplayerPanel(window& window, const sf::Time& dt) noexcept;
 	bool characterPopUpShouldBeOpen = false;
 	const void charactersPanel(window& window, const sf::Time& dt) noexcept;
@@ -47,15 +49,10 @@ private:
 	bool m_PlaySelected = false;
 	bool m_ServerError = false;
 
-	enum class settingState
-	{
-		Graphics = 0, Game, Audio, Mainmenu, Input, Profile
-	};
 	sf::Music* m_MainMusic;
-	
 	sf::Sprite icon;
 	sf::Sprite frontImage;
-	sf::RectangleShape backgroundImage;
+	sf::Sprite backgroundImage;
 
 	profile myAccount;
 
@@ -76,6 +73,4 @@ private:
 		std::uint32_t level = 1;
 		std::uint32_t price = 690;
 	};std::vector<talents> characters;
-
-	const void giveXP(const float& amount) noexcept;
 };

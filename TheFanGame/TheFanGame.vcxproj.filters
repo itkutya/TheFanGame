@@ -19,6 +19,9 @@
     <Filter Include="ImGUI\Notify">
       <UniqueIdentifier>{4b8e0762-8e83-4bec-9dbb-55f0867e8949}</UniqueIdentifier>
     </Filter>
+    <Filter Include="menuItems">
+      <UniqueIdentifier>{2a86814a-041a-4927-8429-f245a17b5e1b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -98,6 +101,9 @@
     </ClCompile>
     <ClCompile Include="particleSystem.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="settingsPanel.cpp">
+      <Filter>menuItems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -199,6 +205,9 @@
     </ClInclude>
     <ClInclude Include="particleSystem.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="settingsPanel.h">
+      <Filter>menuItems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

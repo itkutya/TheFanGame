@@ -29,69 +29,27 @@ public:
 			return true;
 		return false;
 	};
-	const bool button(const char* text, const ImVec2 size = ImVec2()) noexcept
-	{
-		if (ImGui::Button(text, size))
-			return true;
-		return false;
-	};
-	const bool button(const char* text, const char* tip, const ImVec2 size = ImVec2()) noexcept
-	{
-		bool isPushed = false;
-		if (ImGui::Button(text, size))
-			isPushed = true;
-		this->tooltip(tip);
-		return isPushed;
-	};
-	const bool button(const char* text, const ImVec4 color, const ImVec2 size = ImVec2()) noexcept
+	const bool button(const char* text, const ImVec2& size = ImVec2(), const ImVec4& color = ImVec4(ImGui::GetStyleColorVec4(ImGuiCol_Button)), const char* tip = "") noexcept
 	{
 		bool isPushed = false;
 		ImGui::PushStyleColor(ImGuiCol_Button, color);
 		if (ImGui::Button(text, size))
 			isPushed = true;
 		ImGui::PopStyleColor();
+		if (tip != "")
+			this->tooltip(tip);
 		return isPushed;
 	};
-	const bool button(const char* text, const char* tip, const ImVec4 color, const ImVec2 size = ImVec2()) noexcept
-	{
-		bool isPushed = false;
-		ImGui::PushStyleColor(ImGuiCol_Button, color);
-		if (ImGui::Button(text, size))
-			isPushed = true;
-		ImGui::PopStyleColor();
-		this->tooltip(tip);
-		return isPushed;
-	};
-	const void text(const char* t) noexcept
-	{
-		ImGui::Text(t);
-	};
 	template<typename... Args>
-	const void text(const char* t, Args... args) noexcept
+	const void text(const char* t, const ImVec4& color = ImVec4(1, 1, 1, 1), const ImVec2& pos = ImGui::GetCursorPos(), Args... args) noexcept
 	{
-		ImGui::Text(t, args...);
+		ImGui::SetCursorPos(pos);
+		if constexpr (sizeof...(args) > 0)
+			ImGui::TextColored(color, t, args...);
+		else
+			ImGui::TextColored(color, t);
 	};
-	const void text(const char* t, const ImVec4& color) noexcept
-	{
-		ImGui::TextColored(color, t);
-	};
-	template<typename... Args>
-	const void text(const char* t, Args... args, const ImVec4& color) noexcept
-	{
-		ImGui::TextColored(color, t, args...);
-	};
-	const bool tooltip(const char* tip) noexcept
-	{
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::BeginTooltip();
-			this->text(tip);
-			ImGui::EndTooltip();
-			return true;
-		}
-		return false;
-	};
-	const bool tooltip(const char* tip, const ImVec4& color) noexcept
+	const bool tooltip(const char* tip, const ImVec4& color = ImVec4(1, 1, 1, 1)) noexcept
 	{
 		if (ImGui::IsItemHovered())
 		{
@@ -151,4 +109,27 @@ public:
 	};
 private:
 	bool& shouldClosePopUp;
+};
+
+class table : public gui
+{
+public:
+	table(const char* text, const ImVec2& size, const ImGuiTableFlags& flags = 0) noexcept
+	{
+		if (ImGui::BeginTable(text, (int)size.y, flags))
+		{
+			ImGui::TableNextColumn();
+			this->shouldEndTable = true;
+		}
+	};
+	virtual ~table()
+	{
+		if (this->shouldEndTable)
+		{
+			ImGui::EndTable();
+			this->shouldEndTable = false;
+		}
+	};
+private:
+	bool shouldEndTable = false;
 };
