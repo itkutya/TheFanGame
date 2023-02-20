@@ -1,24 +1,18 @@
-#include "menu.h"
+#include <exception>
+#include <cstdio>
+
+#include "src/Application.h"
 
 int main()
 {
-	std::srand((std::uint32_t)std::time(0));
 	try
 	{
-		settings::loadSettings("res/Settings.ini");
-		inputSystem is;
-		if (!is.loadInput("res/inputSettings.ini"))
-			return 1;
-
-		window mainWindow(settings::m_Videomodes[settings::m_currVideomode], "Fan Game!", settings::m_Fullscreen, settings::m_FpsLimit, settings::m_Vsync);
-		stateSystem::add<menu>();
-
-		while (mainWindow.getWindow().isOpen())
+		Application app(sf::VideoMode({ 500, 500 }), "TheFanGame", false, 60);
+		while (app.getWindow().isOpen())
 		{
-			stateSystem::processStateChange(mainWindow);
-			mainWindow.pollEvents();
-			mainWindow.update();
-			mainWindow.draw();
+			app.pollEvents();
+			app.update();
+			app.draw();
 		}
 	}
 	catch (const std::exception& e)
@@ -28,10 +22,8 @@ int main()
 	}
 	catch(...)
 	{
-		std::printf("\033[1;4;31mUnknown error, rethrowing...\n\033[0m");
-		throw;
+		std::printf("\033[1;4;31mUnknown error!\n\033[0m");
+		return 2;
 	}
-	stateSystem::cleanUp();
-	resourceSystem::cleanUp();
 	return 0;
 }

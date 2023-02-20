@@ -90,14 +90,14 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)\ImGUI;$(ProjectDir)\SFML32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\SFML32;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;openal32.lib;freetype.lib;winmm.lib;gdi32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-network-s-d.lib;sfml-system-s-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -111,7 +111,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)\ImGUI;$(ProjectDir)\SFML32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -120,7 +120,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\SFML32;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;openal32.lib;freetype.lib;winmm.lib;gdi32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;sfml-graphics-s.lib;sfml-window-s.lib;sfml-audio-s.lib;sfml-network-s.lib;sfml-system-s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -132,7 +132,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)\ImGUI;$(ProjectDir)\SFML64;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>includes.h</PrecompiledHeaderFile>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -140,7 +140,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\SFML64;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;openal32.lib;freetype.lib;winmm.lib;gdi32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-network-s-d.lib;sfml-system-s-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -154,7 +154,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)\ImGUI;$(ProjectDir)\SFML64;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -163,21 +163,15 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\SFML64;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;openal32.lib;freetype.lib;winmm.lib;gdi32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;sfml-graphics-s.lib;sfml-window-s.lib;sfml-audio-s.lib;sfml-network-s.lib;sfml-system-s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="gui.cpp" />
+    <ClCompile Include="src\Menu.cpp" />
+    <ClCompile Include="src\ResourceManager.cpp" />
+    <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="ImGUI\imgui_stdlib.cpp" />
-    <ClCompile Include="network.cpp" />
-    <ClCompile Include="particleSystem.cpp" />
-    <ClCompile Include="profile.cpp" />
-    <ClCompile Include="animation.cpp" />
-    <ClCompile Include="entity.cpp" />
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="inputSystem.cpp" />
-    <ClCompile Include="menu.cpp" />
     <ClCompile Include="ImGUI\imgui-SFML.cpp" />
     <ClCompile Include="ImGUI\imgui.cpp" />
     <ClCompile Include="ImGUI\imgui_demo.cpp" />
@@ -185,33 +179,17 @@
     <ClCompile Include="ImGUI\imgui_tables.cpp" />
     <ClCompile Include="ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="player.cpp" />
-    <ClCompile Include="ray.cpp" />
-    <ClCompile Include="resourceSystem.cpp" />
-    <ClCompile Include="settings.cpp" />
-    <ClCompile Include="settingsPanel.cpp" />
-    <ClCompile Include="stateSystem.cpp" />
-    <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="weapon.cpp" />
-    <ClCompile Include="window.cpp" />
-    <ClCompile Include="world.cpp" />
+    <ClCompile Include="src\StateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="gui.h" />
+    <ClInclude Include="src\Menu.h" />
+    <ClInclude Include="src\ResourceManager.h" />
+    <ClInclude Include="src\Application.h" />
     <ClInclude Include="ImGUI\fa_solid_900.h" />
     <ClInclude Include="ImGUI\font_awesome_5.h" />
     <ClInclude Include="ImGUI\imgui_notify.h" />
     <ClInclude Include="ImGUI\imgui_stdlib.h" />
     <ClInclude Include="ImGUI\tahoma.h" />
-    <ClInclude Include="includes.h" />
-    <ClInclude Include="network.h" />
-    <ClInclude Include="particleSystem.h" />
-    <ClInclude Include="profile.h" />
-    <ClInclude Include="animation.h" />
-    <ClInclude Include="entity.h" />
-    <ClInclude Include="game.h" />
-    <ClInclude Include="inputSystem.h" />
-    <ClInclude Include="menu.h" />
     <ClInclude Include="ImGUI\imconfig-SFML.h" />
     <ClInclude Include="ImGUI\imconfig.h" />
     <ClInclude Include="ImGUI\imgui-SFML.h" />
@@ -221,16 +199,7 @@
     <ClInclude Include="ImGUI\imstb_rectpack.h" />
     <ClInclude Include="ImGUI\imstb_textedit.h" />
     <ClInclude Include="ImGUI\imstb_truetype.h" />
-    <ClInclude Include="player.h" />
-    <ClInclude Include="ray.h" />
-    <ClInclude Include="resourceSystem.h" />
-    <ClInclude Include="settings.h" />
-    <ClInclude Include="settingsPanel.h" />
-    <ClInclude Include="stateSystem.h" />
-    <ClInclude Include="Timer.h" />
-    <ClInclude Include="weapon.h" />
-    <ClInclude Include="window.h" />
-    <ClInclude Include="world.h" />
+    <ClInclude Include="src\StateManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\wolftextures.png" />

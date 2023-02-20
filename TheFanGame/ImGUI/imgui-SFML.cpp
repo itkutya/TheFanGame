@@ -354,7 +354,7 @@ ImGuiKey keycodeToImGuiKey(sf::Keyboard::Key code) {
         return ImGuiKey_Enter;
     case sf::Keyboard::Escape:
         return ImGuiKey_Escape;
-    case sf::Keyboard::Quote:
+    case sf::Keyboard::Apostrophe:
         return ImGuiKey_Apostrophe;
     case sf::Keyboard::Comma:
         return ImGuiKey_Comma;
@@ -374,7 +374,7 @@ ImGuiKey keycodeToImGuiKey(sf::Keyboard::Key code) {
         return ImGuiKey_Backslash;
     case sf::Keyboard::RBracket:
         return ImGuiKey_RightBracket;
-    case sf::Keyboard::Tilde:
+    case sf::Keyboard::Grave:
         return ImGuiKey_GraveAccent;
     // case : return ImGuiKey_CapsLock;
     // case : return ImGuiKey_ScrollLock;
@@ -1132,12 +1132,12 @@ void SetupRenderState(ImDrawData* draw_data, int fb_width, int fb_height) {
     glPushMatrix();
     glLoadIdentity();
 #ifdef GL_VERSION_ES_CL_1_1
-    glOrthof(draw_data->DisplayPos.x, draw_data->DisplayPos.x + draw_data->DisplaySize.x,
-             draw_data->DisplayPos.y + draw_data->DisplaySize.y, draw_data->DisplayPos.y, -1.0f,
+    glOrthof(GLdouble(draw_data->DisplayPos.x), GLdouble(draw_data->DisplayPos.x) + GLdouble(draw_data->DisplaySize.x),
+             GLdouble(draw_data->DisplayPos.y) + GLdouble(draw_data->DisplaySize.y), GLdouble(draw_data->DisplayPos.y), -1.0f,
              +1.0f);
 #else
-    glOrtho(draw_data->DisplayPos.x, draw_data->DisplayPos.x + draw_data->DisplaySize.x,
-            draw_data->DisplayPos.y + draw_data->DisplaySize.y, draw_data->DisplayPos.y, -1.0f,
+    glOrtho(GLdouble(draw_data->DisplayPos.x), GLdouble(draw_data->DisplayPos.x) + GLdouble(draw_data->DisplaySize.x),
+            GLdouble(draw_data->DisplayPos.y) + GLdouble(draw_data->DisplaySize.y), GLdouble(draw_data->DisplayPos.y), -1.0f,
             +1.0f);
 #endif
     glMatrixMode(GL_MODELVIEW);

@@ -19,7 +19,7 @@
     <Filter Include="ImGUI\Notify">
       <UniqueIdentifier>{4b8e0762-8e83-4bec-9dbb-55f0867e8949}</UniqueIdentifier>
     </Filter>
-    <Filter Include="menuItems">
+    <Filter Include="MenuItems">
       <UniqueIdentifier>{2a86814a-041a-4927-8429-f245a17b5e1b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -45,65 +45,20 @@
     <ClCompile Include="ImGUI\imgui_demo.cpp">
       <Filter>ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="animation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="resourceSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stateSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="menu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="weapon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="world.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="profile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="inputSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="settings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="network.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ImGUI\imgui_stdlib.cpp">
       <Filter>ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="gui.cpp">
+    <ClCompile Include="src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="particleSystem.cpp">
+    <ClCompile Include="src\ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="settingsPanel.cpp">
-      <Filter>menuItems</Filter>
+    <ClCompile Include="src\Menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StateManager.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -134,51 +89,6 @@
     <ClInclude Include="ImGUI\imstb_truetype.h">
       <Filter>ImGUI</Filter>
     </ClInclude>
-    <ClInclude Include="entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="animation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stateSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resourceSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="menu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="world.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="weapon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="profile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inputSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="settings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImGUI\fa_solid_900.h">
       <Filter>ImGUI\Notify</Filter>
     </ClInclude>
@@ -191,23 +101,20 @@
     <ClInclude Include="ImGUI\tahoma.h">
       <Filter>ImGUI\Notify</Filter>
     </ClInclude>
-    <ClInclude Include="network.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImGUI\imgui_stdlib.h">
       <Filter>ImGUI</Filter>
     </ClInclude>
-    <ClInclude Include="gui.h">
+    <ClInclude Include="src\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="includes.h">
+    <ClInclude Include="src\ResourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="particleSystem.h">
+    <ClInclude Include="src\Menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="settingsPanel.h">
-      <Filter>menuItems</Filter>
+    <ClInclude Include="src\StateManager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -34,20 +34,13 @@
 								std::printf("\033[0m\n");				\
 							}
 
-enum class Network_MSG
-{
-	None, Error, Test, LogInAttempt, LogInResult, RegisterAttempt, RegisterResult, Count
-};
-
 static sf::TcpListener listener;
 static sf::SocketSelector selector;
 static std::vector<std::unique_ptr<sf::TcpSocket>> clients;
 static std::atomic<bool> shouldRun = true;
 static std::mutex mutex;
 
-static std::unordered_map<std::string, std::string> users;
-
-void startServer(const std::uint64_t& thickRate = 0)
+void startServer(const std::uint64_t& thickRate = 0) noexcept
 {
 	if (listener.listen(52200, sf::IpAddress::getLocalAddress().value()) != sf::Socket::Status::Done)
 	{
@@ -93,71 +86,11 @@ void startServer(const std::uint64_t& thickRate = 0)
 								break;
 							case sf::Socket::Status::Done:
 							{
-								std::uint32_t tempType;
-								packet >> tempType;
-								Network_MSG msg = static_cast<Network_MSG>(tempType);
-								switch (msg)
+								for (auto it2 = clients.begin(); it2 != clients.end(); ++it2)
 								{
-								case Network_MSG::LogInAttempt:
-								{
-									std::string temp_Un;
-									std::string temp_Pw;
-									packet >> temp_Un >> temp_Pw;
-									packet.clear();
-									if (users.contains(temp_Un) && users.at(temp_Un) == temp_Pw)
-									{
-										LOG_SUCCES("Player loged in: %s(%s:%u)", "\033[37m", client.getRemoteAddress().value().toString().c_str(), client.getRemotePort());
-										packet << true;
-										auto temp = client.send(packet);
-									}
-									else
-									{
-										LOG_ERROR("Player failed to login: %s(%s:%u)", "\033[37m", client.getRemoteAddress().value().toString().c_str(), client.getRemotePort());
-										packet << false;
-										auto temp = client.send(packet);
-									}
-									break;
-								}
-								case Network_MSG::RegisterAttempt:
-								{
-									std::string temp_Un;
-									std::string temp_Pw;
-									std::string temp_Email;
-									packet >> temp_Un >> temp_Pw >> temp_Email;
-									packet.clear();
-									if (users.contains(temp_Un))
-									{
-										LOG_ERROR("Player failed to create account: %s(%s:%u)", "\033[37m", client.getRemoteAddress().value().toString().c_str(), client.getRemotePort());
-										packet << false;
-										auto temp = client.send(packet);
-									}
-									else
-									{
-										LOG_SUCCES("Player created an account: %s(%s:%u)", "\033[37m", client.getRemoteAddress().value().toString().c_str(), client.getRemotePort());
-										packet << true;
-										auto temp = client.send(packet);
-										users.insert({ temp_Un, temp_Pw });
-										std::ofstream file("users.ini", std::ios_base::app);
-										if (file.is_open())
-										{
-											file << temp_Un << '\n' << temp_Pw << '\n' << temp_Email << '\n';
-										}
-										else
-											LOG_ERROR("Cannot load user datas'...");
-										file.close();
-									}
-									break;
-								}
-								default:
-								{
-									for (auto it2 = clients.begin(); it2 != clients.end(); ++it2)
-									{
-										sf::TcpSocket& client2 = **it2;
-										if (it2 != it)
-											auto temp = client2.send(packet);
-									}
-									break;
-								}
+									sf::TcpSocket& client2 = **it2;
+									if (it2 != it)
+										auto temp = client2.send(packet);
 								}
 							}
 							break;
@@ -201,30 +134,6 @@ int main()
     ImFont* font = io.Fonts->AddFontFromFileTTF("tuffy.ttf", 25.0f, 0, io.Fonts->GetGlyphRangesJapanese());
     ImGui::SFML::UpdateFontTexture();
 
-	std::ifstream file("users.ini");
-	if (file.is_open())
-	{
-		std::string temp;
-		std::string un;
-		std::string pw;
-		int currLine = 1;
-		while (std::getline(file, temp))
-		{
-			if (currLine == 1)
-				un = temp;
-			else if (currLine == 2)
-				pw = temp;
-			else if (currLine == 3)
-				users.insert({ un, pw });
-			++currLine;
-			if (currLine >= 4)
-				currLine = 1;
-		}
-	}
-	else
-		LOG_ERROR("Cannot load user datas'...");
-	file.close();
-
 	std::thread server(&startServer, 16);
 
     sf::Clock deltaTime;
@@ -254,17 +163,6 @@ int main()
 					ImGui::EndListBox();
 				}
 			}
-			ImGui::Separator();
-			ImGui::Text("Currently Registered Users: ");
-			for (auto& user : users)
-			{
-				std::string text = std::string("Username: ") + user.first + std::string(" Password: ") + user.second;
-				if (ImGui::BeginListBox("##Registered_users"))
-				{
-					ImGui::Selectable(text.c_str());
-					ImGui::EndListBox();
-				}
-			}
         }ImGui::End();
 
         window.clear();
@@ -274,6 +172,5 @@ int main()
     ImGui::SFML::Shutdown();
 	shouldRun = false;
 	server.join();
-
     return 0;
 }
