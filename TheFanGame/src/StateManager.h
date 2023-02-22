@@ -23,13 +23,13 @@ public:
     void operator=(StateManager const&) = delete;
     virtual ~StateManager() noexcept = default;
 
-    static StateManager& getInstance();
+    [[nodiscard]] static StateManager& getInstance();
 
     template<typename T> void add(const bool& replace = false) noexcept;
     void popCurrent() noexcept;
     void processStateChange(sf::RenderWindow& window) noexcept;
-    const std::unique_ptr<State>& getCurrentState() const noexcept;
-    const std::size_t getSize() const noexcept;
+    [[nodiscard]] const std::unique_ptr<State>& getCurrentState() const noexcept;
+    [[nodiscard]] const std::size_t getSize() const noexcept;
 private:
     explicit StateManager() noexcept = default;
 

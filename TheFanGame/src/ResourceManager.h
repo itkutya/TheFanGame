@@ -21,9 +21,9 @@ public:
     void operator=(ResourceManager const&) = delete;
     virtual ~ResourceManager() noexcept = default;
 
-    static ResourceManager& getInstance();
+    [[nodiscard]] static ResourceManager& getInstance();
     
-    template<class T> std::shared_ptr<T>& get(const std::string& id) noexcept;
+    template<class T> [[nodiscard]] std::shared_ptr<T>& get(const std::string& id) noexcept;
     template<class T> std::shared_ptr<T>& add(const std::string& id) noexcept;
 private:
     explicit ResourceManager() noexcept = default;

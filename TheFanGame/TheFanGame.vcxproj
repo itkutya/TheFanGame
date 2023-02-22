@@ -168,6 +168,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Account.cpp" />
+    <ClCompile Include="src\Login.cpp" />
     <ClCompile Include="src\Menu.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Application.cpp" />
@@ -182,6 +184,8 @@
     <ClCompile Include="src\StateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Account.h" />
+    <ClInclude Include="src\Login.h" />
     <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Application.h" />
