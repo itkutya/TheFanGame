@@ -4,9 +4,6 @@
 #include "StateManager.h"
 #include "Account.h"
 
-#include "imgui.h"
-#include "imgui_stdlib.h"
-
 class Login : public State
 {
 public:

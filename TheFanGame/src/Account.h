@@ -1,6 +1,15 @@
 #pragma once
 
+#include <random>
 #include <string>
+
+#include "SFML/Network.hpp"
+#include "imgui.h"
+#include "imgui_stdlib.h"
+
+#include "Experience.h"
+
+constexpr std::uint8_t MAX_USERNAME_LENGTH = 16;
 
 class Account
 {
@@ -11,16 +20,16 @@ public:
 
     [[nodiscard]] static Account& getInstance();
 
-    std::string m_nickname;
+    std::string m_username;
     std::string m_password;
     std::string m_email;
-    std::uint64_t m_lvl = 0;
-    std::uint64_t m_lvlcap = 100;
     bool m_rememberme = false;
+    Experience m_Experience;
 
-    void Login() noexcept;
-    void Register() noexcept;
+    bool Login() noexcept;
+    bool Register() noexcept;
+    void CreateRandomNumber() noexcept;
 private:
     explicit Account() noexcept = default;
+    std::uint64_t m_random = 0;
 };
-

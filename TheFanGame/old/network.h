@@ -31,7 +31,7 @@ public:
 		std::lock_guard<std::mutex> lock(this->m_mutex);
 		if (this->m_packet.getDataSize() > 0)
 		{
-			std::uint32_t type;
+			std::uint32_t type = 0;
 			this->m_packet >> type;
 			Network_MSG msg = static_cast<Network_MSG>(type);
 			switch (msg)

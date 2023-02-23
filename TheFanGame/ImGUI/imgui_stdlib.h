@@ -6,11 +6,11 @@
 
 #pragma once
 
+#include <string>
+
 #include "imgui-SFML.h"
 #include "imgui_notify.h"
 #include "tahoma.h"
-
-#include <string>
 
 namespace ImGui
 {

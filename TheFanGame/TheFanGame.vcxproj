@@ -168,6 +168,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Experience.cpp" />
     <ClCompile Include="src\Account.cpp" />
     <ClCompile Include="src\Login.cpp" />
     <ClCompile Include="src\Menu.cpp" />
@@ -184,6 +185,7 @@
     <ClCompile Include="src\StateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Experience.h" />
     <ClInclude Include="src\Account.h" />
     <ClInclude Include="src\Login.h" />
     <ClInclude Include="src\Menu.h" />
