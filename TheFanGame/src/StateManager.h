@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <utility>
+#include <vector>
 #include <stack>
 
 #include "SFML/Graphics.hpp"
@@ -26,19 +28,24 @@ public:
     [[nodiscard]] static StateManager& getInstance();
 
     template<typename T> void add(const bool& replace = false) noexcept;
+    void removeLastGUIState() noexcept;
+
     void popCurrent() noexcept;
     void processStateChange(sf::RenderWindow& window) noexcept;
+
     [[nodiscard]] const std::unique_ptr<State>& getCurrentState() const noexcept;
+    [[nodiscard]] std::vector<std::unique_ptr<State>>& getCurrentGUIState() noexcept;
     [[nodiscard]] const std::size_t getSize() const noexcept;
 private:
     explicit StateManager() noexcept = default;
 
-    std::stack<std::unique_ptr<State>> m_statestack;
+    std::stack<std::pair<std::unique_ptr<State>, std::vector<std::unique_ptr<State>>>> m_statestack;
     std::unique_ptr<State> m_newstate;
 
     bool m_add = false;
     bool m_replace = false;
     bool m_remove = false;
+    bool m_removeGUI = false;
 };
 
 template<typename T>

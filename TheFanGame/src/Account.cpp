@@ -51,35 +51,34 @@ bool Account::Login() noexcept
 
 bool Account::Register() noexcept
 {
-	/*
-	if (email.find('@') == std::string::npos ||
-		email.find('.') == std::string::npos ||
-		name.length() > MAX_USERNAME_LENGTH ||
-		!name.length())
+	if (this->m_email.find('@') == std::string::npos	||
+		this->m_email.find('.') == std::string::npos	||
+		this->m_username.length() > MAX_USERNAME_LENGTH ||
+		!this->m_username.length())
 	{
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account, provided email is not valid! Or username is invalid!"));
 	}
 	else
 	{
-		request createProfile("thefangamedb.000webhostapp.com", "/register.php");
-		std::ostringstream stream = createProfile.setParams<std::string>("username=", name, "&password=", password, "&email=", email);
+		std::ostringstream stream;
+		stream << "username=" << this->m_username << "&password=" << this->m_password << "&email=" << this->m_email;
+		sf::Http http("http://thefangamedb.000webhostapp.com");
+		sf::Http::Request request("register.php", sf::Http::Request::Method::Post, stream.str());
+		sf::Http::Response response = http.sendRequest(request, sf::seconds(3.f));
 
-		if (!createProfile.sendRequest(stream.str(), sf::seconds(3)))
+		if (response.getStatus() != sf::Http::Response::Status::Ok)
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
 		else
 		{
-			if (createProfile.getResponse().getBody().find("Success.") == std::string::npos)
+			if (response.getBody().find("Success.") == std::string::npos)
 				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to create an account!"));
 			else
 			{
-				profile::name = name;
 				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully created an account!"));
 				return true;
 			}
 		}
 	}
-	return false;
-	*/
 	return false;
 }
 

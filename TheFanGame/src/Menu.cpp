@@ -5,18 +5,19 @@ void Menu::init(sf::RenderWindow& window)
 	ImGui::LoadCostumeFont("Resources/default.ttf");
 	ImGui::LoadCostumeStyle();
 
-	this->m_menustates.emplace_back(std::make_unique<Login>())->init(window);
+	this->s_StateManager = &StateManager::getInstance();
+	this->s_StateManager->getCurrentGUIState().emplace_back(std::make_unique<Login>())->init(window);
 }
 
 void Menu::processEvent(const sf::Event& event) noexcept
 {
-	for (auto& state : this->m_menustates)
+	for (auto& state : this->s_StateManager->getCurrentGUIState())
 		state->processEvent(event);
 }
 
 void Menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
-	for (auto& state : this->m_menustates)
+	for (auto& state : this->s_StateManager->getCurrentGUIState())
 		state->update(window, dt);
 }
 
@@ -28,6 +29,6 @@ void Menu::draw(sf::RenderWindow& window) noexcept
 	ImGui::PopStyleVar(1);
 	ImGui::PopStyleColor(1);
 
-	for (auto& state : this->m_menustates)
+	for (auto& state : this->s_StateManager->getCurrentGUIState())
 		state->draw(window);
 }
