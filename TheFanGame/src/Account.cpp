@@ -8,11 +8,13 @@ Account& Account::getInstance()
 
 bool Account::Login() noexcept
 {
-	std::ostringstream stream;
-	stream << "username=" << this->m_username << "&password=" << this->m_password;
-	if (this->m_rememberme && this->m_random)
-		stream << "random=" << this->m_random;
+	if (this->m_rememberme)
+		this->m_random = this->CreateHashNumber<std::string>(this->m_username);
+	else
+		this->m_random = 0;
 
+	std::ostringstream stream;
+	stream << "username=" << this->m_username << "&password=" << this->m_password << "&random=" << this->m_random;
 	sf::Http http("http://thefangamedb.000webhostapp.com");
 	sf::Http::Request request("login.php", sf::Http::Request::Method::Post, stream.str());
 	sf::Http::Response response = http.sendRequest(request, sf::seconds(3.f));
@@ -43,6 +45,15 @@ bool Account::Login() noexcept
 			}
 			this->m_Experience = Experience(lvl, xp, xpcap);
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));
+
+			if (this->m_rememberme && this->m_random)
+			{
+				std::ofstream file;
+				file.open("Settings.ini");
+				if (file.is_open())
+					file << this->m_username << '\n' << this->m_random << '\n' << this->m_rememberme;
+				file.close();
+			}
 			return true;
 		}
 	}
@@ -80,11 +91,4 @@ bool Account::Register() noexcept
 		}
 	}
 	return false;
-}
-
-void Account::CreateRandomNumber() noexcept
-{
-	std::random_device rd;
-	std::uniform_int_distribution<std::uint64_t> dist(UINT32_MAX, UINT64_MAX);
-	this->m_random = dist(rd);
 }

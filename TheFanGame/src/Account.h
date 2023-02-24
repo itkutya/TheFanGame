@@ -1,7 +1,8 @@
 #pragma once
 
-#include <random>
 #include <string>
+#include <functional>
+#include <fstream>
 
 #include "SFML/Network.hpp"
 #include "imgui.h"
@@ -10,6 +11,12 @@
 #include "Experience.h"
 
 constexpr std::uint8_t MAX_USERNAME_LENGTH = 16;
+
+template<class T>
+concept Hashable = requires(T a)
+{
+    { std::hash<T>{}(a) } -> std::convertible_to<std::size_t>;
+};
 
 class Account
 {
@@ -25,11 +32,20 @@ public:
     std::string m_email;
     bool m_rememberme = false;
     Experience m_Experience;
+    std::uint64_t m_random = 0;
 
     bool Login() noexcept;
     bool Register() noexcept;
-    void CreateRandomNumber() noexcept;
 private:
     explicit Account() noexcept = default;
-    std::uint64_t m_random = 0;
+
+    template<Hashable T>
+    [[nodiscard]] const std::uint64_t CreateHashNumber(T& type) const noexcept;
 };
+
+template<Hashable T>
+inline const std::uint64_t Account::CreateHashNumber(T& type) const noexcept
+{
+    std::hash<T> temp;
+    return temp(type);
+}

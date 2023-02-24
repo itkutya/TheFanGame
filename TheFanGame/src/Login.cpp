@@ -4,6 +4,32 @@ void Login::init(sf::RenderWindow& window)
 {
 	this->s_Account = &Account::getInstance();
 	this->s_StateManager = &StateManager::getInstance();
+
+	std::ifstream file;
+	file.open("Settings.ini");
+	if (file.is_open())
+	{
+		int line = 0;
+		std::string data;
+		while (std::getline(file, data))
+		{
+			if (line == 0)
+				this->s_Account->m_username = data;
+			if (line == 1)
+				this->s_Account->m_random = std::stoull(data);
+			if (line == 2)
+				this->s_Account->m_rememberme = std::stoi(data);
+			++line;
+		}
+	}
+	file.close();
+
+	if (this->s_Account->m_rememberme)
+		if (this->s_Account->Login())
+		{
+			std::printf("Login...\n");
+			this->s_StateManager->removeLastGUIState();
+		}
 }
 
 void Login::processEvent(const sf::Event& event) noexcept
@@ -31,8 +57,7 @@ void Login::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		if (ImGui::Button("Create Account"))
 			this->s_StateManager->getCurrentGUIState().emplace_back(std::make_unique<Register>())->init(window);
 		ImGui::SameLine();
-		if (ImGui::Checkbox("Remember me", &this->s_Account->m_rememberme) && this->s_Account->m_rememberme)
-			this->s_Account->CreateRandomNumber();
+		ImGui::Checkbox("Remember me", &this->s_Account->m_rememberme);
 		if (ImGui::Button("Quit"))
 			window.close();
 	}

@@ -9,24 +9,64 @@ if(mysqli_connect_errno())
     echo $mysqli->connect_error;
 else
 {
-    if(isset($_POST['username']) && isset($_POST['password']))
+    if(isset($_POST['username']) && isset($_POST['password']) && isset($_POST['random']))
     {
+        $random = $_POST['random'];
         $name = $_POST['username'];
-        $pw = $_POST['password'];
-        $query = "SELECT * FROM TheFanGameAccountsInfo INNER JOIN TheFanGameAccounts ON TheFanGameAccountsInfo.Username = TheFanGameAccounts.Username WHERE TheFanGameAccounts.Username = '$name' AND TheFanGameAccounts.Password = '$pw'";  
-        $resoult = $mysqli->query($query);
-        if($resoult->num_rows)
+        if($random != 0)
         {
-            echo "Success.#";
-            if($row = $resoult->fetch_array(MYSQLI_ASSOC))
+            $query = "SELECT * FROM TheFanGameAccountsInfo INNER JOIN TheFanGameAccounts ON TheFanGameAccountsInfo.Username = TheFanGameAccounts.Username WHERE TheFanGameAccounts.Username = '$name'";  
+            $resoult = $mysqli->query($query);
+            if($resoult->num_rows)
             {
-                echo $row["Level"]."#";
-                echo $row["CurrentXP"]."#";
-                echo $row["MaxXP"];
+                if($row = $resoult->fetch_array(MYSQLI_ASSOC))
+                {
+                    if($row["LoginBuffer"] != 0)
+                    {
+                        if($row["LoginBuffer"] == $random)
+                        {
+                            echo "Success.#";
+                            echo $row["Level"]."#";
+                            echo $row["CurrentXP"]."#";
+                            echo $row["MaxXP"];
+                        }
+                    }
+                    else
+                    {
+                        $pw = $_POST['password'];
+                        if($row['Password'] == $pw)
+                        {
+                            $query2 = "UPDATE `TheFanGameAccounts` SET `LoginBuffer` = '$random' WHERE `TheFanGameAccounts`.`Username` = '$name' AND  `TheFanGameAccounts`.`Password` = '$pw'";
+                            $resoult2 = $mysqli->query($query2);
+                            echo "Success.#";
+                            echo $row["Level"]."#";
+                            echo $row["CurrentXP"]."#";
+                            echo $row["MaxXP"];
+                        }
+                    }
+                }
             }
+            else
+                echo "Failed.";
         }
         else
-            echo "Failed.";
+        {
+            $pw = $_POST['password'];
+            $query = "SELECT * FROM TheFanGameAccountsInfo INNER JOIN TheFanGameAccounts ON TheFanGameAccountsInfo.Username = TheFanGameAccounts.Username WHERE TheFanGameAccounts.Username = '$name' AND TheFanGameAccounts.Password = '$pw'";  
+            $resoult = $mysqli->query($query);
+            if($resoult->num_rows)
+            {
+                echo "Success.#";
+                if($row = $resoult->fetch_array(MYSQLI_ASSOC))
+                {
+                    echo $row["Level"]."#";
+                    echo $row["CurrentXP"]."#";
+                    echo $row["MaxXP"];
+                }
+            }
+            else
+                echo "Failed.";
+        }
     }
 }
 exit();
