@@ -23,7 +23,7 @@ else
                 {
                     if($row["LoginBuffer"] != 0)
                     {
-                        if($row["LoginBuffer"] == $random)
+                        if($row["LoginBuffer"] === $random)
                         {
                             echo "Success.#";
                             echo $row["Level"]."#";
@@ -34,7 +34,7 @@ else
                     else
                     {
                         $pw = $_POST['password'];
-                        if($row['Password'] == $pw)
+                        if($row['Password'] === $pw)
                         {
                             $query2 = "UPDATE `TheFanGameAccounts` SET `LoginBuffer` = '$random' WHERE `TheFanGameAccounts`.`Username` = '$name' AND  `TheFanGameAccounts`.`Password` = '$pw'";
                             $resoult2 = $mysqli->query($query2);
