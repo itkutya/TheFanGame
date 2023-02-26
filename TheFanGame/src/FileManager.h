@@ -15,9 +15,6 @@ public:
 
     [[nodiscard]] static FileManager& getInstance();
 
-    //TODO:
-    //Optional???
-    //Make std::move not optional
     [[nodiscard]] std::vector<std::string> load(const std::string& path) noexcept;
     [[nodiscard]] std::vector<std::string> load(std::stringstream&& ss, const char& seperator) noexcept;
     void save(const std::string& path) noexcept;
