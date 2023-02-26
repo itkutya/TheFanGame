@@ -64,16 +64,16 @@ bool Login::LoginAccount() noexcept
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
 	else
 	{
-		if (response.getBody().find("Success.") == std::string::npos)
+		std::vector<std::string> data = std::move(this->s_FileManager->load(response.getBody(), '#'));
+		if (data[0] != std::string("Success."))
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect login details!"));
 		else
 		{
-			std::vector<std::string> data = std::move(this->s_FileManager->load(std::stringstream(response.getBody()), '#'));
 			this->s_Account->m_Experience = Experience(std::stoull(data[1]), std::stof(data[2]), std::stof(data[3]));
-			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));
-
 			if (this->s_Account->m_rememberme && this->s_Account->m_random)
 				this->s_FileManager->save("Settings.ini");
+
+			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));
 			return true;
 		}
 	}
