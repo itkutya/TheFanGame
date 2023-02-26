@@ -5,7 +5,6 @@ void Menu::init(sf::RenderWindow& window)
 	ImGui::LoadCostumeFont("Resources/default.ttf");
 	ImGui::LoadCostumeStyle();
 
-	this->s_StateManager = &StateManager::getInstance();
 	this->s_StateManager->getCurrentGUIState().emplace_back(std::make_unique<Login>())->init(window);
 }
 

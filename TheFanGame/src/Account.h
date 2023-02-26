@@ -26,6 +26,7 @@ public:
     virtual ~Account() noexcept = default;
 
     [[nodiscard]] static Account& getInstance();
+    template<Hashable T> [[nodiscard]] const std::uint64_t CreateHashNumber(T& type) const noexcept;
 
     std::string m_username;
     std::string m_password;
@@ -33,14 +34,8 @@ public:
     bool m_rememberme = false;
     Experience m_Experience;
     std::uint64_t m_random = 0;
-
-    bool Login() noexcept;
-    bool Register() noexcept;
 private:
     explicit Account() noexcept = default;
-
-    template<Hashable T>
-    [[nodiscard]] const std::uint64_t CreateHashNumber(T& type) const noexcept;
 };
 
 template<Hashable T>

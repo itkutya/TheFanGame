@@ -6,7 +6,7 @@ class Experience
 {
 public:
 	explicit Experience(const float& value = 0.f) noexcept;
-	explicit Experience(const std::uint64_t& lvl, const float& xp, const float& xpcap) noexcept;
+	explicit Experience(const std::uint64_t&& lvl, const float&& xp, const float&& xpcap) noexcept;
 	virtual ~Experience() noexcept = default;
 
 	const float getProgress() noexcept;

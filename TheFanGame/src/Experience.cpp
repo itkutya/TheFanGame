@@ -11,7 +11,7 @@ Experience::Experience(const float& value) noexcept
 	}
 }
 
-Experience::Experience(const std::uint64_t& lvl, const float& xp, const float& xpcap) noexcept
+Experience::Experience(const std::uint64_t&& lvl, const float&& xp, const float&& xpcap) noexcept
 {
 	this->m_lvl = lvl;
 	this->m_xpcap = xpcap;
