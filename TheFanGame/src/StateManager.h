@@ -28,13 +28,14 @@ public:
     [[nodiscard]] static StateManager& getInstance();
 
     template<typename T> void add(const bool& replace = false) noexcept;
+    template<typename T> void addGUIState(const bool& replace = false) noexcept;
     void removeLastGUIState() noexcept;
 
     void popCurrent() noexcept;
     void processStateChange(sf::RenderWindow& window) noexcept;
 
     [[nodiscard]] const std::unique_ptr<State>& getCurrentState() const noexcept;
-    [[nodiscard]] std::vector<std::unique_ptr<State>>& getCurrentGUIState() noexcept;
+    [[nodiscard]] const std::vector<std::unique_ptr<State>>& getCurrentGUIState() noexcept;
     [[nodiscard]] const std::size_t getSize() const noexcept;
 private:
     explicit StateManager() noexcept = default;
@@ -45,6 +46,10 @@ private:
     bool m_add = false;
     bool m_replace = false;
     bool m_remove = false;
+
+    std::unique_ptr<State> m_newGUIstate;
+    bool m_addGUI = false;
+    bool m_replaceGUI = false;
     bool m_removeGUI = false;
 };
 
@@ -54,4 +59,12 @@ inline void StateManager::add(const bool& replace) noexcept
     this->m_add = true;
     this->m_newstate = std::move(std::make_unique<T>());
     this->m_replace = replace;
+}
+
+template<typename T>
+inline void StateManager::addGUIState(const bool& replace) noexcept
+{
+    this->m_addGUI = true;
+    this->m_newGUIstate = std::move(std::make_unique<T>());
+    this->m_replaceGUI = replace;
 }

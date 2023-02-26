@@ -34,7 +34,7 @@ void Login::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Create Account"))
-			this->s_StateManager->getCurrentGUIState().emplace_back(std::make_unique<Register>())->init(window);
+			this->s_StateManager->addGUIState<Register>();
 		ImGui::SameLine();
 		ImGui::Checkbox("Remember me", &this->s_Account->m_rememberme);
 		if (ImGui::Button("Quit"))

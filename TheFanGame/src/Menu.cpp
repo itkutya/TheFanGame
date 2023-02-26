@@ -5,7 +5,7 @@ void Menu::init(sf::RenderWindow& window)
 	ImGui::LoadCostumeFont("Resources/default.ttf");
 	ImGui::LoadCostumeStyle();
 
-	this->s_StateManager->getCurrentGUIState().emplace_back(std::make_unique<Login>())->init(window);
+	this->s_StateManager->addGUIState<Login>();
 }
 
 void Menu::processEvent(const sf::Event& event) noexcept
