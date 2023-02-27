@@ -93,8 +93,8 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 							this->m_Music->stop();
 							if (this->m_Music->openFromFile("Resources/" + music + ".wav"))
 							{
-								this->m_Music->play();
 								this->m_Music->setVolume(20.f);
+								this->m_Music->play();
 							}
 						}
 					}
