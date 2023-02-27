@@ -30,7 +30,7 @@ void Login::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			ImGui::Button("Login"))
 		{
 			if (this->LoginAccount())
-				this->s_StateManager->removeLastGUIState();
+				this->s_StateManager->addGUIState<MainScreen>(true);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Create Account"))

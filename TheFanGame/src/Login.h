@@ -2,6 +2,7 @@
 
 #include "Register.h"
 #include "FileManager.h"
+#include "MainScreen.h"
 
 class Login : public State
 {
