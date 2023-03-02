@@ -21,12 +21,11 @@ private:
     ResourceManager* s_ResourceManager = &ResourceManager::getInstance();
 
     bool m_PlaySelected = false;
-    std::shared_ptr<sf::Sprite> m_Icon;
-    std::shared_ptr<sf::Sprite> m_FrontImage;
+    std::shared_ptr<ResourceManager::Entity> m_Icon;
+    std::shared_ptr<ResourceManager::Entity> m_FrontImage;
     std::shared_ptr<sf::Music> m_Music;
     std::shared_ptr<sf::Texture> m_Pause;
     std::shared_ptr<sf::Texture> m_Resume;
     std::string m_CurrentMusicTitle = "Blackbird - Cecile Corbel";
-    std::array<std::string, 2> m_MusicTitles = { "Blackbird - Cecile Corbel", "Sakakibara Yui - Koi no Honoo" };
+    const std::array<const std::string, 2> m_MusicTitles = { "Blackbird - Cecile Corbel", "Sakakibara Yui - Koi no Honoo" };
 };
-

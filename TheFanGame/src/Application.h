@@ -18,5 +18,5 @@ private:
 	sf::View m_view;
 	sf::Clock m_deltatime;
 
-	StateManager* s_StateManager;
+	StateManager* s_StateManager = &StateManager::getInstance();
 };

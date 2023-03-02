@@ -2,20 +2,18 @@
 
 void MainScreen::init(sf::RenderWindow& window)
 {
-	this->m_Icon = this->s_ResourceManager->add<sf::Sprite>("Icon");
-	std::shared_ptr<sf::Texture> IconTexture = this->s_ResourceManager->add<sf::Texture>("IconTexture");
-	if (IconTexture->loadFromFile("Resources/Icons.png"))
+	this->m_Icon = this->s_ResourceManager->add<ResourceManager::Entity>("Icon");
+	if (this->m_Icon->Texture.loadFromFile("Resources/Icons.png"))
 	{
-		this->m_Icon->setTexture(*IconTexture);
-		this->m_Icon->setTextureRect(sf::IntRect({ 0, 0 }, { 100, 100 }));
+		this->m_Icon->Sprite.setTexture(this->m_Icon->Texture);
+		this->m_Icon->Sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 100, 100 }));
 	}
 
-	this->m_FrontImage = this->s_ResourceManager->add<sf::Sprite>("FrontImage");
-	std::shared_ptr<sf::Texture> FrontImageTexture = this->s_ResourceManager->add<sf::Texture>("FrontImageTexture");
-	if (FrontImageTexture->loadFromFile("Resources/FontImages.png"))
+	this->m_FrontImage = this->s_ResourceManager->add<ResourceManager::Entity>("FrontImage");
+	if (this->m_FrontImage->Texture.loadFromFile("Resources/FontImages.png"))
 	{
-		this->m_FrontImage->setTexture(*FrontImageTexture);
-		this->m_FrontImage->setTextureRect(sf::IntRect({ 0, 0 }, { 600, 600 }));
+		this->m_FrontImage->Sprite.setTexture(this->m_FrontImage->Texture);
+		this->m_FrontImage->Sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 600, 600 }));
 	}
 
 	this->m_Music = this->s_ResourceManager->add<sf::Music>("MainScreenMusic");
@@ -56,7 +54,7 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			if (ImGui::BeginTable("MainMenuProfile", 2, ImGuiTableFlags_SizingFixedFit))
 			{
 				ImGui::TableNextColumn();
-				ImGui::Image(*this->m_Icon, sf::Vector2f(100.f, 100.f));
+				ImGui::Image(this->m_Icon->Sprite, sf::Vector2f(100.f, 100.f));
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("This is the profile picture!");
 				ImGui::TableNextColumn();
@@ -181,7 +179,7 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::EndTable();
 			}
 			ImGui::TableNextColumn();
-			ImGui::Image(*this->m_FrontImage, sf::Vector2f(ImGui::GetContentRegionAvail().x - 5.f, ImGui::GetContentRegionAvail().y - 5.f));
+			ImGui::Image(this->m_FrontImage->Sprite, sf::Vector2f(ImGui::GetContentRegionAvail().x - 5.f, ImGui::GetContentRegionAvail().y - 5.f));
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("This is the front image!");
 			ImGui::EndTable();

@@ -9,7 +9,6 @@ Application::Application(const sf::VideoMode& size, const std::string& title, co
 	this->m_deltatime.restart();
 
 	ImGui::SFML::Init(this->m_window);
-	this->s_StateManager = &StateManager::getInstance();
 	this->s_StateManager->add<Menu>();
 }
 

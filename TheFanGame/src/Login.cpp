@@ -9,7 +9,7 @@ void Login::init(sf::RenderWindow& window)
 
 	if (this->s_Account->m_rememberme)
 		if (this->LoginAccount())
-			this->s_StateManager->removeLastGUIState();
+			this->s_StateManager->addGUIState<MainScreen>(true);
 }
 
 void Login::processEvent(const sf::Event& event) noexcept
