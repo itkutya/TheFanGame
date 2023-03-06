@@ -10,17 +10,12 @@ std::vector<std::string> FileManager::load(const std::string& path, const char& 
 {
 	std::vector<std::string> data;
 	std::ifstream file(path);
-	int line = 0;
 	if (file.is_open())
-	{
-		while (std::getline(file, data.emplace_back(), seperator))
-			++line;
-	}
+		while (std::getline(file, data.emplace_back(), seperator));
 	else
 	{
 		std::stringstream ss(path);
-		while (std::getline(ss, data.emplace_back(), seperator))
-			++line;
+		while (std::getline(ss, data.emplace_back(), seperator));
 	}
 	file.close();
 	return data;

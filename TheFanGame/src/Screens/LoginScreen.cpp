@@ -2,7 +2,7 @@
 
 void LoginScreen::init(sf::RenderWindow& window)
 {
-	std::vector<std::string> data = std::move(this->s_FileManager->load("Settings.ini"));
+	std::vector<std::string> data = this->s_FileManager->load("Settings.ini");
 	this->s_Account->m_username = data[0];
 	this->s_Account->m_random = std::stoull(data[1]);
 	this->s_Account->m_rememberme = std::stoi(data[2]);
@@ -64,7 +64,7 @@ bool LoginScreen::LoginAccount() noexcept
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
 	else
 	{
-		std::vector<std::string> data = std::move(this->s_FileManager->load(response.getBody(), '#'));
+		std::vector<std::string> data = this->s_FileManager->load(response.getBody(), '#');
 		if (data[0] != std::string("Success."))
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect login details!"));
 		else

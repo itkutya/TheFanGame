@@ -4,13 +4,10 @@
 #include <vector>
 #include <sstream>
 #include <string>
+#include <optional>
 
 #include "Account/Account.h"
 
-//TODO:
-//Rethink this
-//Maybie unordered_map?
-//IDK...
 class FileManager
 {
 public:
@@ -24,6 +21,4 @@ public:
     [[nodiscard]] bool save(const std::string& path, const std::vector<std::string>& elements) noexcept;
 private:
     explicit FileManager() noexcept = default;
-
-    Account* s_Account = &Account::getInstance();
 };
