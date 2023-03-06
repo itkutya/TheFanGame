@@ -1,6 +1,6 @@
-#include "Login.h"
+#include "LoginScreen.h"
 
-void Login::init(sf::RenderWindow& window)
+void LoginScreen::init(sf::RenderWindow& window)
 {
 	std::vector<std::string> data = std::move(this->s_FileManager->load("Settings.ini"));
 	this->s_Account->m_username = data[0];
@@ -12,11 +12,11 @@ void Login::init(sf::RenderWindow& window)
 			this->s_StateManager->addGUIState<MainScreen>(true);
 }
 
-void Login::processEvent(const sf::Event& event) noexcept
+void LoginScreen::processEvent(const sf::Event& event) noexcept
 {
 }
 
-void Login::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
+void LoginScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
 	constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -34,7 +34,7 @@ void Login::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Create Account"))
-			this->s_StateManager->addGUIState<Register>();
+			this->s_StateManager->addGUIState<RegisterScreen>();
 		ImGui::SameLine();
 		ImGui::Checkbox("Remember me", &this->s_Account->m_rememberme);
 		if (ImGui::Button("Quit"))
@@ -43,11 +43,11 @@ void Login::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 	ImGui::End();
 }
 
-void Login::draw(sf::RenderWindow& window) noexcept
+void LoginScreen::draw(sf::RenderWindow& window) noexcept
 {
 }
 
-bool Login::LoginAccount() noexcept
+bool LoginScreen::LoginAccount() noexcept
 {
 	if (this->s_Account->m_rememberme)
 		this->s_Account->m_random = this->s_Account->CreateHashNumber<std::string>(this->s_Account->m_username);
@@ -69,9 +69,11 @@ bool Login::LoginAccount() noexcept
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect login details!"));
 		else
 		{
-			this->s_Account->m_Experience = Experience(std::stoull(data[1]), std::stof(data[2]), std::stof(data[3]));
+			this->s_Account->m_experience = Experience(std::stoull(data[1]), std::stof(data[2]), std::stof(data[3]));
 			if (this->s_Account->m_rememberme && this->s_Account->m_random)
-				this->s_FileManager->save("Settings.ini");
+				this->s_FileManager->save("Settings.ini", { this->s_Account->m_username,
+											 std::to_string(this->s_Account->m_random),
+											 std::to_string(this->s_Account->m_rememberme) });
 
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));
 			return true;

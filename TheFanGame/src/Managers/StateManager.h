@@ -5,6 +5,8 @@
 #include <vector>
 #include <stack>
 
+#include "imgui.h"
+#include "imgui_stdlib.h"
 #include "SFML/Graphics.hpp"
 
 class State
@@ -68,3 +70,18 @@ inline void StateManager::addGUIState(const bool& replace) noexcept
     this->m_newGUIstate = std::move(std::make_unique<T>());
     this->m_replaceGUI = replace;
 }
+
+class PopUpState
+{
+public:
+    bool m_once = true;
+    bool m_open = false;
+
+    virtual inline void close() noexcept
+    {
+        ImGui::CloseCurrentPopup();
+        this->s_StateManager->removeLastGUIState();
+    };
+protected:
+    StateManager* s_StateManager = &StateManager::getInstance();
+};

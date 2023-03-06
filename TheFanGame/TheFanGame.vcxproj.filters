@@ -51,31 +51,34 @@
     <ClCompile Include="src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ResourceManager.cpp">
+    <ClCompile Include="src\Managers\ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Menu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\StateManager.cpp">
+    <ClCompile Include="src\Managers\StateManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Login.cpp">
+    <ClCompile Include="src\Screens\LoginScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Account.cpp">
+    <ClCompile Include="src\Account\Account.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Experience.cpp">
+    <ClCompile Include="src\Account\Experience.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Register.cpp">
+    <ClCompile Include="src\Screens\RegisterScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\FileManager.cpp">
+    <ClCompile Include="src\Managers\FileManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\MainScreen.cpp">
+    <ClCompile Include="src\Screens\MainScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Screens\SettingsScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -125,31 +128,34 @@
     <ClInclude Include="src\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ResourceManager.h">
+    <ClInclude Include="src\Managers\ResourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\StateManager.h">
+    <ClInclude Include="src\Managers\StateManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Login.h">
+    <ClInclude Include="src\Screens\LoginScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Account.h">
+    <ClInclude Include="src\Account\Account.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Experience.h">
+    <ClInclude Include="src\Account\Experience.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Register.h">
+    <ClInclude Include="src\Screens\RegisterScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\FileManager.h">
+    <ClInclude Include="src\Managers\FileManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\MainScreen.h">
+    <ClInclude Include="src\Screens\MainScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Screens\SettingsScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

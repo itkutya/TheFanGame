@@ -1,15 +1,15 @@
-#include "Register.h"
+#include "RegisterScreen.h"
 
-void Register::init(sf::RenderWindow& window)
+void RegisterScreen::init(sf::RenderWindow& window)
 {
 	this->m_open = true;
 }
 
-void Register::processEvent(const sf::Event& event) noexcept
+void RegisterScreen::processEvent(const sf::Event& event) noexcept
 {
 }
 
-void Register::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
+void RegisterScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
 	if (this->m_once)
 	{
@@ -40,11 +40,11 @@ void Register::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		this->close();
 }
 
-void Register::draw(sf::RenderWindow& window) noexcept
+void RegisterScreen::draw(sf::RenderWindow& window) noexcept
 {
 }
 
-bool Register::RegisterAccount() noexcept
+bool RegisterScreen::RegisterAccount() noexcept
 {
 	if (this->s_Account->m_email.find('@') == std::string::npos ||
 		this->s_Account->m_email.find('.') == std::string::npos ||
@@ -75,10 +75,4 @@ bool Register::RegisterAccount() noexcept
 		}
 	}
 	return false;
-}
-
-void Register::close() noexcept
-{
-	ImGui::CloseCurrentPopup();
-	this->s_StateManager->removeLastGUIState();
 }

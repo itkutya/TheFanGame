@@ -32,7 +32,7 @@ public:
     std::string m_password;
     std::string m_email;
     bool m_rememberme = false;
-    Experience m_Experience;
+    Experience m_experience;
     std::uint64_t m_random = 0;
 private:
     explicit Account() noexcept = default;

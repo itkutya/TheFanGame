@@ -3,9 +3,14 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <string>
 
-#include "Account.h"
+#include "Account/Account.h"
 
+//TODO:
+//Rethink this
+//Maybie unordered_map?
+//IDK...
 class FileManager
 {
 public:
@@ -16,7 +21,7 @@ public:
     [[nodiscard]] static FileManager& getInstance();
 
     [[nodiscard]] std::vector<std::string> load(const std::string& path, const char& seperator = '\n') noexcept;
-    void save(const std::string& path) noexcept;
+    void save(const std::string& path, const std::vector<std::string>& elements) noexcept;
 private:
     explicit FileManager() noexcept = default;
 

@@ -90,7 +90,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\src;C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -111,7 +111,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\src;C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -132,7 +132,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\src;C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>includes.h</PrecompiledHeaderFile>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -154,7 +154,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\src;C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -168,14 +168,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\MainScreen.cpp" />
-    <ClCompile Include="src\FileManager.cpp" />
-    <ClCompile Include="src\Register.cpp" />
-    <ClCompile Include="src\Experience.cpp" />
-    <ClCompile Include="src\Account.cpp" />
-    <ClCompile Include="src\Login.cpp" />
+    <ClCompile Include="src\Screens\SettingsScreen.cpp" />
+    <ClCompile Include="src\Screens\MainScreen.cpp" />
+    <ClCompile Include="src\Managers\FileManager.cpp" />
+    <ClCompile Include="src\Screens\RegisterScreen.cpp" />
+    <ClCompile Include="src\Account\Experience.cpp" />
+    <ClCompile Include="src\Account\Account.cpp" />
+    <ClCompile Include="src\Screens\LoginScreen.cpp" />
     <ClCompile Include="src\Menu.cpp" />
-    <ClCompile Include="src\ResourceManager.cpp" />
+    <ClCompile Include="src\Managers\ResourceManager.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="ImGUI\imgui_stdlib.cpp" />
     <ClCompile Include="ImGUI\imgui-SFML.cpp" />
@@ -185,17 +186,18 @@
     <ClCompile Include="ImGUI\imgui_tables.cpp" />
     <ClCompile Include="ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="src\StateManager.cpp" />
+    <ClCompile Include="src\Managers\StateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\MainScreen.h" />
-    <ClInclude Include="src\FileManager.h" />
-    <ClInclude Include="src\Register.h" />
-    <ClInclude Include="src\Experience.h" />
-    <ClInclude Include="src\Account.h" />
-    <ClInclude Include="src\Login.h" />
+    <ClInclude Include="src\Screens\SettingsScreen.h" />
+    <ClInclude Include="src\Screens\MainScreen.h" />
+    <ClInclude Include="src\Managers\FileManager.h" />
+    <ClInclude Include="src\Screens\RegisterScreen.h" />
+    <ClInclude Include="src\Account\Experience.h" />
+    <ClInclude Include="src\Account\Account.h" />
+    <ClInclude Include="src\Screens\LoginScreen.h" />
     <ClInclude Include="src\Menu.h" />
-    <ClInclude Include="src\ResourceManager.h" />
+    <ClInclude Include="src\Managers\ResourceManager.h" />
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="ImGUI\fa_solid_900.h" />
     <ClInclude Include="ImGUI\font_awesome_5.h" />
@@ -211,7 +213,7 @@
     <ClInclude Include="ImGUI\imstb_rectpack.h" />
     <ClInclude Include="ImGUI\imstb_textedit.h" />
     <ClInclude Include="ImGUI\imstb_truetype.h" />
-    <ClInclude Include="src\StateManager.h" />
+    <ClInclude Include="src\Managers\StateManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\wolftextures.png" />

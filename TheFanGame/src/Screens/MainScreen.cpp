@@ -60,11 +60,11 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::TableNextColumn();
 				ImGui::Text("Account: %s\nXP: %.2f%%\nLevel: %i\nCoverCoin: %i$",
 					this->s_Account->m_username.c_str(),
-					this->s_Account->m_Experience.getProgress() * 100.f,
-					this->s_Account->m_Experience.getLevel(),
+					this->s_Account->m_experience.getProgress() * 100.f,
+					this->s_Account->m_experience.getLevel(),
 					0);
 				ImGui::Dummy(ImVec2(ImGui::GetContentRegionMax().x, 0.f));
-				ImGui::ProgressBar(this->s_Account->m_Experience.getProgress());
+				ImGui::ProgressBar(this->s_Account->m_experience.getProgress());
 				ImGui::EndTable();
 			}
 			ImGui::TableNextColumn();
@@ -164,7 +164,7 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
 
 				if (ImGui::Button("Settings", ImVec2(300.f, 75.f)))
-					//guistateSystem::add<settingsPanel>();
+					this->s_StateManager->addGUIState<SettingsScreen>();
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Opens the setting menu.");
 

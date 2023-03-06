@@ -1,23 +1,21 @@
 #pragma once
 
-#include "Register.h"
-#include "FileManager.h"
-#include "MainScreen.h"
+#include "Managers/ResourceManager.h"
+#include "Managers/StateManager.h"
+#include "Account/Account.h"
 
-class Login : public State
+class RegisterScreen : public State, public PopUpState
 {
 public:
-    explicit Login() noexcept = default;
-    virtual ~Login() noexcept = default;
+    explicit RegisterScreen() noexcept = default;
+    virtual ~RegisterScreen() noexcept = default;
 
     virtual void init(sf::RenderWindow& window) override;
     virtual void processEvent(const sf::Event& event) noexcept override;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
     virtual void draw(sf::RenderWindow& window) noexcept override;
 
-    bool LoginAccount() noexcept;
+    bool RegisterAccount() noexcept;
 private:
     Account* s_Account = &Account::getInstance();
-    StateManager* s_StateManager = &StateManager::getInstance();
-    FileManager* s_FileManager = &FileManager::getInstance();
 };
