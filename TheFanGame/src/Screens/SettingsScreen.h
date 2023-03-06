@@ -2,6 +2,7 @@
 
 #include "Managers/ResourceManager.h"
 #include "Managers/StateManager.h"
+#include "Managers/FileManager.h"
 #include "Account/Account.h"
 
 class SettingsScreen : public State, public PopUpState
@@ -17,6 +18,7 @@ public:
 private:
     Account* s_Account = &Account::getInstance();
     ResourceManager* s_ResourceManager = &ResourceManager::getInstance();
+    FileManager* s_FileManager = &FileManager::getInstance();
 
     std::shared_ptr<ResourceManager::Entity> m_Icon;
     std::shared_ptr<ResourceManager::Entity> m_FrontImage;

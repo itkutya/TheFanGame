@@ -26,11 +26,13 @@ std::vector<std::string> FileManager::load(const std::string& path, const char& 
 	return data;
 }
 
-void FileManager::save(const std::string& path, const std::vector<std::string>& elements) noexcept
+bool FileManager::save(const std::string& path, const std::vector<std::string>& elements) noexcept
 {
+	bool succes = false;
 	std::ofstream file(path);
-	if (file.is_open())
+	if (succes = file.is_open(); succes)
 		for (auto& element : elements)
 			file << element << '\n';
 	file.close();
+	return succes;
 }

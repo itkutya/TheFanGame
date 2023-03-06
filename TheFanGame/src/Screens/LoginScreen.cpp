@@ -71,10 +71,12 @@ bool LoginScreen::LoginAccount() noexcept
 		{
 			this->s_Account->m_experience = Experience(std::stoull(data[1]), std::stof(data[2]), std::stof(data[3]));
 			if (this->s_Account->m_rememberme && this->s_Account->m_random)
-				this->s_FileManager->save("Settings.ini", { this->s_Account->m_username,
-											 std::to_string(this->s_Account->m_random),
-											 std::to_string(this->s_Account->m_rememberme) });
-
+				if (!this->s_FileManager->save("Settings.ini", { this->s_Account->m_username,
+												  std::to_string(this->s_Account->m_random),
+												  std::to_string(this->s_Account->m_rememberme) }))
+				{
+					ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to save settings!"));
+				}
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));
 			return true;
 		}
