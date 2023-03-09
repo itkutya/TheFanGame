@@ -1,6 +1,6 @@
 #include "Experience.h"
 
-Experience::Experience(const float& value) noexcept
+Experience::Experience(float value) noexcept
 {
 	this->m_xp = value;
 	while (this->m_xp >= this->m_xpcap)
@@ -11,7 +11,7 @@ Experience::Experience(const float& value) noexcept
 	}
 }
 
-Experience::Experience(const std::uint64_t&& lvl, const float&& xp, const float&& xpcap) noexcept
+Experience::Experience(std::uint64_t lvl, float xp, float xpcap) noexcept
 {
 	this->m_lvl = lvl;
 	this->m_xpcap = xpcap;
@@ -34,7 +34,17 @@ const std::uint64_t& Experience::getLevel() noexcept
 	return this->m_lvl;
 }
 
-const float& Experience::add(const float& value) noexcept
+const float& Experience::getCurrentXP() noexcept
+{
+	return this->m_xp;
+}
+
+const float& Experience::getCurrentXPCap() noexcept
+{
+	return this->m_xpcap;
+}
+
+const float& Experience::add(float value) noexcept
 {
 	this->m_xp += value;
 	while (this->m_xp >= this->m_xpcap)

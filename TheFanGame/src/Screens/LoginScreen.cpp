@@ -2,17 +2,19 @@
 
 void LoginScreen::init(sf::RenderWindow& window)
 {
-	std::vector<std::string> data = this->s_FileManager->load("Settings.ini");
-	this->s_Account->m_username = data[0];
-	this->s_Account->m_random = std::stoull(data[1]);
-	this->s_Account->m_rememberme = std::stoi(data[2]);
+	if (this->s_Settings.load("Settings.ini"))
+	{
+		this->s_Account->m_username = this->s_Settings[Settings::FileNumber::USERNAME];
+		this->s_Account->m_random = std::stoull(this->s_Settings[Settings::FileNumber::RANDOM]);
+		this->s_Account->m_rememberme = std::stoi(this->s_Settings[Settings::FileNumber::REMEMBERME]);
 
-	if (this->s_Account->m_rememberme)
-		if (this->LoginAccount())
-			this->s_StateManager->addGUIState<MainScreen>(true);
+		if (this->s_Account->m_rememberme)
+			if (this->LoginAccount())
+				this->s_StateManager->addGUIState<MainScreen>(true);
+	}
 }
 
-void LoginScreen::processEvent(const sf::Event& event) noexcept
+void LoginScreen::processEvent(sf::Event& event) noexcept
 {
 }
 
@@ -65,11 +67,13 @@ bool LoginScreen::LoginAccount() noexcept
 	else
 	{
 		std::vector<std::string> data = this->s_FileManager->load(response.getBody(), '#');
-		if (data[0] != std::string("Success."))
+		if (data[Settings::ServerData::SUCCESS] != std::string("Success."))
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect login details!"));
 		else
 		{
-			this->s_Account->m_experience = Experience(std::stoull(data[1]), std::stof(data[2]), std::stof(data[3]));
+			this->s_Account->m_experience = Experience(std::stoull(data[Settings::ServerData::LVL]), 
+													   std::stof(data[Settings::ServerData::XP]),
+													   std::stof(data[Settings::ServerData::XPCAP]));
 			if (this->s_Account->m_rememberme && this->s_Account->m_random)
 				if (!this->s_FileManager->save("Settings.ini", { this->s_Account->m_username,
 												  std::to_string(this->s_Account->m_random),
@@ -81,5 +85,6 @@ bool LoginScreen::LoginAccount() noexcept
 			return true;
 		}
 	}
+	std::printf("Server response: %i", static_cast<int>(response.getStatus()));
 	return false;
 }

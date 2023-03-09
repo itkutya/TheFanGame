@@ -6,7 +6,7 @@ FileManager& FileManager::getInstance()
 	return instance;
 }
 
-std::vector<std::string> FileManager::load(const std::string& path, const char& seperator) noexcept
+std::vector<std::string> FileManager::load(const std::string& path, const char seperator) noexcept
 {
 	std::vector<std::string> data;
 	std::ifstream file(path);

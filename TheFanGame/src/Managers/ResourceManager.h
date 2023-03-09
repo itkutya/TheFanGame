@@ -3,6 +3,7 @@
 #include <variant>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "SFML/Graphics.hpp"
 #include "SFML/Audio.hpp"
@@ -10,17 +11,21 @@
 class ResourceManager
 {
 public:
-    struct Entity
+    struct Object
     {
         sf::Sprite Sprite;
         sf::Texture Texture;
     };
-    typedef std::variant<std::shared_ptr<sf::Sprite>,
-                         std::shared_ptr<sf::Texture>,
+    struct AudioObject
+    {
+        sf::SoundBuffer Buffer;
+        sf::Sound Sound;
+    };
+    typedef std::variant<std::shared_ptr<sf::Texture>,
                          std::shared_ptr<sf::Font>,
-                         std::shared_ptr<sf::SoundBuffer>,
                          std::shared_ptr<sf::Music>,
-                         std::shared_ptr<Entity>>
+                         std::shared_ptr<Object>,
+                         std::shared_ptr<AudioObject>>
     Resources;
 
     ResourceManager(ResourceManager const&) = delete;
@@ -31,7 +36,7 @@ public:
     
     template<class T> std::shared_ptr<T>& add(const std::string& id) noexcept;
     template<class T> [[nodiscard]] bool load(const std::string& id, const std::string& path) noexcept;
-    template<class T> bool remove(const std::string& id) noexcept;
+    template<class T> [[nodiscard]] bool remove(const std::string& id) noexcept;
     template<class T> [[nodiscard]] std::shared_ptr<T>& get(const std::string& id) noexcept;
 private:
     explicit ResourceManager() noexcept = default;
@@ -67,6 +72,7 @@ inline bool ResourceManager::remove(const std::string& id) noexcept
     if (std::get<std::shared_ptr<T>>(this->m_resources.at(id)).use_count() == 1)
     {
         std::get<std::shared_ptr<T>>(this->m_resources.at(id)).reset();
+        this->m_resources.erase(id);
         return true;
     }
     return false;

@@ -8,7 +8,7 @@ void Menu::init(sf::RenderWindow& window)
 	this->s_StateManager->addGUIState<LoginScreen>();
 }
 
-void Menu::processEvent(const sf::Event& event) noexcept
+void Menu::processEvent(sf::Event& event) noexcept
 {
 	for (auto& state : this->s_StateManager->getCurrentGUIState())
 		state->processEvent(event);

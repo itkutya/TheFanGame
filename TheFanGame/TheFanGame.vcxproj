@@ -168,6 +168,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Settings.cpp" />
+    <ClCompile Include="src\Managers\AudioManager.cpp" />
     <ClCompile Include="src\Screens\SettingsScreen.cpp" />
     <ClCompile Include="src\Screens\MainScreen.cpp" />
     <ClCompile Include="src\Managers\FileManager.cpp" />
@@ -189,6 +191,8 @@
     <ClCompile Include="src\Managers\StateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Settings.h" />
+    <ClInclude Include="src\Managers\AudioManager.h" />
     <ClInclude Include="src\Screens\SettingsScreen.h" />
     <ClInclude Include="src\Screens\MainScreen.h" />
     <ClInclude Include="src\Managers\FileManager.h" />

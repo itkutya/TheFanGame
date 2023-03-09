@@ -45,7 +45,7 @@ void Application::pollEvents() noexcept
 
 void Application::update() noexcept
 {
-	sf::Time dt = this->m_deltatime.restart();
+	const sf::Time dt = this->m_deltatime.restart();
 	ImGui::SFML::Update(this->m_window, dt);
 	if (this->s_StateManager->getSize())
 		this->s_StateManager->getCurrentState()->update(this->m_window, dt);

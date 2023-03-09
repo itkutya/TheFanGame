@@ -5,7 +5,7 @@ void RegisterScreen::init(sf::RenderWindow& window)
 	this->m_open = true;
 }
 
-void RegisterScreen::processEvent(const sf::Event& event) noexcept
+void RegisterScreen::processEvent(sf::Event& event) noexcept
 {
 }
 

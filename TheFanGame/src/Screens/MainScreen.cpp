@@ -2,35 +2,30 @@
 
 void MainScreen::init(sf::RenderWindow& window)
 {
-	this->m_Icon = this->s_ResourceManager->add<ResourceManager::Entity>("Icon");
+	this->m_Icon = this->s_ResourceManager->add<ResourceManager::Object>("Icon");
 	if (this->m_Icon->Texture.loadFromFile("Resources/Icons.png"))
 	{
 		this->m_Icon->Sprite.setTexture(this->m_Icon->Texture);
 		this->m_Icon->Sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 100, 100 }));
 	}
 
-	this->m_FrontImage = this->s_ResourceManager->add<ResourceManager::Entity>("FrontImage");
+	this->m_FrontImage = this->s_ResourceManager->add<ResourceManager::Object>("FrontImage");
 	if (this->m_FrontImage->Texture.loadFromFile("Resources/FontImages.png"))
 	{
 		this->m_FrontImage->Sprite.setTexture(this->m_FrontImage->Texture);
 		this->m_FrontImage->Sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 600, 600 }));
 	}
 
-	this->m_Music = this->s_ResourceManager->add<sf::Music>("MainScreenMusic");
-	if (this->m_Music->openFromFile("Resources/" + this->m_CurrentMusicTitle + ".wav"))
-	{
-		this->m_Music->setLoop(true);
-		this->m_Music->setVolume(20.f);
-		this->m_Music->play();
-	}
-
 	this->m_Pause = this->s_ResourceManager->add<sf::Texture>("PauseTexture");
 	this->m_Resume = this->s_ResourceManager->add<sf::Texture>("ResumeTexture");
 	if (!this->m_Pause->loadFromFile("Resources/Pause.png") || !this->m_Resume->loadFromFile("Resources/Resume.png"))
-		std::printf("Erro could not load some textures!");
+		std::printf("Error could not load some textures!");
+
+	if (!this->s_AudioManager->replaceCurrentMusic(this->s_AudioManager->m_CurrentMusicTitle))
+		ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
 }
 
-void MainScreen::processEvent(const sf::Event& event) noexcept
+void MainScreen::processEvent(sf::Event& event) noexcept
 {
 }
 
@@ -58,9 +53,10 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("This is the profile picture!");
 				ImGui::TableNextColumn();
-				ImGui::Text("Account: %s\nXP: %.2f%%\nLevel: %i\nCoverCoin: %i$",
+				ImGui::Text("Account: %s\nXP: %.2f/%.2f\nLevel: %i\nCoverCoin: %i$",
 					this->s_Account->m_username.c_str(),
-					this->s_Account->m_experience.getProgress() * 100.f,
+					this->s_Account->m_experience.getCurrentXP(),
+					this->s_Account->m_experience.getCurrentXPCap(),
 					this->s_Account->m_experience.getLevel(),
 					0);
 				ImGui::Dummy(ImVec2(ImGui::GetContentRegionMax().x, 0.f));
@@ -68,32 +64,28 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::EndTable();
 			}
 			ImGui::TableNextColumn();
-			if (this->m_Music->getStatus() == sf::SoundSource::Playing)
+			if (this->s_AudioManager->m_CurrentMusic->getStatus() == sf::SoundSource::Playing)
 			{
 				if (ImGui::ImageButton(*this->m_Pause, sf::Vector2f(35.f, 35.f)))
-					this->m_Music->pause();
+					this->s_AudioManager->m_CurrentMusic->pause();
 			}
 			else
 				if (ImGui::ImageButton(*this->m_Resume, sf::Vector2f(35.f, 35.f)))
-					this->m_Music->play();
+					this->s_AudioManager->m_CurrentMusic->play();
 			ImGui::SameLine();
 			ImGui::Text("Currently playing: ");
 			ImGui::SameLine();
-			if (ImGui::BeginCombo("###MusicSelector", this->m_CurrentMusicTitle.c_str(), ImGuiComboFlags_HeightSmall))
+			if (ImGui::BeginCombo("###MusicSelector", this->s_AudioManager->m_CurrentMusicTitle.c_str(), ImGuiComboFlags_HeightSmall))
 			{
-				for (auto& music : this->m_MusicTitles)
+				for (auto& music : this->s_AudioManager->m_MusicTitles)
 				{
 					if (ImGui::Selectable(music.c_str()))
 					{
-						if (this->m_CurrentMusicTitle != music)
+						if (this->s_AudioManager->m_CurrentMusicTitle != music)
 						{
-							this->m_CurrentMusicTitle = music;
-							this->m_Music->stop();
-							if (this->m_Music->openFromFile("Resources/" + music + ".wav"))
-							{
-								this->m_Music->setVolume(20.f);
-								this->m_Music->play();
-							}
+							this->s_AudioManager->m_CurrentMusicTitle = music;
+							if (!this->s_AudioManager->replaceCurrentMusic(this->s_AudioManager->m_CurrentMusicTitle))
+								ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
 						}
 					}
 				}

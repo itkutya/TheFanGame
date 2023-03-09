@@ -17,7 +17,7 @@ public:
 
     [[nodiscard]] static FileManager& getInstance();
 
-    [[nodiscard]] std::vector<std::string> load(const std::string& path, const char& seperator = '\n') noexcept;
+    [[nodiscard]] std::vector<std::string> load(const std::string& path, const char seperator = '\n') noexcept;
     [[nodiscard]] bool save(const std::string& path, const std::vector<std::string>& elements) noexcept;
 private:
     explicit FileManager() noexcept = default;

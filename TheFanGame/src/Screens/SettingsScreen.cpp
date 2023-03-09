@@ -5,7 +5,7 @@ void SettingsScreen::init(sf::RenderWindow& window)
 	this->m_open = true;
 }
 
-void SettingsScreen::processEvent(const sf::Event& event) noexcept
+void SettingsScreen::processEvent(sf::Event& event) noexcept
 {
 }
 

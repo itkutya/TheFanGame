@@ -15,7 +15,7 @@ public:
     explicit State() noexcept = default;
     virtual ~State() noexcept = default;
     virtual void init(sf::RenderWindow& window) = 0;
-    virtual void processEvent(const sf::Event& event) noexcept = 0;
+    virtual void processEvent(sf::Event& event) noexcept = 0;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept = 0;
     virtual void draw(sf::RenderWindow& window) noexcept = 0;
 };
@@ -29,8 +29,8 @@ public:
 
     [[nodiscard]] static StateManager& getInstance();
 
-    template<typename T> void add(const bool& replace = false) noexcept;
-    template<typename T> void addGUIState(const bool& replace = false) noexcept;
+    template<typename T> void add(bool replace = false) noexcept;
+    template<typename T> void addGUIState(bool replace = false) noexcept;
     void removeLastGUIState() noexcept;
 
     void popCurrent() noexcept;
@@ -56,7 +56,7 @@ private:
 };
 
 template<typename T>
-inline void StateManager::add(const bool& replace) noexcept
+inline void StateManager::add(bool replace) noexcept
 {
     this->m_add = true;
     this->m_newstate = std::move(std::make_unique<T>());
@@ -64,7 +64,7 @@ inline void StateManager::add(const bool& replace) noexcept
 }
 
 template<typename T>
-inline void StateManager::addGUIState(const bool& replace) noexcept
+inline void StateManager::addGUIState(bool replace) noexcept
 {
     this->m_addGUI = true;
     this->m_newGUIstate = std::move(std::make_unique<T>());

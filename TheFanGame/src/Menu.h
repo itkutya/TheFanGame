@@ -11,7 +11,7 @@ public:
     virtual ~Menu() noexcept = default;
 
     virtual void init(sf::RenderWindow& window) override;
-    virtual void processEvent(const sf::Event& event) noexcept override;
+    virtual void processEvent(sf::Event& event) noexcept override;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
     virtual void draw(sf::RenderWindow& window) noexcept override;
 private:
