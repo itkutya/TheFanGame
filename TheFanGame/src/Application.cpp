@@ -9,7 +9,7 @@ Application::Application(const sf::VideoMode& size, const std::string& title, co
 	this->m_deltatime.restart();
 
 	ImGui::SFML::Init(this->m_window);
-	this->s_StateManager->add<Menu>();
+	this->s_StateManager.add<Menu>();
 }
 
 Application::~Application() noexcept
@@ -24,7 +24,7 @@ sf::RenderWindow& Application::getWindow() noexcept
 
 void Application::pollEvents() noexcept
 {
-	this->s_StateManager->processStateChange(this->m_window);
+	this->s_StateManager.processStateChange(this->m_window);
 
 	sf::Event event;
 	while (this->m_window.pollEvent(event))
@@ -38,8 +38,8 @@ void Application::pollEvents() noexcept
 			this->m_view = sf::View(sf::Vector2f(event.size.width / 2.f, event.size.height / 2.f),
 									sf::Vector2f((float)event.size.width, (float)event.size.height));
 
-		if (this->s_StateManager->getSize())
-			this->s_StateManager->getCurrentState()->processEvent(event);
+		if (this->s_StateManager.getSize())
+			this->s_StateManager.getCurrentState()->processEvent(event);
 	}
 }
 
@@ -47,15 +47,15 @@ void Application::update() noexcept
 {
 	const sf::Time dt = this->m_deltatime.restart();
 	ImGui::SFML::Update(this->m_window, dt);
-	if (this->s_StateManager->getSize())
-		this->s_StateManager->getCurrentState()->update(this->m_window, dt);
+	if (this->s_StateManager.getSize())
+		this->s_StateManager.getCurrentState()->update(this->m_window, dt);
 }
 
 void Application::draw() noexcept
 {
 	this->m_window.clear();
-	if (this->s_StateManager->getSize())
-		this->s_StateManager->getCurrentState()->draw(this->m_window);
+	if (this->s_StateManager.getSize())
+		this->s_StateManager.getCurrentState()->draw(this->m_window);
 	ImGui::SFML::Render(this->m_window);
 	this->m_window.display();
 }

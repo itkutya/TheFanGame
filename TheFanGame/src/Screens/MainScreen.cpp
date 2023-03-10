@@ -2,31 +2,27 @@
 
 void MainScreen::init(sf::RenderWindow& window)
 {
-	this->m_Icon = this->s_ResourceManager->add<ResourceManager::Object>("Icon");
+	this->m_Icon = this->s_ResourceManager.add<ResourceManager::Object>("Icon");
 	if (this->m_Icon->Texture.loadFromFile("Resources/Icons.png"))
 	{
 		this->m_Icon->Sprite.setTexture(this->m_Icon->Texture);
 		this->m_Icon->Sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 100, 100 }));
 	}
 
-	this->m_FrontImage = this->s_ResourceManager->add<ResourceManager::Object>("FrontImage");
+	this->m_FrontImage = this->s_ResourceManager.add<ResourceManager::Object>("FrontImage");
 	if (this->m_FrontImage->Texture.loadFromFile("Resources/FontImages.png"))
 	{
 		this->m_FrontImage->Sprite.setTexture(this->m_FrontImage->Texture);
 		this->m_FrontImage->Sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 600, 600 }));
 	}
 
-	this->m_Pause = this->s_ResourceManager->add<sf::Texture>("PauseTexture");
-	this->m_Resume = this->s_ResourceManager->add<sf::Texture>("ResumeTexture");
+	this->m_Pause = this->s_ResourceManager.add<sf::Texture>("PauseTexture");
+	this->m_Resume = this->s_ResourceManager.add<sf::Texture>("ResumeTexture");
 	if (!this->m_Pause->loadFromFile("Resources/Pause.png") || !this->m_Resume->loadFromFile("Resources/Resume.png"))
 		std::printf("Error could not load some textures!");
 
-	if (!this->s_AudioManager->replaceCurrentMusic(this->s_AudioManager->m_CurrentMusicTitle))
+	if (!this->s_AudioManager.replaceCurrentMusic(this->s_AudioManager.m_CurrentMusicTitle))
 		ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
-}
-
-void MainScreen::processEvent(sf::Event& event) noexcept
-{
 }
 
 void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
@@ -54,37 +50,37 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					ImGui::SetTooltip("This is the profile picture!");
 				ImGui::TableNextColumn();
 				ImGui::Text("Account: %s\nXP: %.2f/%.2f\nLevel: %i\nCoverCoin: %i$",
-					this->s_Account->m_username.c_str(),
-					this->s_Account->m_experience.getCurrentXP(),
-					this->s_Account->m_experience.getCurrentXPCap(),
-					this->s_Account->m_experience.getLevel(),
+					this->s_Account.m_username.c_str(),
+					this->s_Account.m_experience.getCurrentXP(),
+					this->s_Account.m_experience.getCurrentXPCap(),
+					this->s_Account.m_experience.getLevel(),
 					0);
 				ImGui::Dummy(ImVec2(ImGui::GetContentRegionMax().x, 0.f));
-				ImGui::ProgressBar(this->s_Account->m_experience.getProgress());
+				ImGui::ProgressBar(this->s_Account.m_experience.getProgress());
 				ImGui::EndTable();
 			}
 			ImGui::TableNextColumn();
-			if (this->s_AudioManager->m_CurrentMusic->getStatus() == sf::SoundSource::Playing)
+			if (this->s_AudioManager.m_CurrentMusic->getStatus() == sf::SoundSource::Playing)
 			{
 				if (ImGui::ImageButton(*this->m_Pause, sf::Vector2f(35.f, 35.f)))
-					this->s_AudioManager->m_CurrentMusic->pause();
+					this->s_AudioManager.m_CurrentMusic->pause();
 			}
 			else
 				if (ImGui::ImageButton(*this->m_Resume, sf::Vector2f(35.f, 35.f)))
-					this->s_AudioManager->m_CurrentMusic->play();
+					this->s_AudioManager.m_CurrentMusic->play();
 			ImGui::SameLine();
 			ImGui::Text("Currently playing: ");
 			ImGui::SameLine();
-			if (ImGui::BeginCombo("###MusicSelector", this->s_AudioManager->m_CurrentMusicTitle.c_str(), ImGuiComboFlags_HeightSmall))
+			if (ImGui::BeginCombo("###MusicSelector", this->s_AudioManager.m_CurrentMusicTitle.c_str(), ImGuiComboFlags_HeightSmall))
 			{
-				for (auto& music : this->s_AudioManager->m_MusicTitles)
+				for (auto& music : this->s_AudioManager.m_MusicTitles)
 				{
 					if (ImGui::Selectable(music.c_str()))
 					{
-						if (this->s_AudioManager->m_CurrentMusicTitle != music)
+						if (this->s_AudioManager.m_CurrentMusicTitle != music)
 						{
-							this->s_AudioManager->m_CurrentMusicTitle = music;
-							if (!this->s_AudioManager->replaceCurrentMusic(this->s_AudioManager->m_CurrentMusicTitle))
+							this->s_AudioManager.m_CurrentMusicTitle = music;
+							if (!this->s_AudioManager.replaceCurrentMusic(this->s_AudioManager.m_CurrentMusicTitle))
 								ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
 						}
 					}
@@ -156,7 +152,7 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
 
 				if (ImGui::Button("Settings", ImVec2(300.f, 75.f)))
-					this->s_StateManager->addGUIState<SettingsScreen>();
+					this->s_StateManager.addGUIState<SettingsScreen>();
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Opens the setting menu.");
 
@@ -178,8 +174,4 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		}
 	}
 	ImGui::End();
-}
-
-void MainScreen::draw(sf::RenderWindow& window) noexcept
-{
 }

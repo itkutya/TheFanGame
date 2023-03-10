@@ -17,5 +17,5 @@ public:
 
     bool RegisterAccount() noexcept;
 private:
-    Account* s_Account = &Account::getInstance();
+    Account& s_Account = Account::getInstance();
 };

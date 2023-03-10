@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "imgui_stdlib.h"
 
+#include "Managers/SettingsManager.h"
 #include "Experience.h"
 
 constexpr std::uint8_t MAX_USERNAME_LENGTH = 16;
@@ -20,6 +21,7 @@ concept Hashable = requires(T a)
 
 class Account
 {
+    SettingsManager& s_Settings = SettingsManager::getInstance("Settings.ini");
 public:
     Account(Account const&) = delete;
     void operator=(Account const&) = delete;
@@ -28,7 +30,7 @@ public:
     [[nodiscard]] static Account& getInstance();
     template<Hashable T> [[nodiscard]] const std::uint64_t CreateHashNumber(T& type) const noexcept;
 
-    std::string m_username;
+    std::string& m_username = this->s_Settings[SettingsManager::FileNumber::USERNAME];
     std::string m_password;
     std::string m_email;
     bool m_rememberme = false;

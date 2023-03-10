@@ -5,18 +5,18 @@ void Menu::init(sf::RenderWindow& window)
 	ImGui::LoadCostumeFont("Resources/default.ttf");
 	ImGui::LoadCostumeStyle();
 
-	this->s_StateManager->addGUIState<LoginScreen>();
+	this->s_StateManager.addGUIState<LoginScreen>();
 }
 
 void Menu::processEvent(sf::Event& event) noexcept
 {
-	for (auto& state : this->s_StateManager->getCurrentGUIState())
+	for (auto& state : this->s_StateManager.getCurrentGUIState())
 		state->processEvent(event);
 }
 
 void Menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
-	for (auto& state : this->s_StateManager->getCurrentGUIState())
+	for (auto& state : this->s_StateManager.getCurrentGUIState())
 		state->update(window, dt);
 }
 
@@ -28,6 +28,6 @@ void Menu::draw(sf::RenderWindow& window) noexcept
 	ImGui::PopStyleVar(1);
 	ImGui::PopStyleColor(1);
 
-	for (auto& state : this->s_StateManager->getCurrentGUIState())
+	for (auto& state : this->s_StateManager.getCurrentGUIState())
 		state->draw(window);
 }

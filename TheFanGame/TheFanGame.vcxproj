@@ -168,11 +168,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Settings.cpp" />
+    <ClCompile Include="src\Managers\SettingsManager.cpp" />
     <ClCompile Include="src\Managers\AudioManager.cpp" />
     <ClCompile Include="src\Screens\SettingsScreen.cpp" />
     <ClCompile Include="src\Screens\MainScreen.cpp" />
-    <ClCompile Include="src\Managers\FileManager.cpp" />
     <ClCompile Include="src\Screens\RegisterScreen.cpp" />
     <ClCompile Include="src\Account\Experience.cpp" />
     <ClCompile Include="src\Account\Account.cpp" />
@@ -191,11 +190,10 @@
     <ClCompile Include="src\Managers\StateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Settings.h" />
+    <ClInclude Include="src\Managers\SettingsManager.h" />
     <ClInclude Include="src\Managers\AudioManager.h" />
     <ClInclude Include="src\Screens\SettingsScreen.h" />
     <ClInclude Include="src\Screens\MainScreen.h" />
-    <ClInclude Include="src\Managers\FileManager.h" />
     <ClInclude Include="src\Screens\RegisterScreen.h" />
     <ClInclude Include="src\Account\Experience.h" />
     <ClInclude Include="src\Account\Account.h" />

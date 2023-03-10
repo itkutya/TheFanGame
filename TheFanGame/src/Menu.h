@@ -15,5 +15,5 @@ public:
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
     virtual void draw(sf::RenderWindow& window) noexcept override;
 private:
-    StateManager* s_StateManager = &StateManager::getInstance();
+    StateManager& s_StateManager = StateManager::getInstance();
 };

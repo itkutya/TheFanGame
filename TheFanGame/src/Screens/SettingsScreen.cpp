@@ -5,10 +5,6 @@ void SettingsScreen::init(sf::RenderWindow& window)
 	this->m_open = true;
 }
 
-void SettingsScreen::processEvent(sf::Event& event) noexcept
-{
-}
-
 void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
 	if (this->m_once)
@@ -22,15 +18,13 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 	if (ImGui::BeginPopupModal("Settings", &this->m_open, flags))
 	{
-		if (ImGui::Button("Save") && !this->s_FileManager->save("Settings.ini", {}))
+		if (ImGui::Button("Save") && !this->s_Settings.save("Settings.ini"))
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to save settings!"));
 		ImGui::SameLine();
 		if (ImGui::Button("Back"))
 		{
-			if (!this->s_FileManager->save("Settings.ini", {}))
-			{
+			if (!this->s_Settings.save("Settings.ini"))
 				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to save settings!"));
-			}
 			this->close();
 		}
 		ImGui::EndPopup();
@@ -254,8 +248,4 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 		}
 	}
 	*/
-}
-
-void SettingsScreen::draw(sf::RenderWindow& window) noexcept
-{
 }

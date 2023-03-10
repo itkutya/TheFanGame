@@ -14,10 +14,10 @@ class State
 public:
     explicit State() noexcept = default;
     virtual ~State() noexcept = default;
-    virtual void init(sf::RenderWindow& window) = 0;
-    virtual void processEvent(sf::Event& event) noexcept = 0;
-    virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept = 0;
-    virtual void draw(sf::RenderWindow& window) noexcept = 0;
+    virtual void init(sf::RenderWindow& window) {};
+    virtual void processEvent(sf::Event& event) noexcept {};
+    virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept {};
+    virtual void draw(sf::RenderWindow& window) noexcept {};
 };
 
 class StateManager
