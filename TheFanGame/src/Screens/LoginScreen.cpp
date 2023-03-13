@@ -6,7 +6,7 @@ void LoginScreen::init(sf::RenderWindow& window)
 	this->s_Account.m_rememberme = std::stoi(this->s_Settings[SettingsManager::FileNumber::REMEMBERME]);
 
 	if (this->s_Account.m_rememberme && this->LoginAccount())
-		this->s_StateManager.addGUIState<MainScreen>(true);
+		this->s_StateManager.addGUIState<MainScreen>(this->m_app, true);
 }
 
 void LoginScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
@@ -23,7 +23,7 @@ void LoginScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			ImGui::Button("Login"))
 		{
 			if (this->LoginAccount())
-				this->s_StateManager.addGUIState<MainScreen>(true);
+				this->s_StateManager.addGUIState<MainScreen>(this->m_app, true);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Create Account"))

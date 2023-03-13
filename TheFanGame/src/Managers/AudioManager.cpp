@@ -15,7 +15,7 @@ bool AudioManager::replaceCurrentMusic(const std::string& title) noexcept
 	{
 		this->m_CurrentMusicTitle = title;
 		this->m_CurrentMusic->setLoop(true);
-		this->m_CurrentMusic->setVolume(20.f);
+		this->m_CurrentMusic->setVolume(this->m_musicvolume);
 		this->m_CurrentMusic->play();
 		return true;
 	}
@@ -31,7 +31,7 @@ bool AudioManager::addSoundEffect(const std::string& title) noexcept
 	if (this->m_SoundEffects[title]->Buffer.loadFromFile("Resources/SoundEffects/" + title + ".wav"))
 	{
 		this->m_SoundEffects[title]->Sound.setBuffer(this->m_SoundEffects[title]->Buffer);
-		this->m_SoundEffects[title]->Sound.setVolume(20.f);
+		this->m_SoundEffects[title]->Sound.setVolume(this->m_sfxvolume);
 		return true;
 	}
 	this->m_SoundEffects[title].reset();

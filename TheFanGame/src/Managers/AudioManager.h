@@ -25,6 +25,10 @@ public:
     std::unordered_map<std::string, std::shared_ptr<ResourceManager::AudioObject>> m_SoundEffects;
     //TODO:
     //std::unordered_map<std::string, std::shared_ptr<ResourceManager::AudioObject>> m_3DSoundEffects;
+
+    float m_musicvolume = 20.f;
+    float m_sfxvolume = 20.f;
+    float m_gamevolume = 20.f;
 private:
     explicit AudioManager() noexcept = default;
 };

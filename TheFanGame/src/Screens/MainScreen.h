@@ -5,7 +5,7 @@
 class MainScreen : public State
 {
 public:
-    explicit MainScreen() noexcept = default;
+    explicit MainScreen(Application* app) noexcept : m_app(app) {};
     virtual ~MainScreen() noexcept = default;
 
     virtual void init(sf::RenderWindow& window) override;
@@ -21,4 +21,6 @@ private:
     std::shared_ptr<ResourceManager::Object> m_FrontImage;
     std::shared_ptr<sf::Texture> m_Pause;
     std::shared_ptr<sf::Texture> m_Resume;
+
+    Application* m_app;
 };

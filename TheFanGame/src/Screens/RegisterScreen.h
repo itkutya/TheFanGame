@@ -7,7 +7,7 @@
 class RegisterScreen : public State, public PopUpState
 {
 public:
-    explicit RegisterScreen() noexcept = default;
+    explicit RegisterScreen(Application* app) noexcept {};
     virtual ~RegisterScreen() noexcept = default;
 
     virtual void init(sf::RenderWindow& window) override;

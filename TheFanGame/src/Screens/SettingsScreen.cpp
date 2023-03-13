@@ -13,15 +13,94 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 		this->m_once = false;
 	}
 
-	constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
+	constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
 	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 	if (ImGui::BeginPopupModal("Settings", &this->m_open, flags))
 	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f));
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::Button("Main menu"))
+				this->m_state = SETTINGS_STATE::MAINSCREEN;
+			if (ImGui::Button("Profile"))
+				this->m_state = SETTINGS_STATE::PROFILE;
+			if (ImGui::Button("Game"))
+				this->m_state = SETTINGS_STATE::GAME;
+			if (ImGui::Button("Graphics"))
+				this->m_state = SETTINGS_STATE::GRAPHICS;
+			if (ImGui::Button("Input"))
+				this->m_state = SETTINGS_STATE::INPUT;
+			if (ImGui::Button("Audio"))
+				this->m_state = SETTINGS_STATE::AUDIO;
+			ImGui::EndMenuBar();
+		}
+		ImGui::PopStyleVar(1);
+		ImGui::PopStyleColor(1);
+
+		switch (this->m_state)
+		{
+		case SETTINGS_STATE::GRAPHICS:
+		{
+			if (ImGui::Checkbox("Fullscreen: ", &this->m_app->m_fullscreen))
+				this->m_app->recreateWindow();
+
+			ImGui::SetNextItemWidth(300.f);
+			std::string preview = std::to_string(this->m_app->m_videomodes[this->m_app->m_videomode].size.x) + "x" + std::to_string(this->m_app->m_videomodes[this->m_app->m_videomode].size.y);
+			if (ImGui::BeginCombo("Resolution: ", preview.c_str(), ImGuiComboFlags_HeightSmall))
+			{
+				for (std::size_t i = 0; i < this->m_app->m_videomodes.size(); ++i)
+				{
+					std::string text = std::to_string(this->m_app->m_videomodes[i].size.x) + "x" + std::to_string(this->m_app->m_videomodes[i].size.y);
+					if (ImGui::Selectable(text.c_str()))
+					{
+						this->m_app->m_videomode = (int)i;
+						this->m_app->m_size = this->m_app->m_videomodes[i];
+						this->m_app->recreateWindow();
+					}
+				}
+				ImGui::EndCombo();
+			}
+			/*
+			ImGui::Checkbox("Show FPS", &settings::m_ShowFPS);
+
+			if (!settings::m_isFPSLimited)
+				if (ImGui::Checkbox("VSync: ", &settings::m_Vsync))
+					window.setVSync(settings::m_Vsync);
+
+			if (!settings::m_Vsync)
+			{
+				if (ImGui::Checkbox("FPS Limit: ", &settings::m_isFPSLimited))
+				{
+					if (!settings::m_isFPSLimited)
+						settings::m_FpsLimit = 0;
+					window.setFramerateLimit(settings::m_FpsLimit);
+				}
+				if (ImGui::SliderInt("##Limit: ", &settings::m_FpsLimit, 30, 240))
+					window.setFramerateLimit(settings::m_FpsLimit);
+			}
+			*/
+			break;
+		}
+		case SETTINGS_STATE::PROFILE:
+			break;
+		case SETTINGS_STATE::AUDIO:
+			break;
+		case SETTINGS_STATE::INPUT:
+			break;
+		case SETTINGS_STATE::GAME:
+			break;
+		case SETTINGS_STATE::MAINSCREEN:
+			break;
+		default:
+			break;
+		}
+
 		if (ImGui::Button("Save") && !this->s_Settings.save("Settings.ini"))
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to save settings!"));
 		ImGui::SameLine();
-		if (ImGui::Button("Back"))
+		if (ImGui::Button("Back & Save"))
 		{
 			if (!this->s_Settings.save("Settings.ini"))
 				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to save settings!"));
@@ -33,26 +112,6 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 	if (!this->m_open)
 		this->close();
 	/*
-	if (ImGui::BeginMenuBar())
-	{
-		if (ImGui::MenuItem("Mainmenu"))
-			this->state = settingStates::Mainmenu;
-		if (ImGui::MenuItem("Profile"))
-			this->state = settingStates::Profile;
-		if (ImGui::MenuItem("Game"))
-			this->state = settingStates::Game;
-		if (ImGui::MenuItem("Graphics"))
-			this->state = settingStates::Graphics;
-		if (ImGui::MenuItem("Input"))
-			this->state = settingStates::Input;
-		if (ImGui::MenuItem("Audio"))
-			this->state = settingStates::Audio;
-		ImGui::EndMenuBar();
-	}
-	switch (this->state)
-	{
-	case settingStates::Profile:
-		break;
 	case settingStates::Input:
 	{
 		inputSystem is;
@@ -112,48 +171,6 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 				else
 					keyBindChanger.close();
 			}
-		}
-		break;
-	}
-	case settingStates::Graphics:
-	{
-		if (ImGui::Checkbox("Fullscreen: ", &settings::m_Fullscreen))
-			window.create(settings::m_Videomodes[settings::m_currVideomode], "Fan Game!", settings::m_Fullscreen, settings::m_FpsLimit, settings::m_Vsync);
-
-		ImGui::SetNextItemWidth(300.f);
-		std::string preview = std::to_string(settings::m_Videomodes[settings::m_currVideomode].size.x) + "x" + std::to_string(settings::m_Videomodes[settings::m_currVideomode].size.y);
-		if (ImGui::BeginCombo("Resolution: ", preview.c_str(), ImGuiComboFlags_HeightSmall))
-		{
-			for (std::size_t i = 0; i < settings::m_Videomodes.size(); ++i)
-			{
-				std::string text = std::to_string(settings::m_Videomodes[i].size.x) + "x" + std::to_string(settings::m_Videomodes[i].size.y);
-				if (ImGui::Selectable(text.c_str()))
-				{
-					settings::m_currVideomode = (int)i;
-					window.create(settings::m_Videomodes[settings::m_currVideomode], "Fan Game!", settings::m_Fullscreen, settings::m_FpsLimit, settings::m_Vsync);
-					m_backgroundImage.setScale(sf::Vector2f(
-						window.getView().getSize().x / m_backgroundImage.getLocalBounds().width,
-						window.getView().getSize().y / m_backgroundImage.getLocalBounds().height));
-				}
-			}
-			ImGui::EndCombo();
-		}
-		ImGui::Checkbox("Show FPS", &settings::m_ShowFPS);
-
-		if (!settings::m_isFPSLimited)
-			if (ImGui::Checkbox("VSync: ", &settings::m_Vsync))
-				window.setVSync(settings::m_Vsync);
-
-		if (!settings::m_Vsync)
-		{
-			if (ImGui::Checkbox("FPS Limit: ", &settings::m_isFPSLimited))
-			{
-				if (!settings::m_isFPSLimited)
-					settings::m_FpsLimit = 0;
-				window.setFramerateLimit(settings::m_FpsLimit);
-			}
-			if (ImGui::SliderInt("##Limit: ", &settings::m_FpsLimit, 30, 240))
-				window.setFramerateLimit(settings::m_FpsLimit);
 		}
 		break;
 	}

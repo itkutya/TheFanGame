@@ -1,15 +1,20 @@
 #include "Application.h"
 
-Application::Application(const sf::VideoMode& size, const std::string& title, const bool& fullscreen, const std::uint32_t& fpslimit) noexcept
+Application::Application(sf::VideoMode size, const std::string& title, bool fullscreen, std::uint32_t fpslimit) noexcept
 {
+	this->m_size = size;
+	this->m_title = title;
+	this->m_fullscreen = fullscreen;
+	this->m_fpslimit = fpslimit;
 	this->m_window.create(size, title, fullscreen ? sf::Style::Fullscreen : sf::Style::Default);
 	this->m_window.setFramerateLimit(fpslimit);
-	this->m_view = sf::View(sf::Vector2f(this->m_window.getSize().x / 2.f, this->m_window.getSize().y / 2.f),
-							sf::Vector2f(this->m_window.getSize()));
-	this->m_deltatime.restart();
+
+	this->m_videomodes = sf::VideoMode::getFullscreenModes();
 
 	ImGui::SFML::Init(this->m_window);
-	this->s_StateManager.add<Menu>();
+	this->s_StateManager.add<Menu>(this);
+
+	this->m_deltatime.restart();
 }
 
 Application::~Application() noexcept
@@ -35,8 +40,7 @@ void Application::pollEvents() noexcept
 			this->m_window.close();
 
 		if (event.type == sf::Event::Resized)
-			this->m_view = sf::View(sf::Vector2f(event.size.width / 2.f, event.size.height / 2.f),
-									sf::Vector2f((float)event.size.width, (float)event.size.height));
+			this->m_size = sf::VideoMode({ event.size.width, event.size.height });
 
 		if (this->s_StateManager.getSize())
 			this->s_StateManager.getCurrentState()->processEvent(event);
@@ -58,4 +62,10 @@ void Application::draw() noexcept
 		this->s_StateManager.getCurrentState()->draw(this->m_window);
 	ImGui::SFML::Render(this->m_window);
 	this->m_window.display();
+}
+
+void Application::recreateWindow()
+{
+	this->m_window.create(this->m_size , this->m_title, this->m_fullscreen ? sf::Style::Fullscreen : sf::Style::Default);
+	this->m_window.setFramerateLimit(this->m_fpslimit);
 }

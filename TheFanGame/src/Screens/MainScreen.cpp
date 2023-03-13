@@ -152,7 +152,7 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
 
 				if (ImGui::Button("Settings", ImVec2(300.f, 75.f)))
-					this->s_StateManager.addGUIState<SettingsScreen>();
+					this->s_StateManager.addGUIState<SettingsScreen>(this->m_app);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Opens the setting menu.");
 

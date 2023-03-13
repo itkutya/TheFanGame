@@ -5,7 +5,7 @@
 class Application
 {
 public:
-	explicit Application(const sf::VideoMode& size, const std::string& title, const bool& fullscreen, const std::uint32_t& fpslimit = 0) noexcept;
+	explicit Application(sf::VideoMode size, const std::string& title, bool fullscreen, std::uint32_t fpslimit = 0) noexcept;
 	virtual ~Application() noexcept;
 
 	[[nodiscard]] sf::RenderWindow& getWindow() noexcept;
@@ -13,9 +13,19 @@ public:
 	void pollEvents() noexcept;
 	void update() noexcept;
 	void draw() noexcept;
+
+	void recreateWindow();
+
+	sf::VideoMode m_size;
+	std::string m_title;
+	bool m_fullscreen = false;
+	std::uint32_t m_fpslimit = 0;
+	bool m_fps = true;
+	bool m_vsync = false;
+	std::vector<sf::VideoMode> m_videomodes;
+	int m_videomode = 0;
 private:
 	sf::RenderWindow m_window;
-	sf::View m_view;
 	sf::Clock m_deltatime;
 
 	StateManager& s_StateManager = StateManager::getInstance();

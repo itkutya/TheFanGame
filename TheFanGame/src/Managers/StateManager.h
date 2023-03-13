@@ -9,6 +9,8 @@
 #include "imgui_stdlib.h"
 #include "SFML/Graphics.hpp"
 
+class Application;
+
 class State
 {
 public:
@@ -29,11 +31,12 @@ public:
 
     [[nodiscard]] static StateManager& getInstance();
 
-    template<typename T> void add(bool replace = false) noexcept;
-    template<typename T> void addGUIState(bool replace = false) noexcept;
-    void removeLastGUIState() noexcept;
+    template<typename T> void add(Application* app = nullptr, bool replace = false) noexcept;
+    template<typename T> void addGUIState(Application* app = nullptr, bool replace = false) noexcept;
 
+    void removeLastGUIState() noexcept;
     void popCurrent() noexcept;
+
     void processStateChange(sf::RenderWindow& window) noexcept;
 
     [[nodiscard]] const std::unique_ptr<State>& getCurrentState() const noexcept;
@@ -43,8 +46,8 @@ private:
     explicit StateManager() noexcept = default;
 
     std::stack<std::pair<std::unique_ptr<State>, std::vector<std::unique_ptr<State>>>> m_statestack;
+    
     std::unique_ptr<State> m_newstate;
-
     bool m_add = false;
     bool m_replace = false;
     bool m_remove = false;
@@ -56,19 +59,19 @@ private:
 };
 
 template<typename T>
-inline void StateManager::add(bool replace) noexcept
+inline void StateManager::add(Application* app, bool replace) noexcept
 {
     this->m_add = true;
-    this->m_newstate = std::move(std::make_unique<T>());
     this->m_replace = replace;
+    this->m_newstate = std::make_unique<T>(app);
 }
 
 template<typename T>
-inline void StateManager::addGUIState(bool replace) noexcept
+inline void StateManager::addGUIState(Application* app, bool replace) noexcept
 {
     this->m_addGUI = true;
-    this->m_newGUIstate = std::move(std::make_unique<T>());
     this->m_replaceGUI = replace;
+    this->m_newGUIstate = std::make_unique<T>(app);
 }
 
 class PopUpState
