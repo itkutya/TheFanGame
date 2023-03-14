@@ -4,6 +4,7 @@
 
 class Application
 {
+	StateManager& s_StateManager = StateManager::getInstance();
 public:
 	explicit Application(sf::VideoMode size, const std::string& title, bool fullscreen, std::uint32_t fpslimit = 0) noexcept;
 	virtual ~Application() noexcept;
@@ -27,6 +28,4 @@ public:
 private:
 	sf::RenderWindow m_window;
 	sf::Clock m_deltatime;
-
-	StateManager& s_StateManager = StateManager::getInstance();
 };

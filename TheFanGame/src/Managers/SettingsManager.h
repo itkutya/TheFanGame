@@ -4,6 +4,10 @@
 #include <vector>
 #include <sstream>
 #include <string>
+#include <unordered_map>
+#include <any>
+#include <cstdint>
+#include <type_traits>
 
 class SettingsManager
 {
@@ -21,7 +25,7 @@ public:
 		SUCCESS = 0, LVL, XP, XPCAP
 	};
 
-	std::string& operator[](std::size_t idx) noexcept;
+	std::any& operator[](const std::string& id) noexcept;
 
 	[[nodiscard]] static SettingsManager& getInstance(const std::string& path = "Settings.ini");
 	bool save(const std::string& path) noexcept;
@@ -29,6 +33,9 @@ private:
 	explicit SettingsManager(const std::string& path) noexcept;
 	[[nodiscard]] bool load(const std::string& path) noexcept;
 
-	std::vector<std::string> m_settings;
+	const std::any getTypeAndValue(const std::vector<std::string>& value) noexcept;
+	const std::string getUnderLyingType(std::any& type) noexcept;
+
+	std::unordered_map<std::string, std::any> m_settings;
 	bool m_first = true;
 };

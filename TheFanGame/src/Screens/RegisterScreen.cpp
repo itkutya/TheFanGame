@@ -23,7 +23,7 @@ void RegisterScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 	if (ImGui::BeginPopupModal("Register", &this->m_open, flags))
 	{
 		if (ImGui::InputText("Email:", &this->s_Account.m_email, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank)										||
-			ImGui::InputText("Username:", &this->s_Account.m_username, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank)								||
+			ImGui::InputText("Username:", this->s_Account.m_username, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank)								||
 			ImGui::InputText("Password:", &this->s_Account.m_password, ImGuiInputTextFlags_Password | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank) ||
 			ImGui::Button("Create"))
 		{
@@ -48,17 +48,17 @@ bool RegisterScreen::RegisterAccount() noexcept
 {
 	if (this->s_Account.m_email.find('@') == std::string::npos ||
 		this->s_Account.m_email.find('.') == std::string::npos ||
-		this->s_Account.m_username.length() > MAX_USERNAME_LENGTH ||
-		!this->s_Account.m_username.length())
+		this->s_Account.m_username->length() > MAX_USERNAME_LENGTH ||
+		!this->s_Account.m_username->length())
 	{
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Cannot create account, provided email is not valid! Or username is invalid!"));
 	}
 	else
 	{
 		std::ostringstream stream;
-		stream << "username=" << this->s_Account.m_username << "&password=" << this->s_Account.m_password << "&email=" << this->s_Account.m_email;
+		stream << "username=" << *this->s_Account.m_username << "&password=" << this->s_Account.m_password << "&email=" << this->s_Account.m_email;
 		sf::Http http("http://thefangamedb.000webhostapp.com");
-		sf::Http::Request request("register.php", sf::Http::Request::Method::Post, stream.str());
+		sf::Http::Request request("/register.php", sf::Http::Request::Method::Post, stream.str());
 		sf::Http::Response response = http.sendRequest(request, sf::seconds(3.f));
 
 		if (response.getStatus() != sf::Http::Response::Status::Ok)

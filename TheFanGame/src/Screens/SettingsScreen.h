@@ -10,6 +10,7 @@
 
 class SettingsScreen : public State, public PopUpState
 {
+    SettingsManager& s_Settings = SettingsManager::getInstance();
     enum class SETTINGS_STATE
     {
         GRAPHICS, PROFILE, AUDIO, INPUT, GAME, MAINSCREEN
@@ -21,8 +22,6 @@ public:
     virtual void init(sf::RenderWindow& window) override;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
 private:
-    SettingsManager& s_Settings = SettingsManager::getInstance();
-
     std::shared_ptr<ResourceManager::Object> m_Icon;
     std::shared_ptr<ResourceManager::Object> m_FrontImage;
     std::shared_ptr<sf::Music> m_Music;
