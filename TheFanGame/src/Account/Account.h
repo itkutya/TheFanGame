@@ -30,12 +30,12 @@ public:
     [[nodiscard]] static Account& getInstance();
     template<Hashable T> [[nodiscard]] const std::uint64_t CreateHashNumber(T& type) const noexcept;
 
-    std::string* m_username = std::any_cast<std::string>(&this->s_Settings["username"]);
+    std::string& m_username = this->s_Settings.get<std::string>("username");
     std::string m_password;
     std::string m_email;
-    bool* m_rememberme = std::any_cast<bool>(&this->s_Settings["rememberme"]);
+    bool& m_rememberme = this->s_Settings.get<bool>("rememberme");
     Experience m_experience;
-    std::uint64_t* m_random = std::any_cast<std::uint64_t>(&this->s_Settings["random"]);
+    std::uint64_t& m_random = this->s_Settings.get<std::uint64_t>("random");
 private:
     explicit Account() noexcept = default;
 };

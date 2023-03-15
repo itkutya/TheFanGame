@@ -20,7 +20,7 @@ public:
     [[nodiscard]] bool addSoundEffect(const std::string& title) noexcept;
 
     const std::array<const std::string, 2> m_MusicTitles = { "Blackbird - Cecile Corbel", "Sakakibara Yui - Koi no Honoo" };
-    std::string* m_CurrentMusicTitle = std::any_cast<std::string>(&this->s_Settings["musictitle"]);
+    std::string& m_CurrentMusicTitle = this->s_Settings.get<std::string>("musictitle");
     std::shared_ptr<sf::Music> m_CurrentMusic;
     std::unordered_map<std::string, std::shared_ptr<ResourceManager::AudioObject>> m_SoundEffects;
     //TODO:

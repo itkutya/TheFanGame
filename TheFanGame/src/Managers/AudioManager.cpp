@@ -13,7 +13,7 @@ bool AudioManager::replaceCurrentMusic(const std::string& title) noexcept
 	this->m_CurrentMusic = this->s_ResourceManager.add<sf::Music>(title);
 	if (this->m_CurrentMusic->openFromFile("Resources/Musics/" + title + ".wav"))
 	{
-		*this->m_CurrentMusicTitle = title;
+		this->m_CurrentMusicTitle = title;
 		this->m_CurrentMusic->setLoop(true);
 		this->m_CurrentMusic->setVolume(this->m_musicvolume);
 		this->m_CurrentMusic->play();

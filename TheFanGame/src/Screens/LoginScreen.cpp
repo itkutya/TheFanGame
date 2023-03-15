@@ -15,7 +15,7 @@ void LoginScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 	ImGui::SetNextWindowSize(viewport->Size);
 	if (ImGui::Begin("##Login", 0, flags))
 	{
-		if (ImGui::InputText("Nickname", this->s_Account.m_username, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank) ||
+		if (ImGui::InputText("Nickname", &this->s_Account.m_username, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank) ||
 			ImGui::InputText("Password", &this->s_Account.m_password, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_Password) ||
 			ImGui::Button("Login"))
 		{
@@ -26,7 +26,7 @@ void LoginScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		if (ImGui::Button("Create Account"))
 			this->s_StateManager.addGUIState<RegisterScreen>();
 		ImGui::SameLine();
-		ImGui::Checkbox("Remember me", this->s_Account.m_rememberme);
+		ImGui::Checkbox("Remember me", &this->s_Account.m_rememberme);
 		
 		if (ImGui::Button("Quit"))
 			window.close();
@@ -37,12 +37,12 @@ void LoginScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 bool LoginScreen::LoginAccount() noexcept
 {
 	if (this->s_Account.m_rememberme)
-		*this->s_Account.m_random = this->s_Account.CreateHashNumber<std::string>(*this->s_Account.m_username);
+		this->s_Account.m_random = this->s_Account.CreateHashNumber<std::string>(this->s_Account.m_username);
 	else
-		*this->s_Account.m_random = 0;
+		this->s_Account.m_random = 0;
 	
 	std::ostringstream stream;
-	stream << "username=" << *this->s_Account.m_username << "&password=" << this->s_Account.m_password << "&random=" << *this->s_Account.m_random;
+	stream << "username=" << this->s_Account.m_username << "&password=" << this->s_Account.m_password << "&random=" << this->s_Account.m_random;
 	sf::Http http("http://thefangamedb.000webhostapp.com");
 	sf::Http::Request request("/login.php", sf::Http::Request::Method::Post, stream.str());
 	sf::Http::Response response = http.sendRequest(request, sf::seconds(3.f));
