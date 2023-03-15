@@ -19,10 +19,6 @@ public:
 	void operator=(SettingsManager const&) = delete;
 	virtual ~SettingsManager() noexcept;
 
-	enum FileNumber
-	{
-		USERNAME = 0, RANDOM, REMEMBERME, MUSIC_TITLE
-	};
 	enum ServerData
 	{
 		SUCCESS = 0, LVL, XP, XPCAP
