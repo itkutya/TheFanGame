@@ -12,7 +12,7 @@ class SettingsManager
 	struct Setting
 	{
 		const std::string type;
-		void* value;
+		void* value = nullptr;
 	};
 public:
 	SettingsManager(SettingsManager const&) = delete;
