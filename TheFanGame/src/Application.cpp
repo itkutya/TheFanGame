@@ -51,6 +51,23 @@ void Application::update() noexcept
 {
 	const sf::Time dt = this->m_deltatime.restart();
 	ImGui::SFML::Update(this->m_window, dt);
+	constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize | 
+									   ImGuiWindowFlags_NoSavedSettings  |
+									   ImGuiWindowFlags_NoBackground	 | 
+									   ImGuiWindowFlags_NoDecoration     |
+									   ImGuiWindowFlags_NoCollapse		 | 
+									   ImGuiWindowFlags_NoInputs         |
+									   ImGuiWindowFlags_NoMove;
+	if (this->m_showfps)
+	{
+		if (ImGui::Begin("FPS Counter", 0, flags))
+		{
+			auto& io = ImGui::GetIO();
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetWindowPos("FPS Counter", ImVec2(viewport->WorkSize.x * 0.85f, viewport->WorkPos.y));
+			ImGui::TextColored(ImVec4(0, 0, 1, 1), "%.2f fps (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
+		}ImGui::End();
+	}
 	if (this->s_StateManager.getSize())
 		this->s_StateManager.getCurrentState()->update(this->m_window, dt);
 }

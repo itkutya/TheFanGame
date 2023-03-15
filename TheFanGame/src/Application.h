@@ -22,6 +22,7 @@ public:
 	bool m_fullscreen = false;
 	std::uint32_t m_fpslimit = 0;
 	bool m_fps = true;
+	bool m_showfps = true;
 	bool m_vsync = false;
 	std::vector<sf::VideoMode> m_videomodes;
 	int m_videomode = 0;

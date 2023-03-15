@@ -34,11 +34,6 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 	ImGui::SetNextWindowSize(viewport->Size);
 	if (ImGui::Begin("##MainScreen", 0, flags))
 	{
-		auto& io = ImGui::GetIO();
-		ImGui::SetCursorPos(ImVec2((ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x) * 0.85f,
-									ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y));
-		ImGui::TextColored(ImVec4(0, 0, 1, 1), "%.2f fps (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
-
 		if (ImGui::BeginTable("MainMenu", 2))
 		{
 			ImGui::TableNextColumn();
@@ -71,6 +66,7 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			ImGui::SameLine();
 			ImGui::Text("Currently playing: ");
 			ImGui::SameLine();
+			ImGui::PushItemWidth(300.f);
 			if (ImGui::BeginCombo("###MusicSelector", (this->s_AudioManager.m_CurrentMusicTitle).c_str(), ImGuiComboFlags_HeightSmall))
 			{
 				for (auto& music : this->s_AudioManager.m_MusicTitles)
