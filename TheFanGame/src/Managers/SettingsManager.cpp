@@ -54,7 +54,7 @@ bool SettingsManager::load(const std::string& path) noexcept
 			std::stringstream temp(data);
 			while (std::getline(temp, separate.emplace_back(), ':'));
 			if (separate.size() >= 3)
-				this->m_settings.insert({ separate[1], getTypeAndValue(separate) });
+				this->m_settings.insert({ separate[1], this->getTypeAndValue(separate) });
 		}
 	file.close();
 	return success;
