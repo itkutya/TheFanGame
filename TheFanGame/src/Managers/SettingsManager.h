@@ -25,10 +25,10 @@ public:
 	};
 
 	template<class T>
-	T& get(const std::string& id) noexcept;
+	[[nodiscard]] T& get(const std::string& id) noexcept;
 
 	[[nodiscard]] static SettingsManager& getInstance(const std::string& path = "Settings.ini");
-	bool save(const std::string& path) noexcept;
+	[[nodiscard]] bool save(const std::string& path) noexcept;
 private:
 	explicit SettingsManager(const std::string& path) noexcept;
 	[[nodiscard]] bool load(const std::string& path) noexcept;

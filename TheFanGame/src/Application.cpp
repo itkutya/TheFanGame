@@ -1,15 +1,8 @@
 #include "Application.h"
 
-Application::Application(sf::VideoMode size, const std::string& title, bool fullscreen, std::uint32_t fpslimit) noexcept
+Application::Application(const std::string& title) noexcept : m_title(title)
 {
-	this->m_size = size;
-	this->m_title = title;
-	this->m_fullscreen = fullscreen;
-	this->m_fpslimit = fpslimit;
-	this->m_window.create(size, title, fullscreen ? sf::Style::Fullscreen : sf::Style::Default);
-	this->m_window.setFramerateLimit(fpslimit);
-
-	this->m_videomodes = sf::VideoMode::getFullscreenModes();
+	this->recreateWindow();
 
 	ImGui::SFML::Init(this->m_window);
 	this->s_StateManager.add<Menu>(this);

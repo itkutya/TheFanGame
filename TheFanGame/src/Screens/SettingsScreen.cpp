@@ -62,25 +62,15 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 				}
 				ImGui::EndCombo();
 			}
-			/*
-			ImGui::Checkbox("Show FPS", &settings::m_ShowFPS);
+			ImGui::Checkbox("Show FPS", &this->m_app->m_showfps);
 
-			if (!settings::m_isFPSLimited)
-				if (ImGui::Checkbox("VSync: ", &settings::m_Vsync))
-					window.setVSync(settings::m_Vsync);
+			if (!this->m_app->m_fps)
+				if (ImGui::Checkbox("VSync: ", &this->m_app->m_vsync))
+					window.setVerticalSyncEnabled(this->m_app->m_vsync);
 
-			if (!settings::m_Vsync)
-			{
-				if (ImGui::Checkbox("FPS Limit: ", &settings::m_isFPSLimited))
-				{
-					if (!settings::m_isFPSLimited)
-						settings::m_FpsLimit = 0;
-					window.setFramerateLimit(settings::m_FpsLimit);
-				}
-				if (ImGui::SliderInt("##Limit: ", &settings::m_FpsLimit, 30, 240))
-					window.setFramerateLimit(settings::m_FpsLimit);
-			}
-			*/
+			if (!this->m_app->m_vsync)
+				if (ImGui::Checkbox("FPS Limit: ", &this->m_app->m_fps) || ImGui::SliderInt("##Limit: ", &this->m_app->m_fpslimit, 30, 240))
+					window.setFramerateLimit(this->m_app->m_fps ? this->m_app->m_fpslimit : this->m_app->m_fps);
 			break;
 		}
 		case SETTINGS_STATE::PROFILE:
@@ -252,17 +242,6 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 		if (ImGui::SliderFloat("Music volume: ", &settings::m_MusicVolume, 0.f, 100.f))
 			this->m_MainMusic->setVolume(settings::m_MusicVolume);
 		break;
-	}
-	default:
-		break;
-	}
-	if (settingsPopUp.button("Back & Save##Settings", ImVec2(300.f, 75.f)))
-	{
-		if (settings::saveSettings("res/Settings.ini"))
-		{
-			settingsPopUp.close();
-			guistateSystem::popCurrent();
-		}
 	}
 	*/
 }

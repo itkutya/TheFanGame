@@ -7,7 +7,7 @@ int main()
 {
 	try
 	{
-		Application app(sf::VideoMode({ 500, 500 }), "TheFanGame", false, 60);
+		Application app("TheFanGame");
 		while (app.getWindow().isOpen())
 		{
 			app.pollEvents();

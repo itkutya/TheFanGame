@@ -25,7 +25,7 @@ bool SettingsManager::save(const std::string& path) noexcept
 			else if (setting.second.type == "int")
 				value = std::to_string(*static_cast<int*>(setting.second.value));
 			else if (setting.second.type == "u32")
-				value = std::to_string(*static_cast<std::uint64_t*>(setting.second.value));
+				value = std::to_string(*static_cast<std::uint32_t*>(setting.second.value));
 			else if (setting.second.type == "u64")
 				value = std::to_string(*static_cast<std::uint64_t*>(setting.second.value));
 			else if (setting.second.type == "string")
