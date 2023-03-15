@@ -11,7 +11,7 @@ class SettingsManager
 {
 	struct Setting
 	{
-		std::string type;
+		const std::string type;
 		void* value;
 	};
 public:
