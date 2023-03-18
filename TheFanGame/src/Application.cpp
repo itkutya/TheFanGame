@@ -7,14 +7,6 @@ Application::Application(const std::string& title) noexcept : m_title(title)
 	ImGui::SFML::Init(this->m_window);
 	this->s_StateManager.add<Menu>(this);
 
-	this->m_BackgroundImage = this->s_ResourceManager.add<ResourceManager::Object>("BackgroundImage");
-	if (this->m_BackgroundImage->Texture.loadFromFile("Resources/Backgrounds.png"))
-	{
-		this->m_BackgroundImage->Sprite.setTexture(this->m_BackgroundImage->Texture);
-		this->m_BackgroundImage->Sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 1920, 1080 }));
-		this->m_BackgroundImage->Sprite.setPosition(sf::Vector2f({ 0.f, 0.f }));
-	}
-
 	this->m_deltatime.restart();
 }
 
@@ -76,7 +68,6 @@ void Application::update() noexcept
 void Application::draw() noexcept
 {
 	this->m_window.clear();
-	this->m_window.draw(this->m_BackgroundImage->Sprite);
 	if (this->s_StateManager.getSize())
 		this->s_StateManager.getCurrentState()->draw(this->m_window);
 	ImGui::SFML::Render(this->m_window);

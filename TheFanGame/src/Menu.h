@@ -6,6 +6,8 @@
 
 class Menu : public State
 {
+    StateManager& s_StateManager = StateManager::getInstance();
+    ResourceManager& s_ResourceManager = ResourceManager::getInstance();
 public:
     explicit Menu(Application* app) noexcept : m_app(app) {};
     virtual ~Menu() noexcept = default;
@@ -15,7 +17,7 @@ public:
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
     virtual void draw(sf::RenderWindow& window) noexcept override;
 private:
-    StateManager& s_StateManager = StateManager::getInstance();
-
     Application* m_app;
+
+    std::shared_ptr<ResourceManager::Object> m_BackgroundImage;
 };
