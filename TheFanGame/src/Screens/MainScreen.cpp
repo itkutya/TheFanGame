@@ -71,15 +71,9 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			{
 				for (auto& music : this->s_AudioManager.m_MusicTitles)
 				{
-					if (ImGui::Selectable(music.c_str()))
-					{
-						if (this->s_AudioManager.m_CurrentMusicTitle != music)
-						{
-							this->s_AudioManager.m_CurrentMusicTitle = music;
-							if (!this->s_AudioManager.replaceCurrentMusic(this->s_AudioManager.m_CurrentMusicTitle))
-								ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
-						}
-					}
+					if (ImGui::Selectable(music.c_str()) && this->s_AudioManager.m_CurrentMusicTitle != music)
+						if (!this->s_AudioManager.replaceCurrentMusic(music))
+							ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
 				}
 				ImGui::EndCombo();
 			}

@@ -6,6 +6,7 @@ class Application
 {
 	StateManager& s_StateManager = StateManager::getInstance();
 	SettingsManager& s_Settings_Manager = SettingsManager::getInstance();
+	ResourceManager& s_ResourceManager = ResourceManager::getInstance();
 public:
 	explicit Application(const std::string& title) noexcept;
 	virtual ~Application() noexcept;
@@ -29,6 +30,7 @@ public:
 private:
 	sf::RenderWindow m_window;
 	sf::Clock m_deltatime;
-	
 	const std::string m_title;
+
+	std::shared_ptr<ResourceManager::Object> m_BackgroundImage;
 };

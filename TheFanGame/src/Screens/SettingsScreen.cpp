@@ -76,12 +76,70 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 		case SETTINGS_STATE::PROFILE:
 			break;
 		case SETTINGS_STATE::AUDIO:
+		{
+			ImGui::Text("Currently playing: ");
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(500.f);
+			if (ImGui::BeginCombo("###MusicSelector", this->s_AudioManager.m_CurrentMusicTitle.c_str(), ImGuiComboFlags_HeightSmall))
+			{
+				for (auto& music : this->s_AudioManager.m_MusicTitles)
+				{
+					if (ImGui::Selectable(music.c_str()) && this->s_AudioManager.m_CurrentMusicTitle != music)
+						if (!this->s_AudioManager.replaceCurrentMusic(music))
+							ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
+				}
+				ImGui::EndCombo();
+			}
+			if (ImGui::SliderFloat("Music volume: ", &this->s_AudioManager.m_musicvolume, 0.f, 100.f))
+				this->s_AudioManager.m_CurrentMusic->setVolume(this->s_AudioManager.m_musicvolume);
+			ImGui::SliderFloat("Game volume: ", &this->s_AudioManager.m_gamevolume, 0.f, 100.f);
+			ImGui::SliderFloat("SFX volume: ", &this->s_AudioManager.m_sfxvolume, 0.f, 100.f);
+		}
 			break;
 		case SETTINGS_STATE::INPUT:
 			break;
 		case SETTINGS_STATE::GAME:
+			//ImGui::SliderFloat("Vertical Sensivity: ", &settings::m_VerticalSensivity, 0.f, 20.f);
+			//ImGui::SliderFloat("Horizontal Sensivity: ", &settings::m_HorizontalSensivity, 0.f, 20.f);
 			break;
 		case SETTINGS_STATE::MAINSCREEN:
+		{
+			if (ImGui::SliderInt("Front image: ", &this->m_currFrontImage, 0, 0))
+				this->m_FrontImage->Sprite.setTextureRect(sf::IntRect(sf::Vector2i(600 * this->m_currFrontImage, 0), sf::Vector2i(600, 600)));
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				sf::Sprite background;
+				background.setTexture(this->m_FrontImage->Texture);
+				background.setTextureRect(sf::IntRect(sf::Vector2i(600 * this->m_currFrontImage, 0), sf::Vector2i(600, 600)));
+				ImGui::Image(background, ImVec2(300.f, 300.f));
+				ImGui::EndTooltip();
+			}
+
+			if (ImGui::SliderInt("Profile picture: ", &this->m_currIcon, 0, 3))
+				this->m_Icon->Sprite.setTextureRect(sf::IntRect(sf::Vector2i(100 * this->m_currIcon, 0), sf::Vector2i(100, 100)));
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				sf::Sprite background;
+				background.setTexture(this->m_Icon->Texture);
+				background.setTextureRect(sf::IntRect(sf::Vector2i(100 * this->m_currIcon, 0), sf::Vector2i(100, 100)));
+				ImGui::Image(background, ImVec2(100.f, 100.f));
+				ImGui::EndTooltip();
+			}
+
+			if (ImGui::SliderInt("Background image: ", &this->m_currBackgroundImage, 0, 3))
+				this->m_BackgroundImage->Sprite.setTextureRect(sf::IntRect(sf::Vector2i(1920 * this->m_currBackgroundImage, 0), sf::Vector2i(1920, 1080)));
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				sf::Sprite background;
+				background.setTexture(this->m_BackgroundImage->Texture);
+				background.setTextureRect(sf::IntRect(sf::Vector2i(1920 * this->m_currBackgroundImage, 0), sf::Vector2i(1920, 1080)));
+				ImGui::Image(background, ImVec2(300.f, 300.f));
+				ImGui::EndTooltip();
+			}
+		}
 			break;
 		default:
 			break;
@@ -162,85 +220,6 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 					keyBindChanger.close();
 			}
 		}
-		break;
-	}
-	case settingStates::Game:
-	{
-		ImGui::SliderFloat("Vertical Sensivity: ", &settings::m_VerticalSensivity, 0.f, 20.f);
-		ImGui::SliderFloat("Horizontal Sensivity: ", &settings::m_HorizontalSensivity, 0.f, 20.f);
-		break;
-	}
-	case settingStates::Mainmenu:
-	{
-		if (ImGui::SliderInt("Front image: ", &settings::m_currFrontPicture, 0, 0))
-			this->m_frontImage.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0), sf::Vector2i(600, 600)));
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::BeginTooltip();
-			sf::Sprite background;
-			background.setTexture(*this->m_frontImage.getTexture());
-			background.setTextureRect(sf::IntRect(sf::Vector2i(600 * settings::m_currFrontPicture, 0),
-				sf::Vector2i(600, 600)));
-			ImGui::Image(background, ImVec2(300.f, 300.f));
-			ImGui::EndTooltip();
-		}
-
-		if (ImGui::SliderInt("Profile picture: ", &settings::m_currProfilePicture, 0, 3))
-			this->m_icon.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0),
-				sf::Vector2i(100, 100)));
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::BeginTooltip();
-			sf::Sprite background;
-			background.setTexture(*this->m_icon.getTexture());
-			background.setTextureRect(sf::IntRect(sf::Vector2i(100 * settings::m_currProfilePicture, 0),
-				sf::Vector2i(100, 100)));
-			ImGui::Image(background, ImVec2(100.f, 100.f));
-			ImGui::EndTooltip();
-		}
-
-		if (ImGui::SliderInt("Background image: ", &settings::m_currBackgroundPicture, 0, 3))
-			m_backgroundImage.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
-				sf::Vector2i(1920, 1080)));
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::BeginTooltip();
-			sf::Sprite background;
-			background.setTexture(*m_backgroundImage.getTexture());
-			background.setTextureRect(sf::IntRect(sf::Vector2i(1920 * settings::m_currBackgroundPicture, 0),
-				sf::Vector2i(1920, 1080)));
-			ImGui::Image(background, ImVec2(300.f, 300.f));
-			ImGui::EndTooltip();
-		}
-		break;
-	}
-	case settingStates::Audio:
-	{
-		settingsPopUp.text("Currently playing: ");
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(500.f);
-		if (ImGui::BeginCombo("###MusicSelector", settings::m_currMusic.c_str(), ImGuiComboFlags_HeightSmall))
-		{
-			for (auto& music : settings::m_Music)
-			{
-				if (ImGui::Selectable(music))
-				{
-					if (settings::m_currMusic.c_str() != music)
-					{
-						settings::m_currMusic = music;
-						this->m_MainMusic->stop();
-						this->m_MainMusic = resourceSystem::get<std::unique_ptr<sf::Music>>(settings::m_currMusic).get();
-						if (settings::m_MusicVolume > 0.f)
-							this->m_MainMusic->play();
-						this->m_MainMusic->setVolume(settings::m_MusicVolume);
-					}
-				}
-			}
-			ImGui::EndCombo();
-		}
-		ImGui::SliderFloat("Game volume: ", &settings::m_GameVolume, 0.f, 100.f);
-		if (ImGui::SliderFloat("Music volume: ", &settings::m_MusicVolume, 0.f, 100.f))
-			this->m_MainMusic->setVolume(settings::m_MusicVolume);
 		break;
 	}
 	*/
