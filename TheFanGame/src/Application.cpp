@@ -3,11 +3,8 @@
 Application::Application(const std::string& title) noexcept : m_title(title)
 {
 	this->recreateWindow();
-
 	ImGui::SFML::Init(this->m_window);
 	this->s_StateManager.add<Menu>(this);
-
-	this->m_deltatime.restart();
 }
 
 Application::~Application() noexcept
@@ -35,8 +32,8 @@ void Application::pollEvents() noexcept
 		if (event.type == sf::Event::Resized)
 			this->m_size = sf::VideoMode({ event.size.width, event.size.height });
 
-		if (this->s_StateManager.getSize())
-			this->s_StateManager.getCurrentState()->processEvent(event);
+		this->s_InputManager.processEvent(event);
+		this->s_StateManager.getCurrentState()->processEvent(event);
 	}
 }
 
@@ -44,32 +41,25 @@ void Application::update() noexcept
 {
 	const sf::Time dt = this->m_deltatime.restart();
 	ImGui::SFML::Update(this->m_window, dt);
-	constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize | 
-									   ImGuiWindowFlags_NoSavedSettings  |
-									   ImGuiWindowFlags_NoBackground	 | 
-									   ImGuiWindowFlags_NoDecoration     |
-									   ImGuiWindowFlags_NoCollapse		 | 
-									   ImGuiWindowFlags_NoInputs         |
-									   ImGuiWindowFlags_NoMove;
+
 	if (this->m_showfps)
 	{
-		if (ImGui::Begin("FPS Counter", 0, flags))
+		if (ImGui::Begin("FPS Counter", 0, s_flags))
 		{
 			auto& io = ImGui::GetIO();
 			ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImGui::SetWindowPos("FPS Counter", ImVec2(viewport->WorkSize.x * 0.85f, viewport->WorkPos.y));
+			float size = ImGui::CalcTextSize(" 0.00 fps(0.00gms) ").x;
+			ImGui::SetWindowPos("FPS Counter", ImVec2(viewport->WorkSize.x - size, viewport->WorkPos.y));
 			ImGui::TextColored(ImVec4(0, 0, 1, 1), "%.2f fps (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 		}ImGui::End();
 	}
-	if (this->s_StateManager.getSize())
-		this->s_StateManager.getCurrentState()->update(this->m_window, dt);
+	this->s_StateManager.getCurrentState()->update(this->m_window, dt);
 }
 
 void Application::draw() noexcept
 {
 	this->m_window.clear();
-	if (this->s_StateManager.getSize())
-		this->s_StateManager.getCurrentState()->draw(this->m_window);
+	this->s_StateManager.getCurrentState()->draw(this->m_window);
 	ImGui::SFML::Render(this->m_window);
 	this->m_window.display();
 }

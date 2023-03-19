@@ -24,6 +24,9 @@ void Menu::processEvent(sf::Event& event) noexcept
 
 void Menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
+	if (this->s_InputManager.input(Keyboard(sf::Keyboard::Scancode::A)))
+		std::printf("A");
+
 	for (auto& state : this->s_StateManager.getCurrentGUIState())
 		state->update(window, dt);
 }

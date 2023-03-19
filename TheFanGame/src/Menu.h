@@ -3,11 +3,13 @@
 #include <vector>
 
 #include "Screens/LoginScreen.h"
+#include "Managers/InputManager.h"
 
 class Menu : public State
 {
     StateManager& s_StateManager = StateManager::getInstance();
     ResourceManager& s_ResourceManager = ResourceManager::getInstance();
+    InputManager& s_InputManager = InputManager::getInstance();
 public:
     explicit Menu(Application* app) noexcept : m_app(app) {};
     virtual ~Menu() noexcept = default;

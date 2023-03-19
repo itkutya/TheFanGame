@@ -1,11 +1,13 @@
 #pragma once
 
 #include "Menu.h"
+#include "Managers/InputManager.h"
 
 class Application
 {
 	StateManager& s_StateManager = StateManager::getInstance();
 	SettingsManager& s_Settings_Manager = SettingsManager::getInstance();
+	InputManager& s_InputManager = InputManager::getInstance();
 public:
 	explicit Application(const std::string& title) noexcept;
 	virtual ~Application() noexcept;
@@ -30,4 +32,8 @@ private:
 	sf::RenderWindow m_window;
 	sf::Clock m_deltatime;
 	const std::string m_title;
+
+	static constexpr ImGuiWindowFlags s_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBackground | 
+												ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoInputs | 
+												ImGuiWindowFlags_NoMove;
 };
