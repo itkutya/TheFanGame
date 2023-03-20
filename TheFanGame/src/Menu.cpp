@@ -18,20 +18,22 @@ void Menu::init(sf::RenderWindow& window)
 
 void Menu::processEvent(sf::Event& event) noexcept
 {
-	/*
-	if (event.key.scancode == sf::Keyboard::Scancode::A)
-		std::printf("B");
-	*/
 	for (auto& state : this->s_StateManager.getCurrentGUIState())
 		state->processEvent(event);
 }
 
 void Menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
-	/*
-	if (this->s_InputManager.input(Keyboard(sf::Keyboard::Scancode::A)))
+	//Test
+	if (this->s_InputManager.input<bool>(Keyboard(sf::Keyboard::Scancode::D)))
+		std::printf("D");
+	if (this->s_InputManager.input<bool>("A"))
 		std::printf("A");
-	*/
+	if (this->s_InputManager.input<bool>("B"))
+		std::printf("B");
+	if (this->s_InputManager.input<bool>("C"))
+		std::printf("C");
+
 	for (auto& state : this->s_StateManager.getCurrentGUIState())
 		state->update(window, dt);
 }

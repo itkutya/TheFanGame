@@ -1,6 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
+#include <string>
+#include <any>
 
 #include "SFML/Window.hpp"
 
@@ -8,51 +11,76 @@
 
 class Input
 {
+protected:
+	enum class InputType
+	{
+		None, Keyboard, MouseButton, MouseWheel, JoystickButton, JoystickAxis, Count
+	};
 public:
 	explicit Input() noexcept = default;
 	virtual ~Input() noexcept = default;
 
-	virtual const bool input() const noexcept = 0;
-};
+	virtual const std::any input() const noexcept = 0;
 
-class Mouse : public Input
-{
-public:
-	explicit Mouse(sf::Mouse::Button button) noexcept : m_MouseButton(button) {};
-	explicit Mouse(sf::Mouse::Wheel wheel, sf::Event& event) noexcept : m_MouseWheel(wheel), m_Event(event) {};
-	virtual ~Mouse() noexcept = default;
-
-	virtual const bool input() const noexcept override;
-private:
-	sf::Mouse::Button m_MouseButton = sf::Mouse::Button();
-	sf::Mouse::Wheel m_MouseWheel = sf::Mouse::Wheel();
-	sf::Event m_Event = sf::Event();
+	InputType m_type = InputType::None;
 };
 
 class Keyboard : public Input
 {
 public:
-	explicit Keyboard(sf::Keyboard::Scancode key) noexcept : m_KeyCode(key) {};
+	explicit Keyboard(sf::Keyboard::Scancode key) noexcept : m_KeyCode(key) { this->m_type = InputType::Keyboard; };
 	virtual ~Keyboard() noexcept = default;
 
-	virtual const bool input() const noexcept override;
+	virtual const std::any input() const noexcept override;
 private:
 	sf::Keyboard::Scancode m_KeyCode = sf::Keyboard::Scancode();
 };
 
-class Joystick : public Input
+class MouseButton : public Input
 {
 public:
-	explicit Joystick(std::uint32_t id, sf::Joystick::Axis axis, sf::Event& event) noexcept : m_Identification(id), m_JoystickAxis(axis), m_Event(event) {};
-	explicit Joystick(std::uint32_t id, std::uint32_t button) noexcept : m_Identification(id), m_joystickButton(button) {};
-	virtual ~Joystick() noexcept = default;
+	explicit MouseButton(sf::Mouse::Button button) noexcept : m_MouseButton(button) { this->m_type = InputType::MouseButton; };
+	virtual ~MouseButton() noexcept = default;
 
-	virtual const bool input() const noexcept override;
+	virtual const std::any input() const noexcept override;
+private:
+	sf::Mouse::Button m_MouseButton = sf::Mouse::Button();
+};
+
+class MouseWheel : public Input
+{
+public:
+	explicit MouseWheel(sf::Mouse::Wheel wheel, sf::Event& event) noexcept : m_MouseWheel(wheel), m_Event(event) { this->m_type = InputType::MouseWheel; };
+	virtual ~MouseWheel() noexcept = default;
+
+	virtual const std::any input() const noexcept override;
+private:
+	sf::Mouse::Wheel m_MouseWheel = sf::Mouse::Wheel();
+	sf::Event m_Event = sf::Event();
+};
+
+class JoystickButton : public Input
+{
+public:
+	explicit JoystickButton(std::uint32_t id, std::uint32_t button) noexcept : m_Identification(id), m_joystickButton(button) { this->m_type = InputType::JoystickButton; };
+	virtual ~JoystickButton() noexcept = default;
+
+	virtual const std::any input() const noexcept override;
 private:
 	std::uint32_t m_Identification = 0;
 	std::uint32_t m_joystickButton = 0;
+};
+
+class JoystickAxis : public Input
+{
+public:
+	explicit JoystickAxis(std::uint32_t id, sf::Joystick::Axis axis) noexcept : m_Identification(id), m_JoystickAxis(axis) { this->m_type = InputType::JoystickAxis; };
+	virtual ~JoystickAxis() noexcept = default;
+
+	virtual const std::any input() const noexcept override;
+private:
+	std::uint32_t m_Identification = 0;
 	sf::Joystick::Axis m_JoystickAxis = sf::Joystick::Axis();
-	sf::Event m_Event = sf::Event();
 };
 
 class InputManager
@@ -66,9 +94,29 @@ public:
 	[[nodiscard]] static InputManager& getInstance();
 
 	void processEvent(sf::Event& event) noexcept;
-	[[nodiscard]] bool input(const Input& input) noexcept;
+
+	template<class T> [[nodiscard]] const T input(const Input& input) noexcept;
+	template<class T> [[nodiscard]] const T input(const std::string& id) noexcept;
+private:
+	explicit InputManager() noexcept
+	{
+		this->m_inputs["A"] = std::make_unique<Keyboard>(sf::Keyboard::Scancode::A);
+		this->m_inputs["B"] = std::make_unique<Keyboard>(sf::Keyboard::Scancode::B);
+		this->m_inputs["C"] = std::make_unique<Keyboard>(sf::Keyboard::Scancode::C);
+	};
 
 	std::vector<std::uint32_t> m_ConnectedJoystics;
-private:
-	explicit InputManager() noexcept = default;
+	std::unordered_map<std::string, std::unique_ptr<Input>> m_inputs;
 };
+
+template<class T>
+inline const T InputManager::input(const Input& input) noexcept
+{
+	return std::any_cast<T>(input.input());
+}
+
+template<class T>
+inline const T InputManager::input(const std::string& id) noexcept
+{
+	return std::any_cast<T>(this->m_inputs[id]->input());
+}

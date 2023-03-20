@@ -16,40 +16,27 @@ void InputManager::processEvent(sf::Event& event) noexcept
 				this->m_ConnectedJoystics.erase(it);
 }
 
-bool InputManager::input(const Input& input) noexcept
+const std::any Keyboard::input() const noexcept
 {
-	return input.input();
+	return sf::Keyboard::isKeyPressed(this->m_KeyCode);
 }
 
-const bool Keyboard::input() const noexcept
+const std::any MouseButton::input() const noexcept
 {
-	if (sf::Keyboard::isKeyPressed(this->m_KeyCode))
-		return true;
-	return false;
+	return sf::Mouse::isButtonPressed(this->m_MouseButton);
 }
 
-const bool Mouse::input() const noexcept
+const std::any MouseWheel::input() const noexcept
 {
-	if (sf::Mouse::isButtonPressed(this->m_MouseButton))
-		return true;
-	if (this->m_Event.mouseWheelScroll.wheel == this->m_MouseWheel)
-		return true;
-	if (this->m_Event.mouseWheelScroll.delta) //return float
-		return true;
-	return false;
+	return this->m_MouseWheel == this->m_Event.mouseWheelScroll.wheel ? this->m_Event.mouseWheelScroll.delta : 0.f;
 }
 
-const bool Joystick::input() const noexcept
+const std::any JoystickButton::input() const noexcept
 {
-	if (sf::Joystick::getAxisPosition(this->m_Identification, this->m_JoystickAxis)) //return float
-		return true;
-	if (sf::Joystick::isButtonPressed(this->m_Identification, this->m_joystickButton))
-		return true;
-	if (this->m_Event.joystickMove.position) //return float
-		return true;
-	if (this->m_Event.joystickMove.axis == this->m_JoystickAxis)
-		return true;
-	if (this->m_Event.joystickButton.button == this->m_joystickButton)
-		return true;
-	return false;
+	return sf::Joystick::isButtonPressed(this->m_Identification, this->m_joystickButton);
+}
+
+const std::any JoystickAxis::input() const noexcept
+{
+	return sf::Joystick::getAxisPosition(this->m_Identification, this->m_JoystickAxis);
 }
