@@ -15,7 +15,19 @@ class SettingsManager
 		{
 			INT, BOOL, STRING, U32, U64
 		};
-		Setting() noexcept {};
+		union Value
+		{
+			~Value() noexcept {};
+
+			int m_int = 0;
+			bool m_bool;
+			std::uint32_t m_u32;
+			std::uint64_t m_u64;
+			std::string m_string;
+		};
+
+		Setting() noexcept : type(TYPE::BOOL) {};
+		Setting(const TYPE t) noexcept : type(t) {};
 		Setting(const Setting& other) noexcept : type(other.type) 
 		{
 			switch (other.type)
@@ -42,17 +54,8 @@ class SettingsManager
 			if (this->type == TYPE::STRING)
 				this->value.m_string.~basic_string();
 		};
-		TYPE type = TYPE::BOOL;
-		union Value
-		{
-			~Value() noexcept {};
 
-			bool m_bool = false;
-			int m_int;
-			std::uint32_t m_u32;
-			std::uint64_t m_u64;
-			std::string m_string;
-		};
+		const TYPE type;
 		Value value;
 	};
 public:

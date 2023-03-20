@@ -64,8 +64,7 @@ bool SettingsManager::load(const std::string& path) noexcept
 
 const SettingsManager::Setting SettingsManager::getTypeAndValue(const std::vector<std::string>& value) noexcept
 {
-	Setting temp{};
-	temp.type = static_cast<SettingsManager::Setting::TYPE>(std::stoi(value[0]));
+	Setting temp{ static_cast<const SettingsManager::Setting::TYPE>(std::stoi(value[0])) };
 	switch (temp.type)
 	{
 	case SettingsManager::Setting::INT:
