@@ -1,11 +1,5 @@
 #include "SettingsManager.h"
 
-SettingsManager::~SettingsManager() noexcept
-{
-	for (auto& setting : this->m_settings)
-		delete setting.second.value;
-}
-
 SettingsManager& SettingsManager::getInstance(const std::string& path)
 {
 	static SettingsManager instance(path);
@@ -15,21 +9,29 @@ SettingsManager& SettingsManager::getInstance(const std::string& path)
 bool SettingsManager::save(const std::string& path) noexcept
 {
 	bool succes = false;
-	std::ofstream file(path);
+	std::ofstream file(path, std::ios_base::trunc);
 	if (succes = file.is_open(); succes)
 		for (auto& setting : this->m_settings)
 		{
 			std::string value;
-			if(setting.second.type == "bool")
-				value = std::to_string(*static_cast<bool*>(setting.second.value));
-			else if (setting.second.type == "int")
-				value = std::to_string(*static_cast<int*>(setting.second.value));
-			else if (setting.second.type == "u32")
-				value = std::to_string(*static_cast<std::uint32_t*>(setting.second.value));
-			else if (setting.second.type == "u64")
-				value = std::to_string(*static_cast<std::uint64_t*>(setting.second.value));
-			else if (setting.second.type == "string")
-				value = *static_cast<std::string*>(setting.second.value);
+			switch (setting.second.type)
+			{
+			case SettingsManager::Setting::INT:
+				value = std::to_string(setting.second.value.m_int);
+				break;
+			case SettingsManager::Setting::BOOL:
+				value = std::to_string(setting.second.value.m_bool);
+				break;
+			case SettingsManager::Setting::STRING:
+				value = setting.second.value.m_string;
+				break;
+			case SettingsManager::Setting::U32:
+				value = std::to_string(setting.second.value.m_u32);
+				break;
+			case SettingsManager::Setting::U64:
+				value = std::to_string(setting.second.value.m_u64);
+				break;
+			}
 			file << setting.second.type << ':' << setting.first << ':' << value << '\n';
 		}
 	file.close();
@@ -62,15 +64,25 @@ bool SettingsManager::load(const std::string& path) noexcept
 
 const SettingsManager::Setting SettingsManager::getTypeAndValue(const std::vector<std::string>& value) noexcept
 {
-	if (value[0] == "bool")
-		return { "bool", new bool(value[2] == "1" ? true : false) };
-	else if (value[0] == "int")
-		return { "int", new int(std::stoi(value[2])) };
-	else if (value[0] == "u32")
-		return { "u32", new std::uint32_t(std::stoul(value[2])) };
-	else if (value[0] == "u64")
-		return { "u64", new std::uint64_t(std::stoull(value[2])) };
-	else if (value[0] == "string")
-		return { "string", new std::string(value[2]) };
-	return { "string", new std::string(value[2]) };
+	Setting temp{};
+	temp.type = static_cast<SettingsManager::Setting::TYPE>(std::stoi(value[0]));
+	switch (temp.type)
+	{
+	case SettingsManager::Setting::INT:
+		temp.value.m_int = std::stoi(value[2]);
+		break;
+	case SettingsManager::Setting::BOOL:
+		temp.value.m_bool = (value[2] == "1" ? true : false);
+		break;
+	case SettingsManager::Setting::STRING:
+		new (&temp.value.m_string) std::string(value[2]);
+		break;
+	case SettingsManager::Setting::U32:
+		temp.value.m_u32 = std::stoul(value[2]);
+		break;
+	case SettingsManager::Setting::U64:
+		temp.value.m_u64 = std::stoull(value[2]);
+		break;
+	}
+	return temp;
 }

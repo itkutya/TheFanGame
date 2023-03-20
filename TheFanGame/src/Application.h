@@ -21,13 +21,13 @@ public:
 	void recreateWindow();
 
 	std::vector<sf::VideoMode> m_videomodes = sf::VideoMode::getFullscreenModes();
-	int& m_videomode = this->s_Settings_Manager.get<int>("videomode");
+	int& m_videomode = this->s_Settings_Manager.get("videomode").m_int;
 	sf::VideoMode m_size = this->m_videomodes[this->m_videomode];
-	bool& m_fullscreen = this->s_Settings_Manager.get<bool>("fullscreen");
-	int& m_fpslimit = this->s_Settings_Manager.get<int>("fpslimit");
-	bool& m_fps = this->s_Settings_Manager.get<bool>("fps");
-	bool& m_showfps = this->s_Settings_Manager.get<bool>("showfps");
-	bool& m_vsync = this->s_Settings_Manager.get<bool>("vsync");
+	bool& m_fullscreen = this->s_Settings_Manager.get("fullscreen").m_bool;
+	int& m_fpslimit = this->s_Settings_Manager.get("fpslimit").m_int;
+	bool& m_fps = this->s_Settings_Manager.get("fps").m_bool;
+	bool& m_showfps = this->s_Settings_Manager.get("showfps").m_bool;
+	bool& m_vsync = this->s_Settings_Manager.get("vsync").m_bool;
 private:
 	sf::RenderWindow m_window;
 	sf::Clock m_deltatime;

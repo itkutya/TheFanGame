@@ -67,5 +67,6 @@ void Application::draw() noexcept
 void Application::recreateWindow()
 {
 	this->m_window.create(this->m_size , this->m_title, this->m_fullscreen ? sf::Style::Fullscreen : sf::Style::Default);
+	//this->m_window.setKeyRepeatEnabled(false);
 	this->m_window.setFramerateLimit(this->m_fpslimit);
 }
