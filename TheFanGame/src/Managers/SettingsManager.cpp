@@ -16,7 +16,26 @@ bool SettingsManager::save(const std::string& path) noexcept
 		{
 			file << std::string('[' + setting.first + ']' + '\n');
 			for (const auto& value : this->m_settings[setting.first])
-				file << this->convertTypeToString(Setting::TYPE::BOOL) << ' ' << value.first << ' ' << 0 << '\n';
+			{
+				switch (value.second.type)
+				{
+				case SettingsManager::Setting::INT:
+					file << this->convertTypeToString(value.second.type) << ' ' << value.first << ' ' << std::to_string(value.second.value.m_int) << '\n';
+					break;
+				case SettingsManager::Setting::BOOL:
+					file << this->convertTypeToString(value.second.type) << ' ' << value.first << ' ' << std::to_string(value.second.value.m_bool) << '\n';
+					break;
+				case SettingsManager::Setting::STRING:
+					file << this->convertTypeToString(value.second.type) << ' ' << value.first << ' ' << value.second.value.m_string << '\n';
+					break;
+				case SettingsManager::Setting::U32:
+					file << this->convertTypeToString(value.second.type) << ' ' << value.first << ' ' << std::to_string(value.second.value.m_u32) << '\n';
+					break;
+				case SettingsManager::Setting::U64:
+					file << this->convertTypeToString(value.second.type) << ' ' << value.first << ' ' << std::to_string(value.second.value.m_u64) << '\n';
+					break;
+				}
+			}
 		}
 	}
 	file.close();
@@ -50,19 +69,19 @@ bool SettingsManager::load(const std::string& path) noexcept
 					switch (type)
 					{
 					case SettingsManager::Setting::INT:
-						this->m_settings[data][setting[1]].m_int = std::stoi(setting[2]);
+						this->m_settings[data][setting[1]](type).value.m_int = std::stoi(setting[2]);
 						break;
 					case SettingsManager::Setting::BOOL:
-						this->m_settings[data][setting[1]].m_bool = (setting[2] == "1" ? true : false);
+						this->m_settings[data][setting[1]](type).value.m_bool = (setting[2] == "1" ? true : false);
 						break;
 					case SettingsManager::Setting::STRING:
-						this->m_settings[data][setting[1]].m_string = std::string(setting[2]);
+						this->m_settings[data][setting[1]](type).value.m_string = std::string(setting[2]);
 						break;
 					case SettingsManager::Setting::U32:
-						this->m_settings[data][setting[1]].m_u32 = std::stoul(setting[2]);
+						this->m_settings[data][setting[1]](type).value.m_u32 = std::stoul(setting[2]);
 						break;
 					case SettingsManager::Setting::U64:
-						this->m_settings[data][setting[1]].m_u64 = std::stoull(setting[2]);
+						this->m_settings[data][setting[1]](type).value.m_u64 = std::stoull(setting[2]);
 						break;
 					}
 				}
@@ -76,19 +95,19 @@ bool SettingsManager::load(const std::string& path) noexcept
 						switch (type)
 						{
 						case SettingsManager::Setting::INT:
-							(--this->m_settings.end())->second[setting[0]].m_int = std::stoi(setting[1]);
+							(--this->m_settings.end())->second[setting[0]](type).value.m_int = std::stoi(setting[1]);
 							break;
 						case SettingsManager::Setting::BOOL:
-							(--this->m_settings.end())->second[setting[0]].m_bool = (setting[1] == "1" ? true : false);
+							(--this->m_settings.end())->second[setting[0]](type).value.m_bool = (setting[1] == "1" ? true : false);
 							break;
 						case SettingsManager::Setting::STRING:
-							(--this->m_settings.end())->second[setting[0]].m_string = std::string(setting[1]);
+							(--this->m_settings.end())->second[setting[0]](type).value.m_string = std::string(setting[1]);
 							break;
 						case SettingsManager::Setting::U32:
-							(--this->m_settings.end())->second[setting[0]].m_u32 = std::stoul(setting[1]);
+							(--this->m_settings.end())->second[setting[0]](type).value.m_u32 = std::stoul(setting[1]);
 							break;
 						case SettingsManager::Setting::U64:
-							(--this->m_settings.end())->second[setting[0]].m_u64 = std::stoull(setting[1]);
+							(--this->m_settings.end())->second[setting[0]](type).value.m_u64 = std::stoull(setting[1]);
 							break;
 						}
 					}

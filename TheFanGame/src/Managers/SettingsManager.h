@@ -20,12 +20,11 @@ class SettingsManager
 		{
 			~Value() noexcept {};
 
-			operator int&() noexcept { return this->m_int; };
-			operator bool&() noexcept { return this->m_bool; };
-			operator std::uint32_t&() noexcept { return this->m_u32; };
-			operator std::uint64_t&() noexcept { return this->m_u64; };
-			operator std::string&() noexcept { return this->m_string; };
-
+			operator int& () noexcept { return this->m_int; };
+			operator bool& () noexcept { return this->m_bool; };
+			operator std::uint32_t& () noexcept { return this->m_u32; };
+			operator std::uint64_t& () noexcept { return this->m_u64; };
+			operator std::string& () noexcept { return this->m_string; };
 			std::string& operator=(std::string rhs) noexcept { this->m_string = rhs; return *this; };
 
 			int m_int = 0;
@@ -35,6 +34,7 @@ class SettingsManager
 			std::string m_string;
 		};
 
+		Setting() noexcept = default;
 		Setting(const TYPE t) noexcept : type(t) {};
 		Setting(const Setting& other) noexcept : type(other.type) 
 		{
@@ -63,7 +63,15 @@ class SettingsManager
 				this->value.m_string.~basic_string();
 		};
 
-		const TYPE type;
+		Setting& operator()(const TYPE t) noexcept { this->type = t; return *this; };
+
+		operator int& () noexcept { return this->value.m_int; };
+		operator bool& () noexcept { return this->value.m_bool; };
+		operator std::uint32_t& () noexcept { return this->value.m_u32; };
+		operator std::uint64_t& () noexcept { return this->value.m_u64; };
+		operator std::string& () noexcept { return this->value.m_string; };
+
+		TYPE type = TYPE::BOOL;
 		Value value;
 	};
 public:
@@ -83,6 +91,6 @@ private:
 	const std::string convertTypeToString(const Setting::TYPE& type) noexcept;
 	const std::string trim(std::string& string) noexcept;
 
-	std::unordered_map<std::string, std::unordered_map<std::string, Setting::Value>> m_settings;
+	std::unordered_map<std::string, std::unordered_map<std::string, Setting>> m_settings;
 	bool m_first = true;
 };
