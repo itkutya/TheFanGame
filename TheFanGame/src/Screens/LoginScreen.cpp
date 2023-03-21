@@ -51,16 +51,21 @@ bool LoginScreen::LoginAccount() noexcept
 		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
 	else
 	{
+		enum ServerData
+		{
+			SUCCESS = 0, LVL, XP, XPCAP
+		};
+
 		std::vector<std::string> data;
 		std::stringstream ss(response.getBody());
 		while (std::getline(ss, data.emplace_back(), '#'));
-		if (data[SettingsManager::ServerData::SUCCESS] != std::string("Success."))
+		if (data[ServerData::SUCCESS] != std::string("Success."))
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect login details!"));
 		else
 		{
-			this->s_Account.m_experience = Experience(std::stoull(data[SettingsManager::ServerData::LVL]), 
-													   std::stof(data[SettingsManager::ServerData::XP]),
-													   std::stof(data[SettingsManager::ServerData::XPCAP]));
+			this->s_Account.m_experience = Experience(std::stoull(data[ServerData::LVL]), 
+													   std::stof(data[ServerData::XP]),
+													   std::stof(data[ServerData::XPCAP]));
 			if (this->s_Account.m_rememberme && this->s_Account.m_random && !this->s_Settings.save("Settings.ini"))
 				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to save settings!"));
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));

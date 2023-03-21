@@ -4,6 +4,7 @@
 #include <vector>
 #include <sstream>
 #include <string>
+#include <array>
 #include <unordered_map>
 #include <cstdint>
 
@@ -19,6 +20,14 @@ class SettingsManager
 		{
 			~Value() noexcept {};
 
+			operator int&() noexcept { return this->m_int; };
+			operator bool&() noexcept { return this->m_bool; };
+			operator std::uint32_t&() noexcept { return this->m_u32; };
+			operator std::uint64_t&() noexcept { return this->m_u64; };
+			operator std::string&() noexcept { return this->m_string; };
+
+			std::string& operator=(std::string rhs) noexcept { this->m_string = rhs; return *this; };
+
 			int m_int = 0;
 			bool m_bool;
 			std::uint32_t m_u32;
@@ -26,26 +35,25 @@ class SettingsManager
 			std::string m_string;
 		};
 
-		Setting() noexcept : type(TYPE::BOOL) {};
 		Setting(const TYPE t) noexcept : type(t) {};
 		Setting(const Setting& other) noexcept : type(other.type) 
 		{
 			switch (other.type)
 			{
 			case SettingsManager::Setting::INT:
-				value.m_int = other.value.m_int;
+				this->value.m_int = other.value.m_int;
 				break;
 			case SettingsManager::Setting::BOOL:
-				value.m_bool = other.value.m_bool;
+				this->value.m_bool = other.value.m_bool;
 				break;
 			case SettingsManager::Setting::STRING:
-				new (&value.m_string) std::string(other.value.m_string);
+				new (&this->value.m_string) std::string(other.value.m_string);
 				break;
 			case SettingsManager::Setting::U32:
-				value.m_u32 = other.value.m_u32;
+				this->value.m_u32 = other.value.m_u32;
 				break;
 			case SettingsManager::Setting::U64:
-				value.m_u64 = other.value.m_u64;
+				this->value.m_u64 = other.value.m_u64;
 				break;
 			}
 		};
@@ -63,24 +71,18 @@ public:
 	void operator=(SettingsManager const&) = delete;
 	virtual ~SettingsManager() noexcept = default;
 
-	enum ServerData
-	{
-		SUCCESS = 0, LVL, XP, XPCAP
-	};
-
-	[[nodiscard]] Setting::Value& get(const std::string& id) noexcept
-	{
-		return this->m_settings[id].value;
-	};
+	[[nodiscard]] auto& operator[](const std::string& id) noexcept { return this->m_settings[id]; };
 
 	[[nodiscard]] static SettingsManager& getInstance(const std::string& path = "Settings.ini");
 	[[nodiscard]] bool save(const std::string& path) noexcept;
+	[[nodiscard]] bool load(const std::string& path) noexcept;
 private:
 	explicit SettingsManager(const std::string& path) noexcept;
-	[[nodiscard]] bool load(const std::string& path) noexcept;
 
-	const Setting getTypeAndValue(const std::vector<std::string>& value) noexcept;
+	const Setting::TYPE convertStrintToType(const std::string& type) noexcept;
+	const std::string convertTypeToString(const Setting::TYPE& type) noexcept;
+	const std::string trim(std::string& string) noexcept;
 
-	std::unordered_map<std::string, Setting> m_settings;
+	std::unordered_map<std::string, std::unordered_map<std::string, Setting::Value>> m_settings;
 	bool m_first = true;
 };

@@ -8,34 +8,19 @@ SettingsManager& SettingsManager::getInstance(const std::string& path)
 
 bool SettingsManager::save(const std::string& path) noexcept
 {
-	bool succes = false;
+	bool success = false;
 	std::ofstream file(path, std::ios_base::trunc);
-	if (succes = file.is_open(); succes)
-		for (auto& setting : this->m_settings)
+	if (success = file.is_open())
+	{
+		for (const auto& setting : this->m_settings)
 		{
-			std::string value;
-			switch (setting.second.type)
-			{
-			case SettingsManager::Setting::INT:
-				value = std::to_string(setting.second.value.m_int);
-				break;
-			case SettingsManager::Setting::BOOL:
-				value = std::to_string(setting.second.value.m_bool);
-				break;
-			case SettingsManager::Setting::STRING:
-				value = setting.second.value.m_string;
-				break;
-			case SettingsManager::Setting::U32:
-				value = std::to_string(setting.second.value.m_u32);
-				break;
-			case SettingsManager::Setting::U64:
-				value = std::to_string(setting.second.value.m_u64);
-				break;
-			}
-			file << setting.second.type << ':' << setting.first << ':' << value << '\n';
+			file << std::string('[' + setting.first + ']' + '\n');
+			for (const auto& value : this->m_settings[setting.first])
+				file << this->convertTypeToString(Setting::TYPE::BOOL) << ' ' << value.first << ' ' << 0 << '\n';
 		}
+	}
 	file.close();
-	return succes;
+	return success;
 }
 
 SettingsManager::SettingsManager(const std::string& path) noexcept
@@ -48,40 +33,109 @@ bool SettingsManager::load(const std::string& path) noexcept
 {
 	bool success = false;
 	std::ifstream file(path);
-	std::string data;
-	if (success = file.is_open(); success)
-		while (std::getline(file, data))
+	if (success = file.is_open())
+	{
+		while (!file.eof())
 		{
-			std::vector<std::string> separate;
-			std::stringstream temp(data);
-			while (std::getline(temp, separate.emplace_back(), ':'));
-			if (separate.size() >= 3)
-				this->m_settings.insert({ separate[1], this->getTypeAndValue(separate) });
+			std::string data;
+			file >> data;
+			if(data.length())
+			{
+				if (data[0] == '[' || data[data.length() - 1] == ']')
+				{
+					std::array<std::string, 3> setting;
+					file >> setting[0] >> setting[1] >> setting[2];
+					Setting::TYPE type = this->convertStrintToType(setting[0]);
+					data = this->trim(data);
+					switch (type)
+					{
+					case SettingsManager::Setting::INT:
+						this->m_settings[data][setting[1]].m_int = std::stoi(setting[2]);
+						break;
+					case SettingsManager::Setting::BOOL:
+						this->m_settings[data][setting[1]].m_bool = (setting[2] == "1" ? true : false);
+						break;
+					case SettingsManager::Setting::STRING:
+						this->m_settings[data][setting[1]].m_string = std::string(setting[2]);
+						break;
+					case SettingsManager::Setting::U32:
+						this->m_settings[data][setting[1]].m_u32 = std::stoul(setting[2]);
+						break;
+					case SettingsManager::Setting::U64:
+						this->m_settings[data][setting[1]].m_u64 = std::stoull(setting[2]);
+						break;
+					}
+				}
+				else
+				{
+					std::array<std::string, 2> setting;
+					file >> setting[0] >> setting[1];
+					if (this->m_settings.size())
+					{
+						Setting::TYPE type = this->convertStrintToType(data);
+						switch (type)
+						{
+						case SettingsManager::Setting::INT:
+							(--this->m_settings.end())->second[setting[0]].m_int = std::stoi(setting[1]);
+							break;
+						case SettingsManager::Setting::BOOL:
+							(--this->m_settings.end())->second[setting[0]].m_bool = (setting[1] == "1" ? true : false);
+							break;
+						case SettingsManager::Setting::STRING:
+							(--this->m_settings.end())->second[setting[0]].m_string = std::string(setting[1]);
+							break;
+						case SettingsManager::Setting::U32:
+							(--this->m_settings.end())->second[setting[0]].m_u32 = std::stoul(setting[1]);
+							break;
+						case SettingsManager::Setting::U64:
+							(--this->m_settings.end())->second[setting[0]].m_u64 = std::stoull(setting[1]);
+							break;
+						}
+					}
+				}
+			}
 		}
+	}
 	file.close();
 	return success;
 }
 
-const SettingsManager::Setting SettingsManager::getTypeAndValue(const std::vector<std::string>& value) noexcept
+const SettingsManager::Setting::TYPE SettingsManager::convertStrintToType(const std::string& type) noexcept
 {
-	Setting temp{ static_cast<const SettingsManager::Setting::TYPE>(std::stoi(value[0])) };
-	switch (temp.type)
+	if (type == "int")
+		return SettingsManager::Setting::TYPE::INT;
+	else if (type == "bool")
+		return SettingsManager::Setting::TYPE::BOOL;
+	else if (type == "string")
+		return SettingsManager::Setting::TYPE::STRING;
+	else if (type == "u32")
+		return SettingsManager::Setting::TYPE::U32;
+	else if (type == "u64")
+		return SettingsManager::Setting::TYPE::U64;
+	return SettingsManager::Setting::TYPE();
+}
+
+const std::string SettingsManager::trim(std::string& string) noexcept
+{
+	string.erase(string.begin());
+	string.erase(string.end() - 1);
+	return string;
+}
+
+const std::string SettingsManager::convertTypeToString(const Setting::TYPE& type) noexcept
+{
+	switch (type)
 	{
 	case SettingsManager::Setting::INT:
-		temp.value.m_int = std::stoi(value[2]);
-		break;
+		return std::string("int");
 	case SettingsManager::Setting::BOOL:
-		temp.value.m_bool = (value[2] == "1" ? true : false);
-		break;
+		return std::string("bool");
 	case SettingsManager::Setting::STRING:
-		new (&temp.value.m_string) std::string(value[2]);
-		break;
+		return std::string("string");
 	case SettingsManager::Setting::U32:
-		temp.value.m_u32 = std::stoul(value[2]);
-		break;
+		return std::string("u32");
 	case SettingsManager::Setting::U64:
-		temp.value.m_u64 = std::stoull(value[2]);
-		break;
+		return std::string("u64");
 	}
-	return temp;
+	return std::string();
 }

@@ -24,16 +24,6 @@ void Menu::processEvent(sf::Event& event) noexcept
 
 void Menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
-	//Test
-	if (this->s_InputManager.input<bool>(Keyboard(sf::Keyboard::Scancode::D)))
-		std::printf("D");
-	if (this->s_InputManager.input<bool>("A"))
-		std::printf("A");
-	if (this->s_InputManager.input<bool>("B"))
-		std::printf("B");
-	if (this->s_InputManager.input<bool>("C"))
-		std::printf("C");
-
 	for (auto& state : this->s_StateManager.getCurrentGUIState())
 		state->update(window, dt);
 }

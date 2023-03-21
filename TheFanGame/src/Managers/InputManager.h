@@ -4,18 +4,20 @@
 #include <unordered_map>
 #include <string>
 #include <any>
+#include <fstream>
+#include <sstream>
 
 #include "SFML/Window.hpp"
 
 #include "SettingsManager.h"
 
+enum class InputType
+{
+	None, Keyboard, MouseButton, MouseWheel, JoystickButton, JoystickAxis, Count
+};
+
 class Input
 {
-protected:
-	enum class InputType
-	{
-		None, Keyboard, MouseButton, MouseWheel, JoystickButton, JoystickAxis, Count
-	};
 public:
 	explicit Input() noexcept = default;
 	virtual ~Input() noexcept = default;
@@ -100,9 +102,39 @@ public:
 private:
 	explicit InputManager() noexcept
 	{
-		this->m_inputs["A"] = std::make_unique<Keyboard>(sf::Keyboard::Scancode::A);
-		this->m_inputs["B"] = std::make_unique<Keyboard>(sf::Keyboard::Scancode::B);
-		this->m_inputs["C"] = std::make_unique<Keyboard>(sf::Keyboard::Scancode::C);
+		//load from inputsettings.ini...
+		std::ifstream file("InputSettings.ini");
+		std::string data;
+		if (file.is_open())
+			while (std::getline(file, data))
+			{
+				std::vector<std::string> separate;
+				std::stringstream temp(data);
+				while (std::getline(temp, separate.emplace_back(), ':'));
+				if (separate.size() >= 3)
+				{
+					const InputType type = static_cast<const InputType>(std::stoi(separate[0]));
+					switch (type)
+					{
+					case InputType::Keyboard:
+						this->m_inputs[separate[1]] = std::make_unique<Keyboard>(static_cast<sf::Keyboard::Scancode>(std::stoi(separate[2])));
+						break;
+					case InputType::MouseButton:
+						this->m_inputs[separate[1]] = std::make_unique<MouseButton>(static_cast<sf::Mouse::Button>(std::stoi(separate[2])));
+						break;
+					case InputType::MouseWheel:
+						//this->m_inputs[separate[1]] = std::make_unique<MouseWheel>(static_cast<sf::Mouse::Wheel>(std::stoi(separate[2])));
+						break;
+					case InputType::JoystickButton:
+						//this->m_inputs[separate[1]] = std::make_unique<JoystickButton>(std::stoi(separate[2]));
+						break;
+					case InputType::JoystickAxis:
+						//this->m_inputs[separate[1]] = std::make_unique<JoystickAxis>(static_cast<sf::Joystick::Axis>(std::stoi(separate[2])));
+						break;
+					}
+				}
+			}
+		file.close();
 	};
 
 	std::vector<std::uint32_t> m_ConnectedJoystics;
