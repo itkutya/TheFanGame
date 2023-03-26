@@ -42,6 +42,9 @@ void Application::update() noexcept
 	const sf::Time dt = this->m_deltatime.restart();
 	ImGui::SFML::Update(this->m_window, dt);
 
+	if (this->s_InputManager.input<bool>("MoveForward"))
+		std::printf("A");
+
 	if (this->m_showfps)
 	{
 		if (ImGui::Begin("FPS Counter", 0, s_flags))

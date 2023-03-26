@@ -191,6 +191,7 @@
     <ClCompile Include="src\Managers\StateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Managers\InputTypes.h" />
     <ClInclude Include="src\Managers\InputManager.h" />
     <ClInclude Include="src\Managers\SettingsManager.h" />
     <ClInclude Include="src\Managers\AudioManager.h" />
