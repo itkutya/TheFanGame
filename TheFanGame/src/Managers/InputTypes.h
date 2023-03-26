@@ -253,58 +253,44 @@ inline constexpr std::string ScanCodeToString(const sf::Keyboard::Scancode code)
 	std::unreachable();
 }
 
-inline constexpr std::string ScanCodeToString(sf::Mouse::Button code) noexcept
+inline constexpr std::string ScanCodeToString(const sf::Mouse::Button code) noexcept
 {
 	switch (code)
 	{
-	case sf::Mouse::Button::Left:
-		return "Left";
-	case sf::Mouse::Button::Right:
-		return "Right";
-	case sf::Mouse::Button::Middle:
-		return "Middle";
-	case sf::Mouse::Button::XButton1:
-		return "XButton1";
-	case sf::Mouse::Button::XButton2:
-		return "XButton2";
+	case sf::Mouse::Button::Left:			return "Left";
+	case sf::Mouse::Button::Right:			return "Right";
+	case sf::Mouse::Button::Middle:			return "Middle";
+	case sf::Mouse::Button::XButton1:		return "XButton1";
+	case sf::Mouse::Button::XButton2:		return "XButton2";
+	//case sf::Mouse::Button::ButtonCount:	return "ButtonCount";
 	}
 	std::unreachable();
 }
 
-inline constexpr std::string ScanCodeToString(sf::Mouse::Wheel code) noexcept
+inline constexpr std::string ScanCodeToString(const sf::Mouse::Wheel code) noexcept
 {
 	switch (code)
 	{
-	case sf::Mouse::Wheel::VerticalWheel:
-		return "VerticalWheel";
-	case sf::Mouse::Wheel::HorizontalWheel:
-		return "HorizotnalWheel";
+	case sf::Mouse::Wheel::VerticalWheel:	return "VerticalWheel";
+	case sf::Mouse::Wheel::HorizontalWheel:	return "HorizotnalWheel";
 	}
 	std::unreachable();
 }
 
-inline const std::string ScanCodeToString(std::uint32_t code) noexcept { return std::to_string(code); }
+inline const std::string ScanCodeToString(const std::uint32_t code) noexcept { return std::to_string(code); }
 
-inline constexpr std::string ScanCodeToString(sf::Joystick::Axis code) noexcept
+inline constexpr std::string ScanCodeToString(const sf::Joystick::Axis code) noexcept
 {
 	switch (code)
 	{
-	case sf::Joystick::Axis::X:
-		return "X";
-	case sf::Joystick::Axis::Y:
-		return "Y";
-	case sf::Joystick::Axis::Z:
-		return "Z";
-	case sf::Joystick::Axis::R:
-		return "R";
-	case sf::Joystick::Axis::U:
-		return "U";
-	case sf::Joystick::Axis::V:
-		return "V";
-	case sf::Joystick::Axis::PovX:
-		return "PovX";
-	case sf::Joystick::Axis::PovY:
-		return "PovY";
+	case sf::Joystick::Axis::X:		return "X";
+	case sf::Joystick::Axis::Y:		return "Y";
+	case sf::Joystick::Axis::Z:		return "Z";
+	case sf::Joystick::Axis::R:		return "R";
+	case sf::Joystick::Axis::U:		return "U";
+	case sf::Joystick::Axis::V:		return "V";
+	case sf::Joystick::Axis::PovX:	return "PovX";
+	case sf::Joystick::Axis::PovY:	return "PovY";
 	}
 	std::unreachable();
 }
