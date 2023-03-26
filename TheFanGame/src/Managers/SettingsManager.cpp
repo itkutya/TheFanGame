@@ -61,7 +61,7 @@ bool SettingsManager::load(const std::string& path) noexcept
 		{
 			std::string data;
 			file >> data;
-			if(data.length())
+			if (data.length())
 			{
 				if (data[0] == '[' || data[data.length() - 1] == ']')
 					last = this->m_settings.insert({ this->trim(data), {} }).first;
@@ -76,7 +76,7 @@ bool SettingsManager::load(const std::string& path) noexcept
 							const auto& newdata = (last)->second.insert({ setting[0], Setting("int") }).first;
 							(*newdata).second.value.m_int = std::stoi(setting[1]);
 						}
-						else if(data == "bool")
+						else if (data == "bool")
 						{
 							const auto& newdata = (last)->second.insert({ setting[0], Setting("bool") }).first;
 							(*newdata).second.value.m_bool = std::stoi(setting[1]);
