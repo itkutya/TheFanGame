@@ -26,15 +26,6 @@ void Application::pollEvents() noexcept
 	{
 		ImGui::SFML::ProcessEvent(event);
 
-		if (this->s_InputManager.input<float>(MouseWheel(sf::Mouse::Wheel::HorizontalWheel), event))
-			std::printf("Wheel\n");
-
-		if (this->s_InputManager.input<bool>(MouseButton(sf::Mouse::Button::Left)))
-			std::printf("Click\n");
-
-		//if (this->s_InputManager.input<bool>(MouseButton(sf::Mouse::Button::Right), 0))
-		//	std::printf("No Click\n");
-
 		if (event.type == sf::Event::Closed)
 			this->m_window.close();
 
@@ -50,9 +41,6 @@ void Application::update() noexcept
 {
 	const sf::Time dt = this->m_deltatime.restart();
 	ImGui::SFML::Update(this->m_window, dt);
-
-	if (this->s_InputManager.input<bool>("MoveForward"))
-		std::printf("A");
 
 	if (this->m_showfps)
 	{
@@ -79,6 +67,5 @@ void Application::draw() noexcept
 void Application::recreateWindow()
 {
 	this->m_window.create(this->m_size , this->m_title, this->m_fullscreen ? sf::Style::Fullscreen : sf::Style::Default);
-	//this->m_window.setKeyRepeatEnabled(false);
 	this->m_window.setFramerateLimit(this->m_fpslimit);
 }
