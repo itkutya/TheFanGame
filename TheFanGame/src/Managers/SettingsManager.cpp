@@ -30,13 +30,13 @@ bool SettingsManager::save(const std::string& path) noexcept
 				else if (value.second.type == "Keyboard")
 					file << value.second.type << ' ' << value.first << ' ' << ScanCodeToString(static_cast<Keyboard*>(value.second.value.m_input.get())->m_KeyCode) << '\n';
 				else if (value.second.type == "MouseButton")
-					file << value.second.type << ' ' << value.first << ' ' << ScanCodeToString(static_cast<MouseButton*>(value.second.value.m_input.get())->m_MouseButton) << '\n';
+					file << value.second.type << ' ' << value.first << ' ' << MouseButtonToString(static_cast<MouseButton*>(value.second.value.m_input.get())->m_MouseButton) << '\n';
 				else if (value.second.type == "MouseWheel")
-					file << value.second.type << ' ' << value.first << ' ' << ScanCodeToString(static_cast<MouseWheel*>(value.second.value.m_input.get())->m_MouseWheel) << '\n';
+					file << value.second.type << ' ' << value.first << ' ' << MouseWheelToString(static_cast<MouseWheel*>(value.second.value.m_input.get())->m_MouseWheel) << '\n';
 				else if (value.second.type == "JoystickButton")
-					file << value.second.type << ' ' << value.first << ' ' << ScanCodeToString(static_cast<JoystickButton*>(value.second.value.m_input.get())->m_joystickButton) << '\n';
+					file << value.second.type << ' ' << value.first << ' ' << JoystickButtonToString(static_cast<JoystickButton*>(value.second.value.m_input.get())->m_joystickButton) << '\n';
 				else if (value.second.type == "JoystickAxis")
-					file << value.second.type << ' ' << value.first << ' ' << ScanCodeToString(static_cast<JoystickAxis*>(value.second.value.m_input.get())->m_JoystickAxis) << '\n';
+					file << value.second.type << ' ' << value.first << ' ' << JoystickAxisToString(static_cast<JoystickAxis*>(value.second.value.m_input.get())->m_JoystickAxis) << '\n';
 			}
 		}
 	}
@@ -104,22 +104,22 @@ bool SettingsManager::load(const std::string& path) noexcept
 						else if (data == "MouseButton")
 						{
 							const auto& newdata = (last)->second.insert({ setting[0], Setting("MouseButton") }).first;
-							(*newdata).second.value.m_input = std::make_shared<MouseButton>(sf::Mouse::Button::Left);
+							(*newdata).second.value.m_input = std::make_shared<MouseButton>(StringToMouseButton(setting[1]));
 						}
 						else if (data == "MouseWheel")
 						{
 							const auto& newdata = (last)->second.insert({ setting[0], Setting("MouseWheel") }).first;
-							(*newdata).second.value.m_input = std::make_shared<MouseWheel>(sf::Mouse::Wheel::VerticalWheel);
+							(*newdata).second.value.m_input = std::make_shared<MouseWheel>(StringToMouseWheel(setting[1]));
 						}
 						else if (data == "JoystickButton")
 						{
 							const auto& newdata = (last)->second.insert({ setting[0], Setting("JoystickButton") }).first;
-							(*newdata).second.value.m_input = std::make_shared<JoystickButton>(0);
+							(*newdata).second.value.m_input = std::make_shared<JoystickButton>(StringToJoystickButton(setting[1]));
 						}
 						else if (data == "JoystickAxis")
 						{
 							const auto& newdata = (last)->second.insert({ setting[0], Setting("JoystickAxis") }).first;
-							(*newdata).second.value.m_input = std::make_shared<JoystickAxis>(sf::Joystick::Axis::X);
+							(*newdata).second.value.m_input = std::make_shared<JoystickAxis>(StringToJoystickAxis(setting[1]));
 						}
 					}
 				}
