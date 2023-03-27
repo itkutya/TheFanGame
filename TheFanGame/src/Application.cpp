@@ -26,6 +26,11 @@ void Application::pollEvents() noexcept
 	{
 		ImGui::SFML::ProcessEvent(event);
 
+		if (this->s_InputManager.input<float>(MouseWheel(sf::Mouse::Wheel::HorizontalWheel), event))
+			std::printf("Wheel\n");
+		if (this->s_InputManager.input<bool>(MouseButton(sf::Mouse::Button::Left)))
+			std::printf("Click\n");
+
 		if (event.type == sf::Event::Closed)
 			this->m_window.close();
 

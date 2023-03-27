@@ -16,7 +16,11 @@ public:
 	void processEvent(sf::Event& event) noexcept;
 
 	template<class T> [[nodiscard]] const T input(const Input& input) noexcept;
+	template<class T> [[nodiscard]] const T input(const Input& input, const std::uint32_t j_id) noexcept;
+	template<class T> [[nodiscard]] const T input(const Input& input, sf::Event& event) noexcept;
 	template<class T> [[nodiscard]] const T input(const std::string& id) noexcept;
+	template<class T> [[nodiscard]] const T input(const std::string& id, const std::uint32_t j_id) noexcept;
+	template<class T> [[nodiscard]] const T input(const std::string& id, sf::Event& event) noexcept;
 private:
 	explicit InputManager() noexcept
 	{
@@ -36,7 +40,31 @@ inline const T InputManager::input(const Input& input) noexcept
 }
 
 template<class T>
+inline const T InputManager::input(const Input& input, const std::uint32_t j_id) noexcept
+{
+	return std::any_cast<T>(input.input(j_id));
+}
+
+template<class T>
+inline const T InputManager::input(const Input& input, sf::Event& event) noexcept
+{
+	return std::any_cast<T>(input.input(event));
+}
+
+template<class T>
 inline const T InputManager::input(const std::string& id) noexcept
 {
 	return std::any_cast<T>(this->m_inputs[id]->input());
+}
+
+template<class T>
+inline const T InputManager::input(const std::string& id, const std::uint32_t j_id) noexcept
+{
+	return std::any_cast<T>(this->m_inputs[id]->input(j_id));
+}
+
+template<class T>
+inline const T InputManager::input(const std::string& id, sf::Event& event) noexcept
+{
+	return std::any_cast<T>(this->m_inputs[id]->input(event));
 }
