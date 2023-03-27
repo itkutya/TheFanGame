@@ -28,9 +28,9 @@ public:
 	explicit Input() noexcept = default;
 	virtual ~Input() noexcept = default;
 
-	virtual const std::any input() const noexcept { std::unreachable(); };
-	virtual const std::any input(sf::Event& event) const noexcept { std::unreachable(); };
-	virtual const std::any input(const std::uint32_t id) const noexcept { std::unreachable(); };
+	virtual const std::any input() const { throw "Unimplemented"; };
+	virtual const std::any input(sf::Event& event) const { throw "Unimplemented"; };
+	virtual const std::any input(const std::uint32_t id) const { throw "Unimplemented"; };
 
 	InputType m_type = InputType::None;
 };
@@ -41,7 +41,7 @@ public:
 	explicit Keyboard(sf::Keyboard::Scancode key) noexcept : m_KeyCode(key) { this->m_type = InputType::Keyboard; };
 	virtual ~Keyboard() noexcept = default;
 
-	virtual const std::any input() const noexcept override { return sf::Keyboard::isKeyPressed(this->m_KeyCode); };
+	virtual const std::any input() const override { return sf::Keyboard::isKeyPressed(this->m_KeyCode); };
 
 	sf::Keyboard::Scancode m_KeyCode = sf::Keyboard::Scancode();
 };
@@ -52,7 +52,7 @@ public:
 	explicit MouseButton(sf::Mouse::Button button) noexcept : m_MouseButton(button) { this->m_type = InputType::MouseButton; };
 	virtual ~MouseButton() noexcept = default;
 
-	virtual const std::any input() const noexcept override { return sf::Mouse::isButtonPressed(this->m_MouseButton); };
+	virtual const std::any input() const override { return sf::Mouse::isButtonPressed(this->m_MouseButton); };
 
 	sf::Mouse::Button m_MouseButton = sf::Mouse::Button();
 };
@@ -63,7 +63,7 @@ public:
 	explicit MouseWheel(sf::Mouse::Wheel wheel) noexcept : m_MouseWheel(wheel) { this->m_type = InputType::MouseWheel; };
 	virtual ~MouseWheel() noexcept = default;
 
-	virtual const std::any input(sf::Event& event) const noexcept override { return event.mouseWheelScroll.wheel == this->m_MouseWheel ? event.mouseWheelScroll.delta : 0.f; };
+	virtual const std::any input(sf::Event& event) const override { return event.mouseWheelScroll.wheel == this->m_MouseWheel ? event.mouseWheelScroll.delta : 0.f; };
 
 	sf::Mouse::Wheel m_MouseWheel = sf::Mouse::Wheel();
 };
@@ -74,8 +74,8 @@ public:
 	explicit JoystickButton(std::uint32_t button) noexcept : m_joystickButton(button) { this->m_type = InputType::JoystickButton; };
 	virtual ~JoystickButton() noexcept = default;
 
-	virtual const std::any input(const std::uint32_t id) const noexcept override { return sf::Joystick::isButtonPressed(id, this->m_joystickButton); };
-
+	virtual const std::any input(const std::uint32_t id) const override { return sf::Joystick::isButtonPressed(id, this->m_joystickButton); };
+	
 	std::uint32_t m_joystickButton = 0;
 };
 
@@ -85,7 +85,7 @@ public:
 	explicit JoystickAxis(sf::Joystick::Axis axis) noexcept : m_JoystickAxis(axis) { this->m_type = InputType::JoystickAxis; };
 	virtual ~JoystickAxis() noexcept = default;
 
-	virtual const std::any input(const std::uint32_t id) const noexcept override { return sf::Joystick::getAxisPosition(id, this->m_JoystickAxis); };
+	virtual const std::any input(const std::uint32_t id) const override { return sf::Joystick::getAxisPosition(id, this->m_JoystickAxis); };
 
 	sf::Joystick::Axis m_JoystickAxis = sf::Joystick::Axis();
 };
