@@ -95,9 +95,60 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 			ImGui::SliderFloat("Game volume: ", &this->s_AudioManager.m_gamevolume, 0.f, 100.f);
 			ImGui::SliderFloat("SFX volume: ", &this->s_AudioManager.m_sfxvolume, 0.f, 100.f);
 		}
-			break;
+		break;
 		case SETTINGS_STATE::INPUT:
-			break;
+		{
+			for (auto& it : this->s_InputManager.m_inputs)
+			{
+				ImGui::Text(it.first.c_str());
+				ImGui::SameLine();
+				ImGui::PushID(it.first.c_str());
+				std::string value = this->s_InputManager.inputToString(it.second);
+				if (ImGui::Button(value.c_str(), ImVec2(300.f, 30.f)))
+				{
+					this->m_newInput = &it;
+					this->m_KeyBindingsPopUp = true;
+				}
+				ImGui::PopID();
+			}
+			if (this->m_KeyBindingsPopUp)
+				ImGui::OpenPopup("Change Keybindigs");
+			if (ImGui::BeginPopupModal("Change Keybindigs", &this->m_KeyBindingsPopUp, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				std::shared_ptr<Input> newkey = std::make_shared<Input>();
+				std::string text = "Change [" + this->s_InputManager.inputToString(this->m_newInput->second) + "] to [" + this->s_InputManager.inputToString(newkey) + "]";
+				ImGui::Text(text.c_str(), ImVec4(1, 0, 0, 1));
+
+				/*
+				if (is.checkForAnyInput())
+				{
+					if (is.checkForAnyKeyboardInput().has_value() && is.checkForAnyKeyboardInput().value().m_KeyCode != sf::Keyboard::Enter)
+						key = is.checkForAnyKeyboardInput().value();
+
+					if (is.checkForAnyMouseInput().has_value() && is.checkForAnyMouseInput().value().m_MouseButton != sf::Mouse::Left)
+						key = is.checkForAnyMouseInput().value();
+
+					if (is.checkForAnyJoystickInput().has_value())
+						key = is.checkForAnyJoystickInput().value();
+				}
+				*/
+
+				if (ImGui::Button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+				{
+					this->m_KeyBindingsPopUp = false;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+				{
+					this->m_newInput->second = newkey;
+					this->m_KeyBindingsPopUp = false;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+		}
+		break;
 		case SETTINGS_STATE::GAME:
 			//ImGui::SliderFloat("Vertical Sensivity: ", &settings::m_VerticalSensivity, 0.f, 20.f);
 			//ImGui::SliderFloat("Horizontal Sensivity: ", &settings::m_HorizontalSensivity, 0.f, 20.f);
@@ -140,9 +191,7 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 				ImGui::EndTooltip();
 			}
 		}
-			break;
-		default:
-			break;
+		break;
 		}
 
 		if (ImGui::Button("Save") && !this->s_Settings.save("Settings.ini"))
@@ -159,68 +208,4 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 
 	if (!this->m_open)
 		this->close();
-	/*
-	case settingStates::Input:
-	{
-		inputSystem is;
-		static bool changeKeyBindings = false;
-		static std::pair<std::string, Input>* toChange;
-		for (auto& it : is.getInputHandler())
-		{
-			settingsPopUp.text(it.first.c_str());
-			ImGui::SameLine();
-			ImGui::PushID(std::string(it.first + is.keyToString(it.second)).c_str());
-			if (settingsPopUp.button(is.keyToString(it.second).c_str(), ImVec2(300.f, 30.f)))
-			{
-				toChange = &it;
-				changeKeyBindings = true;
-			}
-			ImGui::PopID();
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(200.f);
-			ImGui::PushID(it.first.c_str() + static_cast<std::uint32_t>(it.second.m_InputType));
-			if (ImGui::BeginCombo("###PressOrRelease", is.eventToString(it.second).c_str(), ImGuiComboFlags_HeightSmall))
-			{
-				if (ImGui::Selectable("Press"))
-					std::printf("...\n");
-				if (ImGui::Selectable("Release"))
-					std::printf("...\n");
-				ImGui::EndCombo();
-			}
-			ImGui::PopID();
-		}
-		popup keyBindChanger("Change Keybindigs", window.getWindow(), changeKeyBindings);
-		if (changeKeyBindings)
-		{
-			static Input key = Input();
-			std::string text = "Change [" + is.keyToString(toChange->second) + "] to [" + is.keyToString(key) + "]";
-			keyBindChanger.text(text.c_str(), ImVec4(1, 0, 0, 1));
-
-			if (is.checkForAnyInput())
-			{
-				if (is.checkForAnyKeyboardInput().has_value() && is.checkForAnyKeyboardInput().value().m_KeyCode != sf::Keyboard::Enter)
-					key = is.checkForAnyKeyboardInput().value();
-
-				if (is.checkForAnyMouseInput().has_value() && is.checkForAnyMouseInput().value().m_MouseButton != sf::Mouse::Left)
-					key = is.checkForAnyMouseInput().value();
-
-				if (is.checkForAnyJoystickInput().has_value())
-					key = is.checkForAnyJoystickInput().value();
-			}
-
-			if (keyBindChanger.button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-				keyBindChanger.close();
-			ImGui::SameLine();
-			if (keyBindChanger.button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
-			{
-				toChange->second = key;
-				if (!is.saveInput("res/inputSettings.ini"))
-					ImGui::InsertNotification({ ImGuiToastType_Error, "Failed to save changes..." });
-				else
-					keyBindChanger.close();
-			}
-		}
-		break;
-	}
-	*/
 }

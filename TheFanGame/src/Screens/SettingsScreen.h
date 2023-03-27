@@ -4,6 +4,7 @@
 #include "Managers/SettingsManager.h"
 #include "Managers/StateManager.h"
 #include "Managers/AudioManager.h"
+#include "Managers/InputManager.h"
 #include "Account/Account.h"
 
 #include "Application.h"
@@ -13,6 +14,7 @@ class SettingsScreen : public State, public PopUpState
     SettingsManager& s_Settings = SettingsManager::getInstance();
     AudioManager& s_AudioManager = AudioManager::getInstance();
     ResourceManager& s_ResourceManager = ResourceManager::getInstance();
+    InputManager& s_InputManager = InputManager::getInstance();
     enum class SETTINGS_STATE
     {
         GRAPHICS, PROFILE, AUDIO, INPUT, GAME, MAINSCREEN
@@ -34,4 +36,7 @@ private:
     int m_currFrontImage = 0;
     int m_currBackgroundImage = 0;
     int m_currIcon = 0;
+
+    bool m_KeyBindingsPopUp = false;
+    std::pair<const std::string, std::shared_ptr<Input>>* m_newInput;
 };
