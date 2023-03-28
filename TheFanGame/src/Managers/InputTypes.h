@@ -5,18 +5,6 @@
 
 #include "SFML/Window.hpp"
 
-namespace std
-{
-	[[noreturn]] inline void unreachable()
-	{
-#ifdef __GNUC__
-		__builtin_unreachable();
-#elifdef _MSC_VER
-		__assume(false);
-#endif
-	};
-};
-
 enum class InputType
 {
 	None, Keyboard, MouseButton, MouseWheel, JoystickButton, JoystickAxis, Count
@@ -90,7 +78,7 @@ public:
 	sf::Joystick::Axis m_JoystickAxis = sf::Joystick::Axis();
 };
 
-inline constexpr sf::Keyboard::Scancode StringToScanCode(const std::string& str) noexcept
+inline constexpr sf::Keyboard::Scancode StringToScanCode(const std::string& str)
 {
 	if (str == "A")						return sf::Keyboard::Scancode::A;
 	if (str == "Apostrophe")			return sf::Keyboard::Scancode::Apostrophe;
@@ -240,10 +228,10 @@ inline constexpr sf::Keyboard::Scancode StringToScanCode(const std::string& str)
 	if (str == "X")						return sf::Keyboard::Scancode::X;		
 	if (str == "Y")						return sf::Keyboard::Scancode::Y;		
 	if (str == "Z")						return sf::Keyboard::Scancode::Z;
-	std::unreachable();
+	throw "Unimplemented";
 }
 
-inline constexpr sf::Mouse::Button StringToMouseButton(const std::string& str) noexcept
+inline constexpr sf::Mouse::Button StringToMouseButton(const std::string& str)
 {
 	if (str == "Left")			return sf::Mouse::Button::Left;			
 	if (str == "Right")			return sf::Mouse::Button::Right;
@@ -251,24 +239,21 @@ inline constexpr sf::Mouse::Button StringToMouseButton(const std::string& str) n
 	if (str == "XButton1")		return sf::Mouse::Button::XButton1;
 	if (str == "XButton2")		return sf::Mouse::Button::XButton2;
 	//if (str == "ButtonCount")	return sf::Mouse::Button::ButtonCount;	
-	std::unreachable();
+	throw "Unimplemented";
 }
 
-inline constexpr sf::Mouse::Wheel StringToMouseWheel(const std::string& str) noexcept
+inline constexpr sf::Mouse::Wheel StringToMouseWheel(const std::string& str)
 {
 	if (str == "HorizontalWheel")
 		return sf::Mouse::Wheel::HorizontalWheel;
 	if (str == "VerticalWheel")
 		return sf::Mouse::Wheel::VerticalWheel;
-	std::unreachable();
+	throw "Unimplemented";
 }
 
-inline const std::uint32_t StringToJoystickButton(const std::string& str) noexcept
-{
-	return std::stoul(str);
-}
+inline const std::uint32_t StringToJoystickButton(const std::string& str) { return std::stoul(str); }
 
-inline constexpr sf::Joystick::Axis StringToJoystickAxis(const std::string& str) noexcept
+inline constexpr sf::Joystick::Axis StringToJoystickAxis(const std::string& str)
 {
 	if (str == "X")		return sf::Joystick::Axis::X;
 	if (str == "Y")		return sf::Joystick::Axis::Y;	
@@ -278,10 +263,10 @@ inline constexpr sf::Joystick::Axis StringToJoystickAxis(const std::string& str)
 	if (str == "V")		return sf::Joystick::Axis::V;	
 	if (str == "PovX")	return sf::Joystick::Axis::PovX;	 
 	if (str == "PovY")	return sf::Joystick::Axis::PovY;	 
-	std::unreachable();
+	throw "Unimplemented";
 }
 
-inline constexpr std::string ScanCodeToString(const sf::Keyboard::Scancode code) noexcept
+inline constexpr std::string ScanCodeToString(const sf::Keyboard::Scancode code)
 {
 	switch (code)
 	{
@@ -434,10 +419,10 @@ inline constexpr std::string ScanCodeToString(const sf::Keyboard::Scancode code)
 	case sf::Keyboard::Scancode::Y:					 return "Y";
 	case sf::Keyboard::Scancode::Z:					 return "Z";
 	}
-	std::unreachable();
+	throw "Unimplemented";
 }
 
-inline constexpr std::string MouseButtonToString(const sf::Mouse::Button code) noexcept
+inline constexpr std::string MouseButtonToString(const sf::Mouse::Button code)
 {
 	switch (code)
 	{
@@ -448,22 +433,22 @@ inline constexpr std::string MouseButtonToString(const sf::Mouse::Button code) n
 	case sf::Mouse::Button::XButton2:		return "XButton2";
 	//case sf::Mouse::Button::ButtonCount:	return "ButtonCount";
 	}
-	std::unreachable();
+	throw "Unimplemented";
 }
 
-inline constexpr std::string MouseWheelToString(const sf::Mouse::Wheel code) noexcept
+inline constexpr std::string MouseWheelToString(const sf::Mouse::Wheel code)
 {
 	switch (code)
 	{
 	case sf::Mouse::Wheel::VerticalWheel:	return "VerticalWheel";
 	case sf::Mouse::Wheel::HorizontalWheel:	return "HorizotnalWheel";
 	}
-	std::unreachable();
+	throw "Unimplemented";
 }
 
-inline const std::string JoystickButtonToString(const std::uint32_t code) noexcept { return std::to_string(code); }
+inline const std::string JoystickButtonToString(const std::uint32_t code) { return std::to_string(code); }
 
-inline constexpr std::string JoystickAxisToString(const sf::Joystick::Axis code) noexcept
+inline constexpr std::string JoystickAxisToString(const sf::Joystick::Axis code)
 {
 	switch (code)
 	{
@@ -476,5 +461,5 @@ inline constexpr std::string JoystickAxisToString(const sf::Joystick::Axis code)
 	case sf::Joystick::Axis::PovX:	return "PovX";
 	case sf::Joystick::Axis::PovY:	return "PovY";
 	}
-	std::unreachable();
+	throw "Unimplemented";
 }

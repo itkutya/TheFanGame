@@ -30,3 +30,18 @@ const std::string InputManager::inputToString(std::shared_ptr<Input>& input) noe
 		return JoystickAxisToString(static_cast<JoystickAxis*>(input.get())->m_JoystickAxis);
 	return "";
 }
+
+const std::shared_ptr<Input> InputManager::getAnyInput(sf::Event& event) noexcept
+{
+	if (event.type == sf::Event::KeyPressed)
+		return std::make_shared<Keyboard>(event.key.scancode);
+	else if(event.type == sf::Event::MouseButtonPressed)
+		return std::make_shared<MouseButton>(event.mouseButton.button);
+	else if (event.type == sf::Event::MouseWheelScrolled)
+		return std::make_shared<MouseWheel>(event.mouseWheelScroll.wheel);
+	else if (event.type == sf::Event::JoystickButtonPressed)
+		return std::make_shared<JoystickButton>(event.joystickButton.button);
+	else if (event.type == sf::Event::JoystickMoved)
+		return std::make_shared<JoystickAxis>(event.joystickMove.axis);
+	return std::make_shared<Input>();
+}

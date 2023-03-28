@@ -5,6 +5,19 @@ void SettingsScreen::init(sf::RenderWindow& window)
 	this->m_open = true;
 }
 
+void SettingsScreen::processEvent(sf::Event& event) noexcept
+{
+	if ((event.type == sf::Event::KeyPressed						|| 
+		 event.type == sf::Event::MouseButtonPressed				|| 
+		 event.type == sf::Event::MouseWheelScrolled				|| 
+		 event.type == sf::Event::JoystickButtonPressed				|| 
+		 event.type == sf::Event::JoystickMoved)					&&
+		(!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)		&& 
+		 !sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter) &&
+		 !sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape)))
+		this->m_newKey = this->s_InputManager.getAnyInput(event);
+}
+
 void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
 	if (this->m_once)
@@ -103,10 +116,10 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 				ImGui::Text(it.first.c_str());
 				ImGui::SameLine();
 				ImGui::PushID(it.first.c_str());
-				std::string value = this->s_InputManager.inputToString(it.second);
+				std::string value = this->s_InputManager.inputToString(*it.second);
 				if (ImGui::Button(value.c_str(), ImVec2(300.f, 30.f)))
 				{
-					this->m_newInput = &it;
+					this->m_newInput = it.first;
 					this->m_KeyBindingsPopUp = true;
 				}
 				ImGui::PopID();
@@ -115,33 +128,29 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 				ImGui::OpenPopup("Change Keybindigs");
 			if (ImGui::BeginPopupModal("Change Keybindigs", &this->m_KeyBindingsPopUp, ImGuiWindowFlags_AlwaysAutoResize))
 			{
-				std::shared_ptr<Input> newkey = std::make_shared<Input>();
-				std::string text = "Change [" + this->s_InputManager.inputToString(this->m_newInput->second) + "] to [" + this->s_InputManager.inputToString(newkey) + "]";
+				std::string text = "Change [" + this->s_InputManager.inputToString(*this->s_InputManager.m_inputs[this->m_newInput]) + "] to [" + this->s_InputManager.inputToString(this->m_newKey) + "]";
 				ImGui::Text(text.c_str(), ImVec4(1, 0, 0, 1));
 
-				/*
-				if (is.checkForAnyInput())
-				{
-					if (is.checkForAnyKeyboardInput().has_value() && is.checkForAnyKeyboardInput().value().m_KeyCode != sf::Keyboard::Enter)
-						key = is.checkForAnyKeyboardInput().value();
-
-					if (is.checkForAnyMouseInput().has_value() && is.checkForAnyMouseInput().value().m_MouseButton != sf::Mouse::Left)
-						key = is.checkForAnyMouseInput().value();
-
-					if (is.checkForAnyJoystickInput().has_value())
-						key = is.checkForAnyJoystickInput().value();
-				}
-				*/
-
-				if (ImGui::Button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+				if (ImGui::Button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape))
 				{
 					this->m_KeyBindingsPopUp = false;
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+				if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
 				{
-					this->m_newInput->second = newkey;
+					(*this->s_InputManager.m_inputs[this->m_newInput]) = this->m_newKey;
+					if (this->m_newKey->m_type == InputType::Keyboard)
+						this->s_Settings["Input"][this->m_newInput].type = "Keyboard";
+					else if (this->m_newKey->m_type == InputType::MouseButton)
+						this->s_Settings["Input"][this->m_newInput].type = "MouseButton";
+					else if (this->m_newKey->m_type == InputType::MouseWheel)
+						this->s_Settings["Input"][this->m_newInput].type = "MouseWheel";
+					else if (this->m_newKey->m_type == InputType::JoystickButton)
+						this->s_Settings["Input"][this->m_newInput].type = "JoystickButton";
+					else if (this->m_newKey->m_type == InputType::JoystickAxis)
+						this->s_Settings["Input"][this->m_newInput].type = "JoystickAxis";
+
 					this->m_KeyBindingsPopUp = false;
 					ImGui::CloseCurrentPopup();
 				}

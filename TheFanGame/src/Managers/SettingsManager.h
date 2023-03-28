@@ -89,7 +89,7 @@ class SettingsManager
 		operator std::uint64_t& () noexcept { return this->value.m_u64; };
 		operator std::string& () noexcept { return this->value.m_string; };
 
-		const std::string type;
+		std::string type;
 		Value value;
 	};
 public:

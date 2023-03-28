@@ -24,6 +24,7 @@ public:
     virtual ~SettingsScreen() noexcept = default;
 
     virtual void init(sf::RenderWindow& window) override;
+    virtual void processEvent(sf::Event& event) noexcept override;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
 private:
     std::shared_ptr<ResourceManager::Object> m_Icon = s_ResourceManager.get<ResourceManager::Object>("Icon");
@@ -38,5 +39,6 @@ private:
     int m_currIcon = 0;
 
     bool m_KeyBindingsPopUp = false;
-    std::pair<const std::string, std::shared_ptr<Input>>* m_newInput;
+    std::string m_newInput = "";
+    std::shared_ptr<Input> m_newKey = std::make_shared<Input>();
 };
