@@ -12,9 +12,7 @@ void SettingsScreen::processEvent(sf::Event& event) noexcept
 		 event.type == sf::Event::MouseWheelScrolled				|| 
 		 event.type == sf::Event::JoystickButtonPressed				|| 
 		 event.type == sf::Event::JoystickMoved)					&&
-		(!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)		&& 
-		 !sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter) &&
-		 !sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape)))
+		!ImGui::IsAnyItemHovered())
 		this->m_newKey = this->s_InputManager.getAnyInput(event);
 }
 
@@ -126,18 +124,18 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 			}
 			if (this->m_KeyBindingsPopUp)
 				ImGui::OpenPopup("Change Keybindigs");
-			if (ImGui::BeginPopupModal("Change Keybindigs", &this->m_KeyBindingsPopUp, ImGuiWindowFlags_AlwaysAutoResize))
+			if (ImGui::BeginPopupModal("Change Keybindigs", &this->m_KeyBindingsPopUp, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
 			{
 				std::string text = "Change [" + this->s_InputManager.inputToString(*this->s_InputManager.m_inputs[this->m_newInput]) + "] to [" + this->s_InputManager.inputToString(this->m_newKey) + "]";
 				ImGui::Text(text.c_str(), ImVec4(1, 0, 0, 1));
 
-				if (ImGui::Button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape))
+				if (ImGui::Button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)))
 				{
 					this->m_KeyBindingsPopUp = false;
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)) || sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
+				if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)))
 				{
 					(*this->s_InputManager.m_inputs[this->m_newInput]) = this->m_newKey;
 					if (this->m_newKey->m_type == InputType::Keyboard)
