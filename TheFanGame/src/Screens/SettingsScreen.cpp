@@ -7,12 +7,12 @@ void SettingsScreen::init(sf::RenderWindow& window)
 
 void SettingsScreen::processEvent(sf::Event& event) noexcept
 {
-	if ((event.type == sf::Event::KeyPressed						|| 
-		 event.type == sf::Event::MouseButtonPressed				|| 
-		 event.type == sf::Event::MouseWheelScrolled				|| 
-		 event.type == sf::Event::JoystickButtonPressed				|| 
-		 event.type == sf::Event::JoystickMoved)					&&
-		!ImGui::IsAnyItemHovered())
+	if ((event.type == sf::Event::KeyPressed										 || 
+		 (event.type == sf::Event::MouseButtonPressed && !ImGui::IsAnyItemHovered()) ||
+		 event.type == sf::Event::MouseWheelScrolled								 || 
+		 event.type == sf::Event::JoystickButtonPressed								 || 
+		 event.type == sf::Event::JoystickMoved)									 &&
+		 this->m_KeyBindingsPopUp)
 		this->m_newKey = this->s_InputManager.getAnyInput(event);
 }
 
