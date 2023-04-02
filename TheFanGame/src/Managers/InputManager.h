@@ -22,17 +22,17 @@ public:
 	template<class T> [[nodiscard]] const T input(const std::string& id, const std::uint32_t j_id) noexcept;
 	template<class T> [[nodiscard]] const T input(const std::string& id, sf::Event& event) noexcept;
 
-	[[nodiscard]] const std::string inputToString(std::shared_ptr<Input>& input) noexcept;
-	[[nodiscard]] const std::shared_ptr<Input> getAnyInput(sf::Event& event) noexcept;
+	[[nodiscard]] const std::string inputToString(Input* input) noexcept;
+	[[nodiscard]] const std::unique_ptr<Input> getAnyInput(sf::Event& event) noexcept;
 
 	std::vector<std::uint32_t> m_ConnectedJoystics;
-	std::unordered_map<std::string, std::shared_ptr<Input>*> m_inputs;
+	std::unordered_map<std::string, Input*> m_inputs;
 private:
-	explicit InputManager() noexcept
+	InputManager() noexcept
 	{
 		auto& input = this->s_SettingsManager["Input"];
 		for (auto& i : input)
-			this->m_inputs[i.first] = &i.second.value.m_input;
+			this->m_inputs[i.first] = i.second.value.m_input.get();
 	};
 };
 

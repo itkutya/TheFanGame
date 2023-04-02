@@ -7,8 +7,7 @@
 class LoginScreen : public State
 {
 public:
-    explicit LoginScreen(Application* app) noexcept : m_app(app) {};
-    virtual ~LoginScreen() noexcept = default;
+    LoginScreen(Application* app) noexcept : m_app(app) {};
 
     virtual void init(sf::RenderWindow& window) override;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;

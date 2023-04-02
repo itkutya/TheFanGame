@@ -14,7 +14,7 @@ class Application;
 class State
 {
 public:
-    explicit State() noexcept = default;
+    State() noexcept = default;
     virtual ~State() noexcept = default;
     virtual void init(sf::RenderWindow& window) {};
     virtual void processEvent(sf::Event& event) noexcept {};
@@ -43,7 +43,7 @@ public:
     [[nodiscard]] const std::vector<std::unique_ptr<State>>& getCurrentGUIState() noexcept;
     [[nodiscard]] const std::size_t getSize() const noexcept;
 private:
-    explicit StateManager() noexcept = default;
+    StateManager() noexcept = default;
 
     std::stack<std::pair<std::unique_ptr<State>, std::vector<std::unique_ptr<State>>>> m_statestack;
     

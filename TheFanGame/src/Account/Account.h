@@ -37,7 +37,7 @@ public:
     Experience m_experience;
     std::uint64_t& m_random = this->s_Settings["Account"]["Random"];
 private:
-    explicit Account() noexcept = default;
+    Account() noexcept = default;
 };
 
 template<Hashable T>

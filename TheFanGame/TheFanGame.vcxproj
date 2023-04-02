@@ -168,6 +168,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Screens\ShopScreen.cpp" />
     <ClCompile Include="src\Managers\InputManager.cpp" />
     <ClCompile Include="src\Managers\SettingsManager.cpp" />
     <ClCompile Include="src\Managers\AudioManager.cpp" />
@@ -191,6 +192,7 @@
     <ClCompile Include="src\Managers\StateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Screens\ShopScreen.h" />
     <ClInclude Include="src\Managers\InputTypes.h" />
     <ClInclude Include="src\Managers\InputManager.h" />
     <ClInclude Include="src\Managers\SettingsManager.h" />

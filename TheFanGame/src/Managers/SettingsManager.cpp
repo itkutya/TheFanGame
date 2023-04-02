@@ -99,27 +99,27 @@ bool SettingsManager::load(const std::string& path) noexcept
 						else if (data == "Keyboard")
 						{
 							const auto& newdata = (last)->second.insert({ setting[0], Setting("Keyboard") }).first;
-							(*newdata).second.value.m_input = std::make_shared<Keyboard>(StringToScanCode(setting[1]));
+							(*newdata).second.value.m_input = std::make_unique<Keyboard>(StringToScanCode(setting[1]));
 						}
 						else if (data == "MouseButton")
 						{
 							const auto& newdata = (last)->second.insert({ setting[0], Setting("MouseButton") }).first;
-							(*newdata).second.value.m_input = std::make_shared<MouseButton>(StringToMouseButton(setting[1]));
+							(*newdata).second.value.m_input = std::make_unique<MouseButton>(StringToMouseButton(setting[1]));
 						}
 						else if (data == "MouseWheel")
 						{
 							const auto& newdata = (last)->second.insert({ setting[0], Setting("MouseWheel") }).first;
-							(*newdata).second.value.m_input = std::make_shared<MouseWheel>(StringToMouseWheel(setting[1]));
+							(*newdata).second.value.m_input = std::make_unique<MouseWheel>(StringToMouseWheel(setting[1]));
 						}
 						else if (data == "JoystickButton")
 						{
 							const auto& newdata = (last)->second.insert({ setting[0], Setting("JoystickButton") }).first;
-							(*newdata).second.value.m_input = std::make_shared<JoystickButton>(StringToJoystickButton(setting[1]));
+							(*newdata).second.value.m_input = std::make_unique<JoystickButton>(StringToJoystickButton(setting[1]));
 						}
 						else if (data == "JoystickAxis")
 						{
 							const auto& newdata = (last)->second.insert({ setting[0], Setting("JoystickAxis") }).first;
-							(*newdata).second.value.m_input = std::make_shared<JoystickAxis>(StringToJoystickAxis(setting[1]));
+							(*newdata).second.value.m_input = std::make_unique<JoystickAxis>(StringToJoystickAxis(setting[1]));
 						}
 					}
 				}

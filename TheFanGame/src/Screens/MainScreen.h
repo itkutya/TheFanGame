@@ -9,17 +9,16 @@ class MainScreen : public State
     StateManager& s_StateManager = StateManager::getInstance();
     AudioManager& s_AudioManager = AudioManager::getInstance();
 public:
-    explicit MainScreen(Application* app) noexcept : m_app(app) {};
-    virtual ~MainScreen() noexcept = default;
+    MainScreen(Application* app) noexcept : m_app(app) {};
 
     virtual void init(sf::RenderWindow& window) override;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
 private:
     bool m_PlaySelected = false;
-    std::shared_ptr<ResourceManager::Object> m_Icon;
-    std::shared_ptr<ResourceManager::Object> m_FrontImage;
-    std::shared_ptr<sf::Texture> m_Pause;
-    std::shared_ptr<sf::Texture> m_Resume;
+    ResourceManager::Object* m_Icon;
+    ResourceManager::Object* m_FrontImage;
+    sf::Texture* m_Pause;
+    sf::Texture* m_Resume;
 
     Application* m_app;
 };

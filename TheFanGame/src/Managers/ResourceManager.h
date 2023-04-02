@@ -21,11 +21,11 @@ public:
         sf::SoundBuffer Buffer;
         sf::Sound Sound;
     };
-    typedef std::variant<std::shared_ptr<sf::Texture>,
-                         std::shared_ptr<sf::Font>,
-                         std::shared_ptr<sf::Music>,
-                         std::shared_ptr<Object>,
-                         std::shared_ptr<AudioObject>>
+    typedef std::variant<std::unique_ptr<sf::Texture>,
+                         std::unique_ptr<sf::Font>,
+                         std::unique_ptr<sf::Music>,
+                         std::unique_ptr<Object>,
+                         std::unique_ptr<AudioObject>>
     Resources;
 
     ResourceManager(ResourceManager const&) = delete;
@@ -34,20 +34,20 @@ public:
 
     [[nodiscard]] static ResourceManager& getInstance();
     
-    template<class T> std::shared_ptr<T>& add(const std::string& id) noexcept;
+    template<class T> T* add(const std::string& id) noexcept;
     template<class T> [[nodiscard]] bool load(const std::string& id, const std::string& path) noexcept;
     template<class T> [[nodiscard]] bool remove(const std::string& id) noexcept;
-    template<class T> [[nodiscard]] std::shared_ptr<T>& get(const std::string& id) noexcept;
+    template<class T> [[nodiscard]] T* get(const std::string& id) noexcept;
 private:
-    explicit ResourceManager() noexcept = default;
+    ResourceManager() noexcept = default;
     std::unordered_map<std::string, Resources> m_resources;
 };
 
 template<class T>
-inline std::shared_ptr<T>& ResourceManager::add(const std::string& id) noexcept
+inline T* ResourceManager::add(const std::string& id) noexcept
 {
-    this->m_resources[id] = std::make_shared<T>();
-    return std::get<std::shared_ptr<T>>(this->m_resources[id]);
+    this->m_resources[id] = std::make_unique<T>();
+    return std::get<std::unique_ptr<T>>(this->m_resources.at(id)).get();
 }
 
 template<class T>
@@ -55,12 +55,12 @@ inline bool ResourceManager::load(const std::string& id, const std::string& path
 {
     if constexpr (requires { T().loadFromFile(path); })
     {
-        if (std::get<std::shared_ptr<T>>(this->m_resources.at(id))->loadFromFile(path))
+        if (std::get<std::unique_ptr<T>>(this->m_resources.at(id))->loadFromFile(path))
             return true;
     }
     else if constexpr (requires { T().openFromFile(path); })
     {
-        if (std::get<std::shared_ptr<T>>(this->m_resources.at(id))->openFromFile(path))
+        if (std::get<std::unique_ptr<T>>(this->m_resources.at(id))->openFromFile(path))
             return true;
     }
     return false;
@@ -69,9 +69,9 @@ inline bool ResourceManager::load(const std::string& id, const std::string& path
 template<class T>
 inline bool ResourceManager::remove(const std::string& id) noexcept
 {
-    if (std::get<std::shared_ptr<T>>(this->m_resources.at(id)).use_count() == 1)
+    if (std::get<std::unique_ptr<T>>(this->m_resources.at(id)) != nullptr)
     {
-        std::get<std::shared_ptr<T>>(this->m_resources.at(id)).reset();
+        std::get<std::unique_ptr<T>>(this->m_resources.at(id)).reset();
         this->m_resources.erase(id);
         return true;
     }
@@ -79,7 +79,7 @@ inline bool ResourceManager::remove(const std::string& id) noexcept
 }
 
 template<class T>
-inline std::shared_ptr<T>& ResourceManager::get(const std::string& id) noexcept
+inline T* ResourceManager::get(const std::string& id) noexcept
 {
-    return std::get<std::shared_ptr<T>>(this->m_resources.at(id));
+    return std::get<std::unique_ptr<T>>(this->m_resources.at(id)).get();
 }

@@ -13,7 +13,7 @@ enum class InputType
 class Input
 {
 public:
-	explicit Input() noexcept = default;
+	Input() noexcept = default;
 	virtual ~Input() noexcept = default;
 
 	virtual const std::any input() const { throw "Unimplemented"; };
@@ -26,9 +26,8 @@ public:
 class Keyboard : public Input
 {
 public:
-	explicit Keyboard(sf::Keyboard::Scancode key) noexcept : m_KeyCode(key) { this->m_type = InputType::Keyboard; };
-	virtual ~Keyboard() noexcept = default;
-
+	Keyboard(sf::Keyboard::Scancode key) noexcept : m_KeyCode(key) { this->m_type = InputType::Keyboard; };
+	
 	virtual const std::any input() const override { return sf::Keyboard::isKeyPressed(this->m_KeyCode); };
 
 	sf::Keyboard::Scancode m_KeyCode = sf::Keyboard::Scancode();
@@ -37,9 +36,8 @@ public:
 class MouseButton : public Input
 {
 public:
-	explicit MouseButton(sf::Mouse::Button button) noexcept : m_MouseButton(button) { this->m_type = InputType::MouseButton; };
-	virtual ~MouseButton() noexcept = default;
-
+	MouseButton(sf::Mouse::Button button) noexcept : m_MouseButton(button) { this->m_type = InputType::MouseButton; };
+	
 	virtual const std::any input() const override { return sf::Mouse::isButtonPressed(this->m_MouseButton); };
 
 	sf::Mouse::Button m_MouseButton = sf::Mouse::Button();
@@ -48,9 +46,8 @@ public:
 class MouseWheel : public Input
 {
 public:
-	explicit MouseWheel(sf::Mouse::Wheel wheel) noexcept : m_MouseWheel(wheel) { this->m_type = InputType::MouseWheel; };
-	virtual ~MouseWheel() noexcept = default;
-
+	MouseWheel(sf::Mouse::Wheel wheel) noexcept : m_MouseWheel(wheel) { this->m_type = InputType::MouseWheel; };
+	
 	virtual const std::any input(sf::Event& event) const override { return event.mouseWheelScroll.wheel == this->m_MouseWheel ? event.mouseWheelScroll.delta : 0.f; };
 
 	sf::Mouse::Wheel m_MouseWheel = sf::Mouse::Wheel();
@@ -59,9 +56,8 @@ public:
 class JoystickButton : public Input
 {
 public:
-	explicit JoystickButton(std::uint32_t button) noexcept : m_joystickButton(button) { this->m_type = InputType::JoystickButton; };
-	virtual ~JoystickButton() noexcept = default;
-
+	JoystickButton(std::uint32_t button) noexcept : m_joystickButton(button) { this->m_type = InputType::JoystickButton; };
+	
 	virtual const std::any input(const std::uint32_t id) const override { return sf::Joystick::isButtonPressed(id, this->m_joystickButton); };
 	
 	std::uint32_t m_joystickButton = 0;
@@ -70,9 +66,8 @@ public:
 class JoystickAxis : public Input
 {
 public:
-	explicit JoystickAxis(sf::Joystick::Axis axis) noexcept : m_JoystickAxis(axis) { this->m_type = InputType::JoystickAxis; };
-	virtual ~JoystickAxis() noexcept = default;
-
+	JoystickAxis(sf::Joystick::Axis axis) noexcept : m_JoystickAxis(axis) { this->m_type = InputType::JoystickAxis; };
+	
 	virtual const std::any input(const std::uint32_t id) const override { return sf::Joystick::getAxisPosition(id, this->m_JoystickAxis); };
 
 	sf::Joystick::Axis m_JoystickAxis = sf::Joystick::Axis();

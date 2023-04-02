@@ -11,8 +11,7 @@ class Menu : public State
     ResourceManager& s_ResourceManager = ResourceManager::getInstance();
     InputManager& s_InputManager = InputManager::getInstance();
 public:
-    explicit Menu(Application* app) noexcept : m_app(app) {};
-    virtual ~Menu() noexcept = default;
+    Menu(Application* app) noexcept : m_app(app) {};
 
     virtual void init(sf::RenderWindow& window) override;
     virtual void processEvent(sf::Event& event) noexcept override;
@@ -21,5 +20,5 @@ public:
 private:
     Application* m_app;
 
-    std::shared_ptr<ResourceManager::Object> m_BackgroundImage;
+    ResourceManager::Object* m_BackgroundImage;
 };
