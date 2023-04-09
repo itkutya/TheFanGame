@@ -11,12 +11,9 @@ public:
 
     virtual void init(sf::RenderWindow& window) override;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
-
-    bool LoginAccount() noexcept;
 private:
     Account& s_Account = Account::getInstance();
     StateManager& s_StateManager = StateManager::getInstance();
-    SettingsManager& s_Settings = SettingsManager::getInstance();
 
     Application* m_app;
 };

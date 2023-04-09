@@ -28,20 +28,26 @@ public:
     virtual ~Account() noexcept = default;
 
     [[nodiscard]] static Account& getInstance();
-    template<Hashable T> [[nodiscard]] const std::uint64_t CreateHashNumber(T& type) const noexcept;
+
+    const bool Login(bool loaduplogin = false) noexcept;
+    const bool Register() noexcept;
 
     std::string& m_username = this->s_Settings["Account"]["Username"];
     std::string m_password;
     std::string m_email;
     bool& m_rememberme = this->s_Settings["Account"]["RememberMe"];
     Experience m_experience;
-    std::uint64_t& m_random = this->s_Settings["Account"]["Random"];
+    std::uint64_t m_currency = 0;
 private:
     Account() noexcept = default;
+
+    template<Hashable T> [[nodiscard]] const std::size_t CreateHashNumber(T& type) const noexcept;
+
+    std::size_t& m_random = this->s_Settings["Account"]["Random"];
 };
 
 template<Hashable T>
-inline const std::uint64_t Account::CreateHashNumber(T& type) const noexcept
+inline const std::size_t Account::CreateHashNumber(T& type) const noexcept
 {
     std::hash<T> temp;
     return temp(type);

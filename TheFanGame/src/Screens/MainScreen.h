@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SettingsScreen.h"
+#include "ShopScreen.h"
 
 class MainScreen : public State
 {

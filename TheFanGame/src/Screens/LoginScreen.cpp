@@ -2,7 +2,7 @@
 
 void LoginScreen::init(sf::RenderWindow& window)
 {
-	if (this->s_Account.m_rememberme && this->LoginAccount())
+	if (this->s_Account.m_rememberme && this->s_Account.Login(true))
 		this->s_StateManager.addGUIState<MainScreen>(this->m_app, true);
 }
 
@@ -19,7 +19,7 @@ void LoginScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			ImGui::InputText("Password", &this->s_Account.m_password, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_Password) ||
 			ImGui::Button("Login"))
 		{
-			if (this->LoginAccount())
+			if (this->s_Account.Login())
 				this->s_StateManager.addGUIState<MainScreen>(this->m_app, true);
 		}
 		ImGui::SameLine();
@@ -32,45 +32,4 @@ void LoginScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			window.close();
 	}
 	ImGui::End();
-}
-
-bool LoginScreen::LoginAccount() noexcept
-{
-	if (this->s_Account.m_rememberme)
-		this->s_Account.m_random = this->s_Account.CreateHashNumber<std::string>(this->s_Account.m_username);
-	else
-		this->s_Account.m_random = 0;
-	
-	std::ostringstream stream;
-	stream << "username=" << this->s_Account.m_username << "&password=" << this->s_Account.m_password << "&random=" << this->s_Account.m_random;
-	sf::Http http("http://thefangamedb.000webhostapp.com");
-	sf::Http::Request request("/login.php", sf::Http::Request::Method::Post, stream.str());
-	sf::Http::Response response = http.sendRequest(request, sf::seconds(3.f));
-
-	if (response.getStatus() != sf::Http::Response::Status::Ok)
-		ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
-	else
-	{
-		enum ServerData
-		{
-			SUCCESS = 0, LVL, XP, XPCAP
-		};
-
-		std::vector<std::string> data;
-		std::stringstream ss(response.getBody());
-		while (std::getline(ss, data.emplace_back(), '#'));
-		if (data[ServerData::SUCCESS] != std::string("Success."))
-			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Incorrect login details!"));
-		else
-		{
-			this->s_Account.m_experience = Experience(std::stoull(data[ServerData::LVL]), 
-													   std::stof(data[ServerData::XP]),
-													   std::stof(data[ServerData::XPCAP]));
-			if (this->s_Account.m_rememberme && this->s_Account.m_random && !this->s_Settings.save("Settings.ini"))
-				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to save settings!"));
-			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));
-			return true;
-		}
-	}
-	return false;
 }

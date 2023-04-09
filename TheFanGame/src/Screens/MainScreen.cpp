@@ -44,12 +44,12 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("This is the profile picture!");
 				ImGui::TableNextColumn();
-				ImGui::Text("Account: %s\nXP: %.2f/%.2f\nLevel: %i\nCoverCoin: %i$",
+				ImGui::Text("Account: %s\nXP: %.2f/%.2f\nLevel: %i\nCoverCoin: %u$",
 					(this->s_Account.m_username).c_str(),
 					 this->s_Account.m_experience.getCurrentXP(),
 					 this->s_Account.m_experience.getCurrentXPCap(),
 					 this->s_Account.m_experience.getLevel(),
-					 0);
+					 this->s_Account.m_currency);
 				ImGui::Dummy(ImVec2(ImGui::GetContentRegionMax().x, 0.f));
 				ImGui::ProgressBar(this->s_Account.m_experience.getProgress());
 				ImGui::EndTable();
@@ -133,7 +133,7 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
 
 				if (ImGui::Button("Characters", ImVec2(300.f, 75.f)))
-					//guistateSystem::add<charactersPanel>();
+					this->s_StateManager.addGUIState<ShopScreen>(this->m_app);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Unlocked characters and the character shop, etc...");
 
