@@ -122,16 +122,7 @@
     <ClInclude Include="ImGUI\imstb_truetype.h">
       <Filter>ImGUI</Filter>
     </ClInclude>
-    <ClInclude Include="ImGUI\fa_solid_900.h">
-      <Filter>ImGUI\Notify</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGUI\font_awesome_5.h">
-      <Filter>ImGUI\Notify</Filter>
-    </ClInclude>
     <ClInclude Include="ImGUI\imgui_notify.h">
-      <Filter>ImGUI\Notify</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGUI\tahoma.h">
       <Filter>ImGUI\Notify</Filter>
     </ClInclude>
     <ClInclude Include="ImGUI\imgui_stdlib.h">
@@ -183,6 +174,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Managers\CharactersManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\font_awesome_5.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,7 +10,6 @@
 
 #include "imgui-SFML.h"
 #include "imgui_notify.h"
-#include "tahoma.h"
 
 namespace ImGui
 {

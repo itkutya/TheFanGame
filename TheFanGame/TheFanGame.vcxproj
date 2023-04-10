@@ -193,6 +193,7 @@
     <ClCompile Include="src\Managers\StateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ImGUI\font_awesome_5.h" />
     <ClInclude Include="src\Managers\CharactersManager.h" />
     <ClInclude Include="src\Screens\ShopScreen.h" />
     <ClInclude Include="src\Managers\InputTypes.h" />
@@ -208,11 +209,8 @@
     <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\Managers\ResourceManager.h" />
     <ClInclude Include="src\Application.h" />
-    <ClInclude Include="ImGUI\fa_solid_900.h" />
-    <ClInclude Include="ImGUI\font_awesome_5.h" />
     <ClInclude Include="ImGUI\imgui_notify.h" />
     <ClInclude Include="ImGUI\imgui_stdlib.h" />
-    <ClInclude Include="ImGUI\tahoma.h" />
     <ClInclude Include="ImGUI\imconfig-SFML.h" />
     <ClInclude Include="ImGUI\imconfig.h" />
     <ClInclude Include="ImGUI\imgui-SFML.h" />

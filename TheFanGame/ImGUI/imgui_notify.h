@@ -10,7 +10,6 @@
 #include <Windows.h>
 #include "imgui.h"
 #include "font_awesome_5.h"
-#include "fa_solid_900.h"
 
 #define NOTIFY_MAX_MSG_LENGTH			4096		// Max message content length
 #define NOTIFY_PADDING_X				20.f		// Bottom-left X padding
@@ -352,9 +351,7 @@ namespace ImGui
 		icons_config.MergeMode = true;
 		icons_config.PixelSnapH = true;
 		icons_config.FontDataOwnedByAtlas = FontDataOwnedByAtlas;
-
-		GetIO().Fonts->AddFontFromMemoryTTF((void*)fa_solid_900, sizeof(fa_solid_900), font_size, &icons_config, icons_ranges);
+		GetIO().Fonts->AddFontFromFileTTF("Resources/fa-solid-900.ttf", font_size, &icons_config, icons_ranges);
 	}
 }
-
 #endif

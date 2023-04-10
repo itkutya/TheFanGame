@@ -195,7 +195,5 @@ IMGUI_API void ImGui::LoadCostumeFont(const std::string& path)
     font_cfg.FontDataOwnedByAtlas = false;
     io.Fonts->AddFontFromFileTTF(path.c_str(), 25.0f, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
     ImGui::MergeIconsWithLatestFont(17.f, false);
-    io.Fonts->AddFontFromMemoryTTF((void*)tahoma, sizeof(tahoma), 17.f, &font_cfg);
-    ImGui::MergeIconsWithLatestFont(17.f, false);
     ImGui::SFML::UpdateFontTexture();
 }

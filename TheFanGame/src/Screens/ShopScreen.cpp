@@ -58,10 +58,10 @@ void ShopScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 						ability.setTexture(character.m_Icon);
 						ImGui::Image(ability, sf::Vector2f(50.f, 50.f));
 						ImGui::SameLine();
-						ImGui::TextColored(ImVec4(1.f, 0.0f, 0.1f, 1.f), "Health: %.1f %s\nATK: %u %s\nDEF: %u %s\nSpeed: %.1f %s\nPrice: %u %s\n",
+						ImGui::TextColored(ImVec4(1.f, 0.0f, 0.1f, 1.f), "Health: %.1f %s\nATK: %u %s\nDEF: %u %s\nSpeed: %.1f %s\nPrice: %u %s",
 							character.m_Health, ICON_FA_HEART, 
-							character.m_ATK, ICON_FA_HAMMER, 
-							character.m_DEF, ICON_FA_DEMOCRAT, 
+							character.m_ATK, ICON_FA_SWORD,
+							character.m_DEF, ICON_FA_SHIELD, 
 							character.m_Speed, ICON_FA_SHOE_PRINTS, 
 							character.m_Price, ICON_FA_MONEY_BILL);
 						ImGui::EndTooltip();
