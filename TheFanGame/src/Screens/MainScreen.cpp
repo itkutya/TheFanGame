@@ -132,7 +132,7 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::TableNextColumn();
 				ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x / 3.f);
 
-				if (ImGui::Button("Characters", ImVec2(300.f, 75.f)))
+				if (ImGui::Button("Shop", ImVec2(300.f, 75.f)))
 					this->s_StateManager.addGUIState<ShopScreen>(this->m_app);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Unlocked characters and the character shop, etc...");

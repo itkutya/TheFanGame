@@ -1,4 +1,4 @@
-#include "ShopScreen.h"
+﻿#include "ShopScreen.h"
 
 void ShopScreen::init(sf::RenderWindow& window)
 {
@@ -45,61 +45,44 @@ void ShopScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		{
 			if (ImGui::BeginChild("##CharSet", ImVec2(600.f, 300.f), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar))
 			{
-				/*
-				for (std::size_t i = 0; i < this->characters.size(); ++i)
+				for (auto& [name, character] : this->s_CharactersManager.m_Characters)
 				{
 					sf::Sprite temp;
-					if (!this->characters[i].unlocked)
-						temp.setTexture(resourceSystem::c_get<sf::Texture>("WallTexture"));
-					else
-						temp.setTexture(resourceSystem::c_get<sf::Texture>("CharacterTexture"));
-
-					temp.setTextureRect(sf::IntRect(sf::Vector2i(64 * (int)i, 0), sf::Vector2i(64, 64)));
-					ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + 25.f, ImGui::GetCursorPos().y));
+					temp.setTexture(character.m_Icon);
 					ImGui::Image(temp, sf::Vector2f(150.f, 150.f));
 
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						sf::Sprite ability;
-						ability.setTexture(resourceSystem::c_get<sf::Texture>("WallTexture"));
-						ability.setTextureRect(sf::IntRect(sf::Vector2i(128, 0), sf::Vector2i(64, 64)));
-						ImGui::SetCursorPos(ImVec2(5.f, 5.f));
+						ability.setTexture(character.m_Icon);
 						ImGui::Image(ability, sf::Vector2f(50.f, 50.f));
 						ImGui::SameLine();
-						CharactersPanel.text("Can be an image of any ability or something like that.", ImVec4(1.f, 0.0f, 0.1f, 1.f));
-						CharactersPanel.text("This will be updated later so it displays information about the charater that is currently being hoverd.", ImVec4(0.f, 0.8f, 0.1f, 1.f));
+						ImGui::TextColored(ImVec4(1.f, 0.0f, 0.1f, 1.f), 
+							reinterpret_cast<const char*>(u8"Health: %.1f°\nATK: %uĐ\nDEF: %u¤\nSpeed: %.1fł\nPrice: %u$\n"),
+							character.m_Health, character.m_ATK, character.m_DEF, character.m_Speed, character.m_Price);
 						ImGui::EndTooltip();
 					}
 					ImGui::SameLine();
-					CharactersPanel.text("Some information about the character that is being displayed can go here.");
+					ImGui::Text("%s", name.data());
 
-					if (!this->characters[i].unlocked)
+					if (!character.m_Unlocked)
 					{
-						ImGui::PushID("CharacterUnlock" + i);
-						if (CharactersPanel.button("Unlock", ImVec2(200.f, 50.f)) && profile::currency > this->characters[i].price)
+						ImGui::PushID(name.data());
+						if (ImGui::Button("Unlock", ImVec2(200.f, 50.f)) && this->s_Account.m_currency > character.m_Price)
 						{
-							profile::currency -= this->characters[i].price;
-							this->characters[i].unlocked = true;
+							this->s_Account.m_currency -= character.m_Price;
+							character.m_Unlocked = true;
 						}
 						ImGui::PopID();
-						if (this->s_Account.m_currency < this->characters[i].price)
-							CharactersPanel.tooltip("Not enough currency, come back later.\nAnd put some usefull information here later...", ImVec4(1.f, 0.f, 0.f, 1.f));
-						else
-							CharactersPanel.tooltip(reinterpret_cast<const char*>(u8"This item costs 690$."), ImVec4(0.f, 1.f, 0.4f, 1.f));
+						if (ImGui::IsItemHovered() && this->s_Account.m_currency < character.m_Price)
+							ImGui::SetTooltip("Not enough currency, come back later.\nAnd put some usefull information here later...");
+						else if (ImGui::IsItemHovered())
+							ImGui::SetTooltip(reinterpret_cast<const char*>(u8"This item costs 690$."));
 					}
 				}
-				*/
 				ImGui::EndChild();
 			}
-
-			if (ImGui::Button("Open loot box", ImVec2(300.f, 75.f)) && this->s_Account.m_currency >= 420)
-				this->s_Account.m_currency -= 420;
-
-			if (this->s_Account.m_currency < 420)
-				ImGui::SetTooltip("Not enough currency, come back later.\nAnd put some usefull information here later...");
-			else
-				ImGui::SetTooltip("This item costs 420c.");
 		}
 			break;
 		case SHOP_STATE::ICONS:
@@ -107,6 +90,14 @@ void ShopScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		case SHOP_STATE::BACKGROUND:
 			break;
 		case SHOP_STATE::OTHERSTUFF:
+		{
+			if (ImGui::Button("Open loot box", ImVec2(300.f, 75.f)) && this->s_Account.m_currency >= 420)
+				this->s_Account.m_currency -= 420;
+			if (ImGui::IsItemHovered() && this->s_Account.m_currency < 420)
+				ImGui::SetTooltip("Not enough currency, come back later.\nAnd put some usefull information here later...");
+			else if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("This item costs 420c.");
+		}
 			break;
 		}
 
