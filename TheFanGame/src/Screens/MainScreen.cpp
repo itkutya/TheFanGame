@@ -16,11 +16,6 @@ void MainScreen::init(sf::RenderWindow& window)
 		this->m_FrontImage->Sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 600, 600 }));
 	}
 
-	this->m_Pause = this->s_ResourceManager.add<sf::Texture>("PauseTexture");
-	this->m_Resume = this->s_ResourceManager.add<sf::Texture>("ResumeTexture");
-	if (!this->m_Pause->loadFromFile("Resources/Pause.png") || !this->m_Resume->loadFromFile("Resources/Resume.png"))
-		std::printf("Error could not load some textures!");
-
 	if (!this->s_AudioManager.replaceCurrentMusic(this->s_AudioManager.m_CurrentMusicTitle))
 		ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
 }
@@ -55,14 +50,21 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::EndTable();
 			}
 			ImGui::TableNextColumn();
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			if (this->s_AudioManager.m_CurrentMusic->getStatus() == sf::SoundSource::Playing)
 			{
-				if (ImGui::ImageButton(*this->m_Pause, sf::Vector2f(35.f, 35.f)))
+				ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
+				if (ImGui::Button("\xef\x81\x8c", sf::Vector2f(35.f, 35.f)))
 					this->s_AudioManager.m_CurrentMusic->pause();
 			}
 			else
-				if (ImGui::ImageButton(*this->m_Resume, sf::Vector2f(35.f, 35.f)))
+			{
+				ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.65f, 0.5f));
+				if (ImGui::Button("\xef\x81\x8b", sf::Vector2f(35.f, 35.f)))
 					this->s_AudioManager.m_CurrentMusic->play();
+			}
+			ImGui::PopStyleColor();
+			ImGui::PopStyleVar();
 			ImGui::SameLine();
 			ImGui::Text("Currently playing: ");
 			ImGui::SameLine();

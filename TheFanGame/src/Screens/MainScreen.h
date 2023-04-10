@@ -18,8 +18,6 @@ private:
     bool m_PlaySelected = false;
     ResourceManager::Object* m_Icon;
     ResourceManager::Object* m_FrontImage;
-    sf::Texture* m_Pause;
-    sf::Texture* m_Resume;
 
     Application* m_app;
 };
