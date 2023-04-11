@@ -25,18 +25,7 @@ else
             $query ="INSERT INTO `TheFanGameAccounts` (`Username`, `Email`, `Salt`, `Password`) VALUES ('$name', '$email', '$salt', '$pw')";
             $resoult = $mysqli->query($query);
             if($resoult)
-            {
-                $query ="INSERT INTO `TheFanGameAccountsInfo` (`Username`, `Level`, `CurrentXP`, `MaxXP`, `Currency`) VALUES ('$name', '0', '0', '100', '1000')";
-                $resoult = $mysqli->query($query);
-                if($resoult)
-                    echo "Success.";
-                else
-                {
-                    $query ="DELETE FROM `TheFanGameAccountsInfo` WHERE Username='$name'";
-                    $resoult = $mysqli->query($query);
-                    echo "Query failed.";
-                }
-            }
+                echo "Success.";
             else
                 echo "Query failed.";
         }
@@ -46,16 +35,3 @@ else
 }
 exit();
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <title>Register to the game.</title>
-</head>
-<body>
-</body>
-</html>

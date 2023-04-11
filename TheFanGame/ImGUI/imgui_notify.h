@@ -9,7 +9,7 @@
 #include <string>
 #include <Windows.h>
 #include "imgui.h"
-#include "font_awesome_5.h"
+#include "IconsFontAwesome6.h"
 
 #define NOTIFY_MAX_MSG_LENGTH			4096		// Max message content length
 #define NOTIFY_PADDING_X				20.f		// Bottom-left X padding
@@ -140,13 +140,13 @@ public:
 		case ImGuiToastType_None:
 			return NULL;
 		case ImGuiToastType_Success:
-			return ICON_FA_CHECK_CIRCLE;
+			return ICON_FA_CHECK;
 		case ImGuiToastType_Warning:
-			return ICON_FA_EXCLAMATION_TRIANGLE;
+			return ICON_FA_EXCLAMATION;
 		case ImGuiToastType_Error:
-			return ICON_FA_TIMES_CIRCLE;
+			return ICON_FA_HOLLY_BERRY;
 		case ImGuiToastType_Info:
-			return ICON_FA_INFO_CIRCLE;
+			return ICON_FA_INFO;
 		default:
 			return nullptr;
 		}

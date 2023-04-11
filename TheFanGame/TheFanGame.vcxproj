@@ -193,7 +193,7 @@
     <ClCompile Include="src\Managers\StateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ImGUI\font_awesome_5.h" />
+    <ClInclude Include="ImGUI\IconsFontAwesome6.h" />
     <ClInclude Include="src\Managers\CharactersManager.h" />
     <ClInclude Include="src\Screens\ShopScreen.h" />
     <ClInclude Include="src\Managers\InputTypes.h" />

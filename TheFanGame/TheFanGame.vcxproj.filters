@@ -176,7 +176,7 @@
     <ClInclude Include="src\Managers\CharactersManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImGUI\font_awesome_5.h">
+    <ClInclude Include="ImGUI\IconsFontAwesome6.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

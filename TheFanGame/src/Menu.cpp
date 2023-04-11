@@ -2,7 +2,7 @@
 
 void Menu::init(sf::RenderWindow& window)
 {
-	ImGui::LoadCostumeFont("Resources/default.ttf");
+	ImGui::LoadCostumeFont("Resources/Gen-Jyuu-Gothic-Monospace-Bold.ttf");
 	ImGui::LoadCostumeStyle();
 
 	this->m_BackgroundImage = this->s_ResourceManager.add<ResourceManager::Object>("BackgroundImage");
