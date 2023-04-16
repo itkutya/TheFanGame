@@ -1,10 +1,14 @@
 #pragma once
 
-#include <string_view>
-#include <array>
+#include <string>
 #include <unordered_map>
+#include <fstream>
+
+#include "imgui.h"
+#include "imgui_stdlib.h"
 
 #include "SFML/Graphics.hpp"
+#include "SFML/Network.hpp"
 
 class CharactersManager
 {
@@ -12,9 +16,10 @@ class CharactersManager
     {
     public:
         Character() noexcept = default;
+        Character(std::string name, std::uint32_t atk, std::uint32_t def) noexcept : m_Name(std::move(name)), m_ATK(atk), m_DEF(def) {};
         virtual ~Character() noexcept = default;
 
-        std::string_view m_Name = "";
+        std::string m_Name = "";
         std::uint32_t m_ATK = 0;
         std::uint32_t m_DEF = 0;
         float m_Health = 0.f;
@@ -22,24 +27,6 @@ class CharactersManager
         bool m_Unlocked = false;
         sf::Texture m_Icon;
         std::uint64_t m_Price = 0;
-    private:
-    };
-
-    class ShishiroBotan : public Character
-    {
-    public:
-        ShishiroBotan() noexcept 
-        { 
-            this->m_Name = "Shishiro Botan";
-            this->m_ATK = 100;
-            this->m_DEF = 100;
-            this->m_Health = 100.f;
-            this->m_Speed = 100.f;
-            this->m_Price = 100;
-            if (!this->m_Icon.loadFromFile("Resources/Icons.png", sf::IntRect({ 0, 0 }, { 100, 100 })))
-                std::printf("Could not load Shishiro Botan Icon'.");
-        };
-    private:
     };
 public:
     CharactersManager(CharactersManager const&) = delete;
@@ -48,12 +35,32 @@ public:
 
     [[nodiscard]] static CharactersManager& getInstance();
 
-    std::unordered_map<std::string_view, Character> m_Characters;
+    std::unordered_map<std::string, Character> m_Characters;
 private:
     CharactersManager() noexcept
     {
-        constexpr std::array names = { "Shishiro Botan", "Omaru Polka" };
-        this->m_Characters[names[0]] = ShishiroBotan();
-        this->m_Characters[names[1]] = {};
+        sf::Http http("http://thefangamedb.000webhostapp.com");
+        sf::Http::Request request("/characters.php", sf::Http::Request::Method::Get);
+        sf::Http::Response response = http.sendRequest(request, sf::seconds(3.f));
+
+        if (response.getStatus() != sf::Http::Response::Status::Ok)
+            ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured!"));
+        else
+        {
+            enum CharData { SUCCESS = 0, NAME, ATK, DEF };
+            std::printf("%s\n", response.getBody().c_str());
+
+            std::vector<std::string> data;
+            std::stringstream ss(response.getBody());
+            while (std::getline(ss, data.emplace_back(), '#'));
+            if (data[CharData::SUCCESS] != std::string("Success."))
+                ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Error occured while loading in the characters!"));
+            else
+                for (std::size_t i = 0; i < data.size() - 2; i += 3)
+                    this->m_Characters[data[CharData::NAME + i]] = Character(
+                                   data[CharData::NAME + i], 
+                        std::stoul(data[CharData::ATK + i]), 
+                        std::stoul(data[CharData::DEF + i]));
+        }
     };
 };

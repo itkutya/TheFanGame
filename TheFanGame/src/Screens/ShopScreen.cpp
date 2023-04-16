@@ -40,7 +40,6 @@ void ShopScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 		switch (this->m_state)
 		{
 		case SHOP_STATE::SALES:
-			ImGui::ShowMetricsWindow();
 			break;
 		case SHOP_STATE::CHARACTERS:
 		{
