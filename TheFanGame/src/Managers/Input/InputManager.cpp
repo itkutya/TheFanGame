@@ -16,6 +16,36 @@ void InputManager::processEvent(sf::Event& event) noexcept
 				this->m_ConnectedJoystics.erase(it);
 }
 
+const bool InputManager::input(const Input& input) noexcept
+{
+	return input.input();
+}
+
+const float InputManager::input(const Input& input, const std::uint32_t j_id) noexcept
+{
+	return input.input(j_id);
+}
+
+const float InputManager::input(const Input& input, sf::Event& event) noexcept
+{
+	return input.input(event);
+}
+
+const bool InputManager::input(const std::string& id) noexcept
+{
+	return this->m_inputs.at(id)->input();
+}
+
+const float InputManager::input(const std::string& id, const std::uint32_t j_id) noexcept
+{
+	return this->m_inputs.at(id)->input(j_id);
+}
+
+const float InputManager::input(const std::string& id, sf::Event& event) noexcept
+{
+	return this->m_inputs.at(id)->input(event);
+}
+
 const std::string InputManager::inputToString(Input* input) noexcept
 {
 	if (input->m_type == InputType::Keyboard)

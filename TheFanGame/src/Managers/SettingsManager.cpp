@@ -1,20 +1,21 @@
 #include "SettingsManager.h"
 
-SettingsManager& SettingsManager::getInstance(const std::string& path)
+SettingsManager& SettingsManager::getInstance(const char* path)
 {
 	static SettingsManager instance(path);
 	return instance;
 }
 
-bool SettingsManager::save(const std::string& path) noexcept
+const bool SettingsManager::save(const char* path) noexcept
 {
 	bool success = false;
+	/*
 	std::ofstream file(path, std::ios_base::trunc);
 	if (success = file.is_open())
 	{
 		for (const auto& setting : this->m_settings)
 		{
-			file << std::string('[' + setting.first + ']' + '\n');
+			file << '[' << setting.first << ']' << '\n';
 			for (const auto& value : this->m_settings[setting.first])
 			{
 				if (value.second.type == "int")
@@ -22,7 +23,7 @@ bool SettingsManager::save(const std::string& path) noexcept
 				else if (value.second.type == "bool")
 					file << value.second.type << ' ' << value.first << ' ' << std::to_string(value.second.value.m_bool) << '\n';
 				else if (value.second.type == "string")
-					file << value.second.type << ' ' << value.first << ' ' << value.second.value.m_string << '\n';
+					file << value.second.type << ' ' << value.first << ' ' << value.second.value.m_string_view << '\n';
 				else if (value.second.type == "u32")
 					file << value.second.type << ' ' << value.first << ' ' << std::to_string(value.second.value.m_u32) << '\n';
 				else if (value.second.type == "u64")
@@ -41,98 +42,48 @@ bool SettingsManager::save(const std::string& path) noexcept
 		}
 	}
 	file.close();
+	*/
 	return success;
 }
 
-SettingsManager::SettingsManager(const std::string& path) noexcept
+SettingsManager::SettingsManager(const char* path) noexcept
 {
 	if (this->m_first && this->load(path))
 		this->m_first = false;
 }
 
-bool SettingsManager::load(const std::string& path) noexcept
+const bool SettingsManager::load(const char* path) noexcept
 {
-	bool success = false;
-	std::ifstream file(path);
-	if (success = file.is_open())
+	FileManager fm(path);
+	const auto& parse = fm.parseFile();
+	for (const auto& mainchannel : parse)
 	{
-		std::unordered_map<std::string, std::unordered_map<std::string, Setting>>::iterator last;
-		while (!file.eof())
+		for (const auto& settings : mainchannel.second)
 		{
-			std::string data;
-			file >> data;
-			if (data.length())
-			{
-				if (data[0] == '[' || data[data.length() - 1] == ']')
-					last = this->m_settings.insert({ this->trim(data), {} }).first;
-				else
-				{
-					std::array<std::string, 2> setting;
-					file >> setting[0] >> setting[1];
-					if (this->m_settings.size())
-					{
-						if (data == "int")
-						{
-							const auto& newdata = (last)->second.insert({ setting[0], Setting("int") }).first;
-							(*newdata).second.value.m_int = std::stoi(setting[1]);
-						}
-						else if (data == "bool")
-						{
-							const auto& newdata = (last)->second.insert({ setting[0], Setting("bool") }).first;
-							(*newdata).second.value.m_bool = std::stoi(setting[1]);
-						}
-						else if (data == "string")
-						{
-							const auto& newdata = (last)->second.insert({ setting[0], Setting("string") }).first;
-							(*newdata).second.value.m_string = std::string(setting[1]);
-						}
-						else if (data == "u32")
-						{
-							const auto& newdata = (last)->second.insert({ setting[0], Setting("u32") }).first;
-							(*newdata).second.value.m_u32 = std::stoul(setting[1]);
-						}
-						else if (data == "u64")
-						{
-							const auto& newdata = (last)->second.insert({ setting[0], Setting("u64") }).first;
-							(*newdata).second.value.m_u64 = std::stoull(setting[1]);
-						}
-						else if (data == "Keyboard")
-						{
-							const auto& newdata = (last)->second.insert({ setting[0], Setting("Keyboard") }).first;
-							(*newdata).second.value.m_input = std::make_unique<Keyboard>(StringToScanCode(setting[1]));
-						}
-						else if (data == "MouseButton")
-						{
-							const auto& newdata = (last)->second.insert({ setting[0], Setting("MouseButton") }).first;
-							(*newdata).second.value.m_input = std::make_unique<MouseButton>(StringToMouseButton(setting[1]));
-						}
-						else if (data == "MouseWheel")
-						{
-							const auto& newdata = (last)->second.insert({ setting[0], Setting("MouseWheel") }).first;
-							(*newdata).second.value.m_input = std::make_unique<MouseWheel>(StringToMouseWheel(setting[1]));
-						}
-						else if (data == "JoystickButton")
-						{
-							const auto& newdata = (last)->second.insert({ setting[0], Setting("JoystickButton") }).first;
-							(*newdata).second.value.m_input = std::make_unique<JoystickButton>(StringToJoystickButton(setting[1]));
-						}
-						else if (data == "JoystickAxis")
-						{
-							const auto& newdata = (last)->second.insert({ setting[0], Setting("JoystickAxis") }).first;
-							(*newdata).second.value.m_input = std::make_unique<JoystickAxis>(StringToJoystickAxis(setting[1]));
-						}
-					}
-				}
-			}
+			const auto& [type, name, value] = settings;
+			auto& mainbranch = this->m_settings.emplace(mainchannel.first, std::unordered_map<std::string, Setting>()).first->second;
+			auto& newdata = mainbranch.emplace(name, Setting(type.c_str())).first->second;
+			if (newdata.type == "int")
+				newdata.value.m_int = std::stoi(value.data());
+			else if (newdata.type == "bool")
+				newdata.value.m_bool = std::stoi(value.data());
+			else if (newdata.type == "string")
+				newdata.value.m_string = value;
+			else if (newdata.type == "u32")
+				newdata.value.m_u32 = std::stoul(value.data());
+			else if (newdata.type == "u64")
+				newdata.value.m_u64 = std::stoull(value.data());
+			else if (newdata.type == "Keyboard")
+				newdata.value.m_input = std::make_unique<Keyboard>(StringToScanCode(value));
+			else if (newdata.type == "MouseButton")
+				newdata.value.m_input = std::make_unique<MouseButton>(StringToMouseButton(value));
+			else if (newdata.type == "MouseWheel")
+				newdata.value.m_input = std::make_unique<MouseWheel>(StringToMouseWheel(value));
+			else if (newdata.type == "JoystickButton")
+				newdata.value.m_input = std::make_unique<JoystickButton>(StringToJoystickButton(value));
+			else if (newdata.type == "JoystickAxis")
+				newdata.value.m_input = std::make_unique<JoystickAxis>(StringToJoystickAxis(value));
 		}
 	}
-	file.close();
-	return success;
-}
-
-const std::string SettingsManager::trim(std::string& string) noexcept
-{
-	string.erase(string.begin());
-	string.erase(string.end() - 1);
-	return string;
+	return true;
 }

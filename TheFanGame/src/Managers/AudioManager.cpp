@@ -6,12 +6,13 @@ AudioManager& AudioManager::getInstance()
 	return instance;
 }
 
-bool AudioManager::replaceCurrentMusic(const std::string& title) noexcept
+bool AudioManager::replaceCurrentMusic(const std::string_view title) noexcept
 {
 	if (this->m_CurrentMusic)
 		this->m_CurrentMusic->stop();
 	this->m_CurrentMusic = this->s_ResourceManager.add<sf::Music>(title);
-	if (this->m_CurrentMusic->openFromFile("Resources/Musics/" + title + ".wav"))
+	const auto& path = std::format("Resources/Musics/{}.wav", title.data());
+	if (this->m_CurrentMusic->openFromFile(path.c_str()))
 	{
 		this->m_CurrentMusicTitle = title;
 		this->m_CurrentMusic->setLoop(true);
@@ -25,10 +26,11 @@ bool AudioManager::replaceCurrentMusic(const std::string& title) noexcept
 	return false;
 }
 
-bool AudioManager::addSoundEffect(const std::string& title) noexcept
+bool AudioManager::addSoundEffect(const std::string_view title) noexcept
 {
 	this->m_SoundEffects[title] = this->s_ResourceManager.add<ResourceManager::AudioObject>(title);
-	if (this->m_SoundEffects[title]->Buffer.loadFromFile("Resources/SoundEffects/" + title + ".wav"))
+	const auto& path = std::format("Resources/SoundEffects/{}.wav", title.data());
+	if (this->m_SoundEffects[title]->Buffer.loadFromFile(path.c_str()))
 	{
 		this->m_SoundEffects[title]->Sound.setBuffer(this->m_SoundEffects[title]->Buffer);
 		this->m_SoundEffects[title]->Sound.setVolume(this->m_sfxvolume);

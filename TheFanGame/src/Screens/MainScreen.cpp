@@ -16,7 +16,7 @@ void MainScreen::init(sf::RenderWindow& window)
 		this->m_FrontImage->Sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 600, 600 }));
 	}
 
-	if (!this->s_AudioManager.replaceCurrentMusic(this->s_AudioManager.m_CurrentMusicTitle))
+	if (!this->s_AudioManager.replaceCurrentMusic(this->s_AudioManager.m_CurrentMusicTitle.c_str()))
 		ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
 }
 
@@ -69,11 +69,11 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			ImGui::Text("Currently playing: ");
 			ImGui::SameLine();
 			ImGui::PushItemWidth(300.f);
-			if (ImGui::BeginCombo("###MusicSelector", (this->s_AudioManager.m_CurrentMusicTitle).c_str(), ImGuiComboFlags_HeightSmall))
+			if (ImGui::BeginCombo("###MusicSelector", this->s_AudioManager.m_CurrentMusicTitle.c_str(), ImGuiComboFlags_HeightSmall))
 			{
 				for (auto& music : this->s_AudioManager.m_MusicTitles)
 				{
-					if (ImGui::Selectable(music.c_str()) && this->s_AudioManager.m_CurrentMusicTitle != music)
+					if (ImGui::Selectable(music.data()) && this->s_AudioManager.m_CurrentMusicTitle.c_str() != music.data())
 						if (!this->s_AudioManager.replaceCurrentMusic(music))
 							ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
 				}

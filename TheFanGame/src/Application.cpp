@@ -50,7 +50,7 @@ void Application::update() noexcept
 			ImGuiViewport* viewport = ImGui::GetMainViewport();
 			float size = ImGui::CalcTextSize(" 000.00 fps(000.00 ms) ").x;
 			ImGui::SetWindowPos("FPS Counter", ImVec2(viewport->WorkSize.x - size, viewport->WorkPos.y));
-			ImGui::TextColored(ImVec4(0, 0, 1, 1), "%.2f fps (%.2f ms)", (1000.f / dt.asMilliseconds()), (dt.asSeconds() * 1000.f));
+			ImGui::TextColored(ImVec4(0, 0, 1, 1), "%.2f fps (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 		}ImGui::End();
 	}
 	this->s_StateManager.getCurrentState()->update(this->m_window, dt);

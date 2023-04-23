@@ -2,7 +2,7 @@
 
 #include <variant>
 #include <memory>
-#include <string>
+#include <string_view>
 #include <unordered_map>
 
 #include "SFML/Graphics.hpp"
@@ -34,24 +34,24 @@ public:
 
     [[nodiscard]] static ResourceManager& getInstance();
     
-    template<class T> T* add(const std::string& id) noexcept;
-    template<class T> [[nodiscard]] bool load(const std::string& id, const std::string& path) noexcept;
-    template<class T> [[nodiscard]] bool remove(const std::string& id) noexcept;
-    template<class T> [[nodiscard]] T* get(const std::string& id) noexcept;
+    template<class T> T* add(const std::string_view id) noexcept;
+    template<class T> [[nodiscard]] bool load(const std::string_view id, const char* path) noexcept;
+    template<class T> [[nodiscard]] bool remove(const std::string_view id) noexcept;
+    template<class T> [[nodiscard]] T* get(const std::string_view id) noexcept;
 private:
     ResourceManager() noexcept = default;
-    std::unordered_map<std::string, Resources> m_resources;
+    std::unordered_map<std::string_view, Resources> m_resources;
 };
 
 template<class T>
-inline T* ResourceManager::add(const std::string& id) noexcept
+inline T* ResourceManager::add(const std::string_view id) noexcept
 {
     this->m_resources[id] = std::make_unique<T>();
     return std::get<std::unique_ptr<T>>(this->m_resources.at(id)).get();
 }
 
 template<class T>
-inline bool ResourceManager::load(const std::string& id, const std::string& path) noexcept
+inline bool ResourceManager::load(const std::string_view id, const char* path) noexcept
 {
     if constexpr (requires { T().loadFromFile(path); })
     {
@@ -67,7 +67,7 @@ inline bool ResourceManager::load(const std::string& id, const std::string& path
 }
 
 template<class T>
-inline bool ResourceManager::remove(const std::string& id) noexcept
+inline bool ResourceManager::remove(const std::string_view id) noexcept
 {
     if (std::get<std::unique_ptr<T>>(this->m_resources.at(id)) != nullptr)
     {
@@ -79,7 +79,7 @@ inline bool ResourceManager::remove(const std::string& id) noexcept
 }
 
 template<class T>
-inline T* ResourceManager::get(const std::string& id) noexcept
+inline T* ResourceManager::get(const std::string_view id) noexcept
 {
     return std::get<std::unique_ptr<T>>(this->m_resources.at(id)).get();
 }

@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "Screens/LoginScreen.h"
-#include "Managers/InputManager.h"
+#include "Managers/Input/InputManager.h"
 
 class Menu : public State
 {
@@ -20,5 +20,5 @@ public:
 private:
     Application* m_app;
 
-    ResourceManager::Object* m_BackgroundImage;
+    ResourceManager::Object* m_BackgroundImage = nullptr;
 };

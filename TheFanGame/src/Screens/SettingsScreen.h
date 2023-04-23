@@ -4,7 +4,7 @@
 #include "Managers/SettingsManager.h"
 #include "Managers/StateManager.h"
 #include "Managers/AudioManager.h"
-#include "Managers/InputManager.h"
+#include "Managers/Input/InputManager.h"
 #include "Account/Account.h"
 
 #include "Application.h"

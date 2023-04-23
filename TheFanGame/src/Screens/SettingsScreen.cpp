@@ -107,7 +107,7 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 			{
 				for (auto& music : this->s_AudioManager.m_MusicTitles)
 				{
-					if (ImGui::Selectable(music.c_str()) && this->s_AudioManager.m_CurrentMusicTitle != music)
+					if (ImGui::Selectable(music.data()) && this->s_AudioManager.m_CurrentMusicTitle.c_str() != music.data())
 						if (!this->s_AudioManager.replaceCurrentMusic(music))
 							ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
 				}
@@ -123,9 +123,9 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 		{
 			for (auto& it : this->s_InputManager.m_inputs)
 			{
-				ImGui::Text(it.first.c_str());
+				ImGui::Text(it.first.data());
 				ImGui::SameLine();
-				ImGui::PushID(it.first.c_str());
+				ImGui::PushID(it.first.data());
 				std::string value = this->s_InputManager.inputToString(it.second);
 				if (ImGui::Button(value.c_str(), ImVec2(300.f, 30.f)))
 				{

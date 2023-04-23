@@ -1,79 +1,76 @@
 #pragma once
 
-#include <string>
-#include <any>
+#include <string_view>
+#include <charconv>
+#include <cstdint>
+#include <array>
 
-#include "SFML/Window.hpp"
+#include "SFML/Window/Event.hpp"
+#include "SFML/Window/Keyboard.hpp"
+#include "SFML/Window/Mouse.hpp"
+#include "SFML/Window/Joystick.hpp"
 
 enum class InputType
 {
 	None, Keyboard, MouseButton, MouseWheel, JoystickButton, JoystickAxis, Count
 };
 
-class Input
+struct Input 
 {
-public:
-	Input() noexcept = default;
-	virtual ~Input() noexcept = default;
+	[[noreturn]] virtual const bool	 input() const						 { throw "Unimplemented"; };
+	[[noreturn]] virtual const float input(sf::Event& event) const		 { throw "Unimplemented"; };
+	//[[noreturn]] virtual const bool  input(const std::uint32_t id) const { throw "Unimplemented"; };
+	[[noreturn]] virtual const float input(const std::uint32_t id) const { throw "Unimplemented"; };
 
-	virtual const std::any input() const { throw "Unimplemented"; };
-	virtual const std::any input(sf::Event& event) const { throw "Unimplemented"; };
-	virtual const std::any input(const std::uint32_t id) const { throw "Unimplemented"; };
-
-	InputType m_type = InputType::None;
+	InputType m_type = InputType::None; 
 };
 
-class Keyboard : public Input
+struct Keyboard : public Input
 {
-public:
 	Keyboard(sf::Keyboard::Scancode key) noexcept : m_KeyCode(key) { this->m_type = InputType::Keyboard; };
 	
-	virtual const std::any input() const override { return sf::Keyboard::isKeyPressed(this->m_KeyCode); };
+	const bool input() const override { return sf::Keyboard::isKeyPressed(this->m_KeyCode); };
 
 	sf::Keyboard::Scancode m_KeyCode = sf::Keyboard::Scancode();
 };
 
-class MouseButton : public Input
+struct MouseButton : public Input
 {
-public:
 	MouseButton(sf::Mouse::Button button) noexcept : m_MouseButton(button) { this->m_type = InputType::MouseButton; };
 	
-	virtual const std::any input() const override { return sf::Mouse::isButtonPressed(this->m_MouseButton); };
+	const bool input() const override { return sf::Mouse::isButtonPressed(this->m_MouseButton); };
 
 	sf::Mouse::Button m_MouseButton = sf::Mouse::Button();
 };
 
-class MouseWheel : public Input
+struct MouseWheel : public Input
 {
-public:
 	MouseWheel(sf::Mouse::Wheel wheel) noexcept : m_MouseWheel(wheel) { this->m_type = InputType::MouseWheel; };
 	
-	virtual const std::any input(sf::Event& event) const override { return event.mouseWheelScroll.wheel == this->m_MouseWheel ? event.mouseWheelScroll.delta : 0.f; };
+	const float input(sf::Event& event) const override { return event.mouseWheelScroll.wheel == this->m_MouseWheel ? event.mouseWheelScroll.delta : 0.f; };
 
 	sf::Mouse::Wheel m_MouseWheel = sf::Mouse::Wheel();
 };
 
-class JoystickButton : public Input
+struct JoystickButton : public Input
 {
-public:
 	JoystickButton(std::uint32_t button) noexcept : m_joystickButton(button) { this->m_type = InputType::JoystickButton; };
 	
-	virtual const std::any input(const std::uint32_t id) const override { return sf::Joystick::isButtonPressed(id, this->m_joystickButton); };
+	const float input(const std::uint32_t id) const override { return sf::Joystick::isButtonPressed(id, this->m_joystickButton); };
 	
 	std::uint32_t m_joystickButton = 0;
 };
 
-class JoystickAxis : public Input
+struct JoystickAxis : public Input
 {
-public:
 	JoystickAxis(sf::Joystick::Axis axis) noexcept : m_JoystickAxis(axis) { this->m_type = InputType::JoystickAxis; };
 	
-	virtual const std::any input(const std::uint32_t id) const override { return sf::Joystick::getAxisPosition(id, this->m_JoystickAxis); };
+	const float input(const std::uint32_t id) const override { return sf::Joystick::getAxisPosition(id, this->m_JoystickAxis); };
 
 	sf::Joystick::Axis m_JoystickAxis = sf::Joystick::Axis();
 };
 
-inline constexpr sf::Keyboard::Scancode StringToScanCode(const std::string& str)
+inline constexpr sf::Keyboard::Scancode StringToScanCode(const std::string_view str)
 {
 	if (str == "A")						return sf::Keyboard::Scancode::A;
 	if (str == "Apostrophe")			return sf::Keyboard::Scancode::Apostrophe;
@@ -226,7 +223,7 @@ inline constexpr sf::Keyboard::Scancode StringToScanCode(const std::string& str)
 	throw "Unimplemented";
 }
 
-inline constexpr sf::Mouse::Button StringToMouseButton(const std::string& str)
+inline constexpr sf::Mouse::Button StringToMouseButton(const std::string_view str)
 {
 	if (str == "Left")			return sf::Mouse::Button::Left;			
 	if (str == "Right")			return sf::Mouse::Button::Right;
@@ -237,18 +234,16 @@ inline constexpr sf::Mouse::Button StringToMouseButton(const std::string& str)
 	throw "Unimplemented";
 }
 
-inline constexpr sf::Mouse::Wheel StringToMouseWheel(const std::string& str)
+inline constexpr sf::Mouse::Wheel StringToMouseWheel(const std::string_view str)
 {
-	if (str == "HorizontalWheel")
-		return sf::Mouse::Wheel::HorizontalWheel;
-	if (str == "VerticalWheel")
-		return sf::Mouse::Wheel::VerticalWheel;
+	if (str == "HorizontalWheel")	return sf::Mouse::Wheel::HorizontalWheel;
+	if (str == "VerticalWheel")		return sf::Mouse::Wheel::VerticalWheel;
 	throw "Unimplemented";
 }
 
-inline const std::uint32_t StringToJoystickButton(const std::string& str) { return std::stoul(str); }
+inline const std::uint32_t StringToJoystickButton(const std::string_view str) { return std::stoul(str.data()); }
 
-inline constexpr sf::Joystick::Axis StringToJoystickAxis(const std::string& str)
+inline constexpr sf::Joystick::Axis StringToJoystickAxis(const std::string_view str)
 {
 	if (str == "X")		return sf::Joystick::Axis::X;
 	if (str == "Y")		return sf::Joystick::Axis::Y;	
@@ -261,7 +256,7 @@ inline constexpr sf::Joystick::Axis StringToJoystickAxis(const std::string& str)
 	throw "Unimplemented";
 }
 
-inline constexpr std::string ScanCodeToString(const sf::Keyboard::Scancode code)
+inline constexpr const char* ScanCodeToString(const sf::Keyboard::Scancode code)
 {
 	switch (code)
 	{
@@ -417,7 +412,7 @@ inline constexpr std::string ScanCodeToString(const sf::Keyboard::Scancode code)
 	throw "Unimplemented";
 }
 
-inline constexpr std::string MouseButtonToString(const sf::Mouse::Button code)
+inline constexpr const char* MouseButtonToString(const sf::Mouse::Button code)
 {
 	switch (code)
 	{
@@ -431,7 +426,7 @@ inline constexpr std::string MouseButtonToString(const sf::Mouse::Button code)
 	throw "Unimplemented";
 }
 
-inline constexpr std::string MouseWheelToString(const sf::Mouse::Wheel code)
+inline constexpr const char* MouseWheelToString(const sf::Mouse::Wheel code)
 {
 	switch (code)
 	{
@@ -441,9 +436,13 @@ inline constexpr std::string MouseWheelToString(const sf::Mouse::Wheel code)
 	throw "Unimplemented";
 }
 
-inline const std::string JoystickButtonToString(const std::uint32_t code) { return std::to_string(code); }
+inline const char* JoystickButtonToString(const std::uint32_t code)
+{
+	std::array<char, 1> str = {};
+	return std::to_chars(str.data(), str.data() + str.size(), code).ptr;
+}
 
-inline constexpr std::string JoystickAxisToString(const sf::Joystick::Axis code)
+inline constexpr const char* JoystickAxisToString(const sf::Joystick::Axis code)
 {
 	switch (code)
 	{

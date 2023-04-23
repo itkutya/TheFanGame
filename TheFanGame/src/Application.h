@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Menu.h"
-#include "Managers/InputManager.h"
+#include "Managers/Input/InputManager.h"
 
 class Application
 {

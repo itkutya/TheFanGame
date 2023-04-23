@@ -16,8 +16,8 @@ public:
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
 private:
     bool m_PlaySelected = false;
-    ResourceManager::Object* m_Icon;
-    ResourceManager::Object* m_FrontImage;
+    ResourceManager::Object* m_Icon = nullptr;
+    ResourceManager::Object* m_FrontImage = nullptr;
 
     Application* m_app;
 };

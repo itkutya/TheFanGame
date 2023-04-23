@@ -1,16 +1,12 @@
 #pragma once
 
-#include <fstream>
-#include <vector>
-#include <sstream>
-#include <array>
 #include <unordered_map>
-#include <cstdint>
 #include <memory>
 
-#include "InputTypes.h"
+#include "Input/InputTypes.h"
+#include "FileManager.h"
 
-class SettingsManager
+class SettingsManager : NonCopyable
 {
 	struct Setting
 	{
@@ -27,9 +23,9 @@ class SettingsManager
 			std::uint32_t m_u32;
 			std::uint64_t m_u64;
 		};
-
-		Setting() noexcept : type("string") {};
-		Setting(const std::string& t) noexcept : type(t) 
+		
+		Setting() noexcept : type("Null") {};
+		Setting(const std::string_view t) noexcept : type(t)
 		{
 			if (this->type == "int")
 				this->value.m_int = 0;
@@ -77,10 +73,14 @@ class SettingsManager
 		}
 		~Setting() noexcept
 		{
-			if (this->type == "string")
-				this->value.m_string.~basic_string();
-			else if (this->type == "Keyboard" || this->type == "MouseButton" || this->type == "MouseWheel" || this->type == "JoystickButton" || this->type == "JoystickAxis")
+			if (this->type == "Keyboard"		|| 
+				this->type == "MouseButton"		|| 
+				this->type == "MouseWheel"		|| 
+				this->type == "JoystickButton"	|| 
+				this->type == "JoystickAxis")
 				this->value.m_input.~unique_ptr();
+			else if (this->type == "string")
+				this->value.m_string.~basic_string();
 		};
 
 		operator int& () noexcept { return this->value.m_int; };
@@ -89,23 +89,19 @@ class SettingsManager
 		operator std::uint64_t& () noexcept { return this->value.m_u64; };
 		operator std::string& () noexcept { return this->value.m_string; };
 
-		std::string type;
+		std::string_view type;
 		Value value;
 	};
 public:
-	SettingsManager(SettingsManager const&) = delete;
-	void operator=(SettingsManager const&) = delete;
-	virtual ~SettingsManager() noexcept = default;
+	~SettingsManager() noexcept = default;
 
-	[[nodiscard]] auto& operator[](const std::string& id) noexcept { return this->m_settings[id]; };
+	[[nodiscard]] auto& operator[](const std::string id) noexcept { return this->m_settings.at(id); };
 
-	[[nodiscard]] static SettingsManager& getInstance(const std::string& path = "Settings.ini");
-	[[nodiscard]] bool save(const std::string& path) noexcept;
-	[[nodiscard]] bool load(const std::string& path) noexcept;
+	[[nodiscard]] static SettingsManager& getInstance(const char* path = "Settings.ini");
+	[[nodiscard]] const bool save(const char* path) noexcept;
+	[[nodiscard]] const bool load(const char* path) noexcept;
 private:
-	explicit SettingsManager(const std::string& path) noexcept;
-
-	const std::string trim(std::string& string) noexcept;
+	explicit SettingsManager(const char* path) noexcept;
 
 	std::unordered_map<std::string, std::unordered_map<std::string, Setting>> m_settings;
 	bool m_first = true;
