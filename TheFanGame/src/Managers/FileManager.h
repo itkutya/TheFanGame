@@ -1,11 +1,10 @@
 #pragma once
 
 #include <fstream>
-#include <string_view>
 #include <vector>
 #include <array>
-#include <string>
 #include <tuple>
+#include <unordered_map>
 
 #include "Utility.h"
 
@@ -20,7 +19,7 @@ public:
 	const std::vector<std::pair<const std::string, std::vector<ParsedSetting>>> parseFile(const char* filepath) noexcept;
 	const std::vector<std::pair<const std::string, std::vector<ParsedSetting>>> parseFile() noexcept;
 
-	const bool saveToFile(const char* filepath) noexcept;
+	const bool saveToFile(const char* filepath, const std::unordered_map<std::string, std::unordered_map<std::string, Setting>>& data) noexcept;
 private:
 	std::string_view m_filepath;
 	std::ifstream m_inputstream;

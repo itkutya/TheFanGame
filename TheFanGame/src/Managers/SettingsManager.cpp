@@ -8,42 +8,8 @@ SettingsManager& SettingsManager::getInstance(const char* path)
 
 const bool SettingsManager::save(const char* path) noexcept
 {
-	bool success = false;
-	/*
-	std::ofstream file(path, std::ios_base::trunc);
-	if (success = file.is_open())
-	{
-		for (const auto& setting : this->m_settings)
-		{
-			file << '[' << setting.first << ']' << '\n';
-			for (const auto& value : this->m_settings[setting.first])
-			{
-				if (value.second.type == "int")
-					file << value.second.type << ' ' << value.first << ' ' << std::to_string(value.second.value.m_int) << '\n';
-				else if (value.second.type == "bool")
-					file << value.second.type << ' ' << value.first << ' ' << std::to_string(value.second.value.m_bool) << '\n';
-				else if (value.second.type == "string")
-					file << value.second.type << ' ' << value.first << ' ' << value.second.value.m_string_view << '\n';
-				else if (value.second.type == "u32")
-					file << value.second.type << ' ' << value.first << ' ' << std::to_string(value.second.value.m_u32) << '\n';
-				else if (value.second.type == "u64")
-					file << value.second.type << ' ' << value.first << ' ' << std::to_string(value.second.value.m_u64) << '\n';
-				else if (value.second.type == "Keyboard")
-					file << value.second.type << ' ' << value.first << ' ' << ScanCodeToString(static_cast<Keyboard*>(value.second.value.m_input.get())->m_KeyCode) << '\n';
-				else if (value.second.type == "MouseButton")
-					file << value.second.type << ' ' << value.first << ' ' << MouseButtonToString(static_cast<MouseButton*>(value.second.value.m_input.get())->m_MouseButton) << '\n';
-				else if (value.second.type == "MouseWheel")
-					file << value.second.type << ' ' << value.first << ' ' << MouseWheelToString(static_cast<MouseWheel*>(value.second.value.m_input.get())->m_MouseWheel) << '\n';
-				else if (value.second.type == "JoystickButton")
-					file << value.second.type << ' ' << value.first << ' ' << JoystickButtonToString(static_cast<JoystickButton*>(value.second.value.m_input.get())->m_joystickButton) << '\n';
-				else if (value.second.type == "JoystickAxis")
-					file << value.second.type << ' ' << value.first << ' ' << JoystickAxisToString(static_cast<JoystickAxis*>(value.second.value.m_input.get())->m_JoystickAxis) << '\n';
-			}
-		}
-	}
-	file.close();
-	*/
-	return success;
+	FileManager fm;
+	return fm.saveToFile(path, this->m_settings);
 }
 
 SettingsManager::SettingsManager(const char* path) noexcept
