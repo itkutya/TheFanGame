@@ -3,7 +3,7 @@
 #include <array>
 #include <format>
 
-#include "SettingsManager.h"
+#include "Setting/SettingsManager.h"
 #include "ResourceManager.h"
 
 class AudioManager

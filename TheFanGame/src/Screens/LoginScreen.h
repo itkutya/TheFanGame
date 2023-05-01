@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Managers/SettingsManager.h"
+#include "Managers/Setting/SettingsManager.h"
 #include "RegisterScreen.h"
 #include "MainScreen.h"
 

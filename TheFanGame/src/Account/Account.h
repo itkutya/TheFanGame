@@ -8,7 +8,7 @@
 #include "imgui.h"
 #include "imgui_stdlib.h"
 
-#include "Managers/SettingsManager.h"
+#include "Managers/Setting/SettingsManager.h"
 #include "Experience.h"
 
 constexpr std::uint8_t MAX_USERNAME_LENGTH = 16;

@@ -1,5 +1,4 @@
 #include <exception>
-#include <cstdio>
 
 #include "src/Application.h"
 
@@ -15,7 +14,7 @@ int main()
 			app.draw();
 		}
 	}
-	catch (const std::exception& e)
+	catch (std::exception e)
 	{
 		std::printf("\033[1;4;31m%s\n\033[0m", e.what());
 		return 1;

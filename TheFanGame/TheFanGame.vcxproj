@@ -114,6 +114,7 @@
       <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\src;C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,6 +158,7 @@
       <AdditionalIncludeDirectories>C:\Users\36306\source\repos\TheFanGame\TheFanGame\src;C:\Users\36306\source\repos\TheFanGame\TheFanGame\SFML\include;C:\Users\36306\source\repos\TheFanGame\TheFanGame\ImGUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -172,7 +174,7 @@
     <ClCompile Include="src\Managers\CharactersManager.cpp" />
     <ClCompile Include="src\Screens\ShopScreen.cpp" />
     <ClCompile Include="src\Managers\Input\InputManager.cpp" />
-    <ClCompile Include="src\Managers\SettingsManager.cpp" />
+    <ClCompile Include="src\Managers\Setting\SettingsManager.cpp" />
     <ClCompile Include="src\Managers\AudioManager.cpp" />
     <ClCompile Include="src\Screens\SettingsScreen.cpp" />
     <ClCompile Include="src\Screens\MainScreen.cpp" />
@@ -195,14 +197,14 @@
     <ClCompile Include="src\Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Managers\Setting.h" />
+    <ClInclude Include="src\Managers\Setting\Setting.h" />
     <ClInclude Include="src\Managers\FileManager.h" />
     <ClInclude Include="ImGUI\IconsFontAwesome6.h" />
     <ClInclude Include="src\Managers\CharactersManager.h" />
     <ClInclude Include="src\Screens\ShopScreen.h" />
     <ClInclude Include="src\Managers\Input\InputTypes.h" />
     <ClInclude Include="src\Managers\Input\InputManager.h" />
-    <ClInclude Include="src\Managers\SettingsManager.h" />
+    <ClInclude Include="src\Managers\Setting\SettingsManager.h" />
     <ClInclude Include="src\Managers\AudioManager.h" />
     <ClInclude Include="src\Screens\SettingsScreen.h" />
     <ClInclude Include="src\Screens\MainScreen.h" />

@@ -4,7 +4,7 @@
 #include <string_view>
 #include <memory>
 
-#include "Input/InputTypes.h"
+#include "Managers/Input/InputTypes.h"
 
 struct Setting
 {
@@ -15,8 +15,9 @@ struct Setting
 		std::string& operator=(std::string rhs) noexcept { this->m_string = rhs; return this->m_string; };
 
 		std::string m_string = "Null";
-		std::unique_ptr<Input> m_input;
+		std::shared_ptr<Input> m_input;
 		int m_int;
+		//float!
 		bool m_bool;
 		std::uint32_t m_u32;
 		std::uint64_t m_u64;
@@ -36,15 +37,15 @@ struct Setting
 		else if (this->type == "u64")
 			this->value.m_u64 = 0;
 		else if (this->type == "Keyboard")
-			new (&this->value.m_input) std::unique_ptr<Keyboard>(std::make_unique<Keyboard>(sf::Keyboard::Scancode::A));
+			new (&this->value.m_input) std::shared_ptr<Keyboard>(std::make_shared<Keyboard>(sf::Keyboard::Scancode::A));
 		else if (this->type == "MouseButton")
-			new (&this->value.m_input) std::unique_ptr<MouseButton>(std::make_unique<MouseButton>(sf::Mouse::Button::Left));
+			new (&this->value.m_input) std::shared_ptr<MouseButton>(std::make_shared<MouseButton>(sf::Mouse::Button::Left));
 		else if (this->type == "MouseWheel")
-			new (&this->value.m_input) std::unique_ptr<MouseWheel>(std::make_unique<MouseWheel>(sf::Mouse::Wheel::VerticalWheel));
+			new (&this->value.m_input) std::shared_ptr<MouseWheel>(std::make_shared<MouseWheel>(sf::Mouse::Wheel::VerticalWheel));
 		else if (this->type == "JoystickButton")
-			new (&this->value.m_input) std::unique_ptr<JoystickButton>(std::make_unique<JoystickButton>(0));
+			new (&this->value.m_input) std::shared_ptr<JoystickButton>(std::make_shared<JoystickButton>(0));
 		else if (this->type == "JoystickAxis")
-			new (&this->value.m_input) std::unique_ptr<JoystickAxis>(std::make_unique<JoystickAxis>(sf::Joystick::Axis::X));
+			new (&this->value.m_input) std::shared_ptr<JoystickAxis>(std::make_shared<JoystickAxis>(sf::Joystick::Axis::X));
 	};
 	Setting(const Setting& other) noexcept : type(other.type)
 	{
@@ -59,15 +60,15 @@ struct Setting
 		else if (this->type == "u64")
 			this->value.m_u64 = other.value.m_u64;
 		else if (this->type == "Keyboard")
-			new (&this->value.m_input) std::unique_ptr<Keyboard>(std::make_unique<Keyboard>(static_cast<Keyboard*>(other.value.m_input.get())->m_KeyCode));
+			new (&this->value.m_input) std::shared_ptr<Keyboard>(std::make_shared<Keyboard>(static_cast<Keyboard*>(other.value.m_input.get())->m_KeyCode));
 		else if (this->type == "MouseButton")
-			new (&this->value.m_input) std::unique_ptr<MouseButton>(std::make_unique<MouseButton>(static_cast<MouseButton*>(other.value.m_input.get())->m_MouseButton));
+			new (&this->value.m_input) std::shared_ptr<MouseButton>(std::make_shared<MouseButton>(static_cast<MouseButton*>(other.value.m_input.get())->m_MouseButton));
 		else if (this->type == "MouseWheel")
-			new (&this->value.m_input) std::unique_ptr<MouseWheel>(std::make_unique<MouseWheel>(static_cast<MouseWheel*>(other.value.m_input.get())->m_MouseWheel));
+			new (&this->value.m_input) std::shared_ptr<MouseWheel>(std::make_shared<MouseWheel>(static_cast<MouseWheel*>(other.value.m_input.get())->m_MouseWheel));
 		else if (this->type == "JoystickButton")
-			new (&this->value.m_input) std::unique_ptr<JoystickButton>(std::make_unique<JoystickButton>(static_cast<JoystickButton*>(other.value.m_input.get())->m_joystickButton));
+			new (&this->value.m_input) std::shared_ptr<JoystickButton>(std::make_shared<JoystickButton>(static_cast<JoystickButton*>(other.value.m_input.get())->m_joystickButton));
 		else if (this->type == "JoystickAxis")
-			new (&this->value.m_input) std::unique_ptr<JoystickAxis>(std::make_unique<JoystickAxis>(static_cast<JoystickAxis*>(other.value.m_input.get())->m_JoystickAxis));
+			new (&this->value.m_input) std::shared_ptr<JoystickAxis>(std::make_shared<JoystickAxis>(static_cast<JoystickAxis*>(other.value.m_input.get())->m_JoystickAxis));
 	}
 	~Setting() noexcept
 	{
@@ -76,7 +77,7 @@ struct Setting
 			this->type == "MouseWheel" ||
 			this->type == "JoystickButton" ||
 			this->type == "JoystickAxis")
-			this->value.m_input.~unique_ptr();
+			this->value.m_input.~shared_ptr();
 		else if (this->type == "string")
 			this->value.m_string.~basic_string();
 	};
@@ -125,15 +126,15 @@ struct Setting
 		else if (this->type == "u64")
 			this->value.m_u64 = std::stoull(value);
 		else if (this->type == "Keyboard")
-			this->value.m_input = std::make_unique<Keyboard>(StringToScanCode(value));
+			this->value.m_input = std::make_shared<Keyboard>(StringToScanCode(value));
 		else if (this->type == "MouseButton")
-			this->value.m_input = std::make_unique<MouseButton>(StringToMouseButton(value));
+			this->value.m_input = std::make_shared<MouseButton>(StringToMouseButton(value));
 		else if (this->type == "MouseWheel")
-			this->value.m_input = std::make_unique<MouseWheel>(StringToMouseWheel(value));
+			this->value.m_input = std::make_shared<MouseWheel>(StringToMouseWheel(value));
 		else if (this->type == "JoystickButton")
-			this->value.m_input = std::make_unique<JoystickButton>(StringToJoystickButton(value));
+			this->value.m_input = std::make_shared<JoystickButton>(StringToJoystickButton(value));
 		else if (this->type == "JoystickAxis")
-			this->value.m_input = std::make_unique<JoystickAxis>(StringToJoystickAxis(value));
+			this->value.m_input = std::make_shared<JoystickAxis>(StringToJoystickAxis(value));
 	}
 
 	std::string type;

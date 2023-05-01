@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Managers/ResourceManager.h"
-#include "Managers/SettingsManager.h"
+#include "Managers/Setting/SettingsManager.h"
 #include "Managers/StateManager.h"
 #include "Managers/AudioManager.h"
 #include "Managers/Input/InputManager.h"
@@ -37,6 +37,6 @@ private:
     int m_currIcon = 0;
 
     bool m_KeyBindingsPopUp = false;
-    std::string m_newInput = "";
-    std::unique_ptr<Input> m_newKey = std::make_unique<Input>();
+    std::string m_newKey = "";
+    std::shared_ptr<Input> m_newInput = std::make_shared<Input>();
 };

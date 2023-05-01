@@ -16,29 +16,19 @@ void InputManager::processEvent(sf::Event& event) noexcept
 				this->m_ConnectedJoystics.erase(it);
 }
 
-const bool InputManager::input(const Input& input) noexcept
-{
-	return input.input();
-}
-
-const float InputManager::input(const Input& input, const std::uint32_t j_id) noexcept
-{
-	return input.input(j_id);
-}
-
-const float InputManager::input(const Input& input, sf::Event& event) noexcept
-{
-	return input.input(event);
-}
-
 const bool InputManager::input(const std::string& id) noexcept
 {
 	return this->m_inputs.at(id)->input();
 }
 
-const float InputManager::input(const std::string& id, const std::uint32_t j_id) noexcept
+const bool InputManager::input(const std::string& id, const std::uint32_t j_id) noexcept
 {
 	return this->m_inputs.at(id)->input(j_id);
+}
+
+const float InputManager::input(const std::string& id, const std::uint32_t j_id, float min) noexcept
+{
+	return this->m_inputs.at(id)->input(j_id, min);
 }
 
 const float InputManager::input(const std::string& id, sf::Event& event) noexcept
@@ -61,17 +51,17 @@ const std::string InputManager::inputToString(Input* input) noexcept
 	return "";
 }
 
-const std::unique_ptr<Input> InputManager::getAnyInput(sf::Event& event) noexcept
+const std::shared_ptr<Input> InputManager::getAnyInput(sf::Event& event) noexcept
 {
 	if (event.type == sf::Event::KeyPressed)
-		return std::make_unique<Keyboard>(event.key.scancode);
+		return std::make_shared<Keyboard>(event.key.scancode);
 	else if(event.type == sf::Event::MouseButtonPressed)
-		return std::make_unique<MouseButton>(event.mouseButton.button);
+		return std::make_shared<MouseButton>(event.mouseButton.button);
 	else if (event.type == sf::Event::MouseWheelScrolled)
-		return std::make_unique<MouseWheel>(event.mouseWheelScroll.wheel);
+		return std::make_shared<MouseWheel>(event.mouseWheelScroll.wheel);
 	else if (event.type == sf::Event::JoystickButtonPressed)
-		return std::make_unique<JoystickButton>(event.joystickButton.button);
+		return std::make_shared<JoystickButton>(event.joystickButton.button);
 	else if (event.type == sf::Event::JoystickMoved)
-		return std::make_unique<JoystickAxis>(event.joystickMove.axis);
-	return std::make_unique<Input>();
+		return std::make_shared<JoystickAxis>(event.joystickMove.axis);
+	return std::make_shared<Input>();
 }

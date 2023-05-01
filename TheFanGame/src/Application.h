@@ -32,8 +32,4 @@ private:
 	sf::RenderWindow m_window;
 	sf::Clock m_deltatime;
 	const std::string m_title;
-
-	static constexpr ImGuiWindowFlags s_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBackground | 
-												ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoInputs | 
-												ImGuiWindowFlags_NoMove;
 };

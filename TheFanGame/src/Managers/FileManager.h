@@ -2,10 +2,10 @@
 
 #include <vector>
 #include <tuple>
+#include <unordered_map>
 
 #include "Utility.h"
-#include "Setting.h"
-#include <unordered_map>
+#include "Setting/Setting.h"
 
 class FileManager : NonCopyable
 {

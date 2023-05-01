@@ -81,7 +81,7 @@
     <ClCompile Include="src\Managers\AudioManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Managers\SettingsManager.cpp">
+    <ClCompile Include="src\Managers\Setting\SettingsManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Managers\Input\InputManager.cpp">
@@ -167,7 +167,7 @@
     <ClInclude Include="src\Managers\AudioManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Managers\SettingsManager.h">
+    <ClInclude Include="src\Managers\Setting\SettingsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Managers\Input\InputManager.h">
@@ -191,7 +191,7 @@
     <ClInclude Include="src\Managers\FileManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Managers\Setting.h">
+    <ClInclude Include="src\Managers\Setting\Setting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

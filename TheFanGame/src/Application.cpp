@@ -44,6 +44,10 @@ void Application::update() noexcept
 
 	if (this->m_showfps)
 	{
+		static constexpr ImGuiWindowFlags s_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBackground |
+			ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoInputs |
+			ImGuiWindowFlags_NoMove;
+
 		if (ImGui::Begin("FPS Counter", 0, s_flags))
 		{
 			auto& io = ImGui::GetIO();

@@ -8,23 +8,13 @@ void SettingsScreen::init(sf::RenderWindow& window)
 void SettingsScreen::processEvent(sf::Event& event) noexcept
 {
 	if ((event.type == sf::Event::KeyPressed										 || 
-		 (event.type == sf::Event::MouseButtonPressed && !ImGui::IsAnyItemHovered()) ||
+		(event.type == sf::Event::MouseButtonPressed && !ImGui::IsAnyItemHovered())	 ||
 		 event.type == sf::Event::MouseWheelScrolled								 || 
 		 event.type == sf::Event::JoystickButtonPressed								 || 
 		 event.type == sf::Event::JoystickMoved)									 &&
 		 this->m_KeyBindingsPopUp)
 	{
-		auto& p = this->s_InputManager.getAnyInput(event);
-		if (p->m_type == InputType::Keyboard)
-			this->m_newKey = std::make_unique<Keyboard>(static_cast<Keyboard*>(p.get())->m_KeyCode);
-		else if (p->m_type == InputType::MouseButton)
-			this->m_newKey = std::make_unique<MouseButton>(static_cast<MouseButton*>(p.get())->m_MouseButton);
-		else if (p->m_type == InputType::MouseWheel)
-			this->m_newKey = std::make_unique<MouseWheel>(static_cast<MouseWheel*>(p.get())->m_MouseWheel);
-		else if (p->m_type == InputType::JoystickButton)
-			this->m_newKey = std::make_unique<JoystickButton>(static_cast<JoystickButton*>(p.get())->m_joystickButton);
-		else if (p->m_type == InputType::JoystickAxis)
-			this->m_newKey = std::make_unique<JoystickAxis>(static_cast<JoystickAxis*>(p.get())->m_JoystickAxis);
+		this->m_newInput = this->s_InputManager.getAnyInput(event);
 	}
 }
 
@@ -36,10 +26,10 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 		this->m_once = false;
 	}
 
-	constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
+	static constexpr ImGuiWindowFlags s_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
 	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 	ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-	if (ImGui::BeginPopupModal("Settings", &this->m_open, flags))
+	if (ImGui::BeginPopupModal("Settings", &this->m_open, s_flags))
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f));
@@ -123,14 +113,13 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 		{
 			for (auto& it : this->s_InputManager.m_inputs)
 			{
-				ImGui::Text(it.first.data());
+				ImGui::Text(it.first.c_str());
 				ImGui::SameLine();
-				ImGui::PushID(it.first.data());
-				std::string value = this->s_InputManager.inputToString(it.second);
-				if (ImGui::Button(value.c_str(), ImVec2(300.f, 30.f)))
+				ImGui::PushID(it.first.c_str());
+				if (ImGui::Button(this->s_InputManager.inputToString(it.second).c_str(), ImVec2(300.f, 30.f)))
 				{
-					this->m_newInput = it.first;
 					this->m_KeyBindingsPopUp = true;
+					this->m_newKey = it.first;
 				}
 				ImGui::PopID();
 			}
@@ -138,7 +127,7 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 				ImGui::OpenPopup("Change Keybindigs");
 			if (ImGui::BeginPopupModal("Change Keybindigs", &this->m_KeyBindingsPopUp, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
 			{
-				std::string text = "Change [" + this->s_InputManager.inputToString(this->s_InputManager.m_inputs[this->m_newInput]) + "] to [" + this->s_InputManager.inputToString(this->m_newKey.get()) + "]";
+				std::string text = "Change [" + this->s_InputManager.inputToString(this->s_InputManager.m_inputs[this->m_newKey]) + "] to [" + this->s_InputManager.inputToString(this->m_newInput.get()) + "]";
 				ImGui::Text(text.c_str(), ImVec4(1, 0, 0, 1));
 
 				if (ImGui::Button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)))
@@ -149,37 +138,18 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 				ImGui::SameLine();
 				if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)))
 				{
-					if (this->m_newKey->m_type == InputType::Keyboard)
-					{
-						this->s_InputManager.m_inputs[this->m_newInput]->m_type = InputType::Keyboard;
-						static_cast<Keyboard*>(this->s_InputManager.m_inputs[this->m_newInput])->m_KeyCode = static_cast<Keyboard*>(this->m_newKey.get())->m_KeyCode;
-						this->s_Settings["Input"][this->m_newInput].type = "Keyboard";
-					}
-					else if (this->m_newKey->m_type == InputType::MouseButton)
-					{
-						this->s_InputManager.m_inputs[this->m_newInput]->m_type = InputType::MouseButton;
-						static_cast<MouseButton*>(this->s_InputManager.m_inputs[this->m_newInput])->m_MouseButton = static_cast<MouseButton*>(this->m_newKey.get())->m_MouseButton;
-						this->s_Settings["Input"][this->m_newInput].type = "MouseButton";
-					}
-					else if (this->m_newKey->m_type == InputType::MouseWheel)
-					{
-						this->s_InputManager.m_inputs[this->m_newInput]->m_type = InputType::MouseWheel;
-						static_cast<MouseWheel*>(this->s_InputManager.m_inputs[this->m_newInput])->m_MouseWheel = static_cast<MouseWheel*>(this->m_newKey.get())->m_MouseWheel;
-						this->s_Settings["Input"][this->m_newInput].type = "MouseWheel";
-					}
-					else if (this->m_newKey->m_type == InputType::JoystickButton)
-					{
-						this->s_InputManager.m_inputs[this->m_newInput]->m_type = InputType::JoystickButton;
-						static_cast<JoystickButton*>(this->s_InputManager.m_inputs[this->m_newInput])->m_joystickButton = static_cast<JoystickButton*>(this->m_newKey.get())->m_joystickButton;
-						this->s_Settings["Input"][this->m_newInput].type = "JoystickButton";
-					}
-					else if (this->m_newKey->m_type == InputType::JoystickAxis)
-					{
-						this->s_InputManager.m_inputs[this->m_newInput]->m_type = InputType::JoystickAxis;
-						static_cast<JoystickAxis*>(this->s_InputManager.m_inputs[this->m_newInput])->m_JoystickAxis = static_cast<JoystickAxis*>(this->m_newKey.get())->m_JoystickAxis;
-						this->s_Settings["Input"][this->m_newInput].type = "JoystickAxis";
-					}
-
+					this->s_Settings["Input"][this->m_newKey].value.m_input = this->m_newInput;
+					this->s_InputManager.m_inputs[this->m_newKey] = this->s_Settings["Input"][this->m_newKey].value.m_input.get();
+					if (this->m_newInput->m_type == InputType::Keyboard)
+						this->s_Settings["Input"][this->m_newKey].type = "Keyboard";
+					else if (this->m_newInput->m_type == InputType::MouseButton)
+						this->s_Settings["Input"][this->m_newKey].type = "MouseButton";
+					else if (this->m_newInput->m_type == InputType::MouseWheel)
+						this->s_Settings["Input"][this->m_newKey].type = "MouseWheel";
+					else if (this->m_newInput->m_type == InputType::JoystickButton)
+						this->s_Settings["Input"][this->m_newKey].type = "JoystickButton";
+					else if (this->m_newInput->m_type == InputType::JoystickAxis)
+						this->s_Settings["Input"][this->m_newKey].type = "JoystickAxis";
 					this->m_KeyBindingsPopUp = false;
 					ImGui::CloseCurrentPopup();
 				}

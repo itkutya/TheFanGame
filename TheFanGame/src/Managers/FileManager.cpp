@@ -22,7 +22,7 @@ const std::vector<FileManager::ParsedBranch> FileManager::parseFile(const char* 
 					std::array<std::string, 2> setting;
 					is >> setting[0] >> setting[1];
 					if (parsedString.size())
-						parsedString.back().second.emplace_back(data, setting[0].c_str(), setting[1].c_str());
+						parsedString.back().second.emplace_back(data, setting[0], setting[1]);
 				}
 			}
 		}
