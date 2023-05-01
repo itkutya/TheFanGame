@@ -195,6 +195,7 @@
     <ClCompile Include="src\Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Managers\Setting.h" />
     <ClInclude Include="src\Managers\FileManager.h" />
     <ClInclude Include="ImGUI\IconsFontAwesome6.h" />
     <ClInclude Include="src\Managers\CharactersManager.h" />

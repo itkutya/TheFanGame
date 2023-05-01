@@ -1,28 +1,22 @@
 #pragma once
 
-#include <fstream>
 #include <vector>
-#include <array>
 #include <tuple>
-#include <unordered_map>
 
 #include "Utility.h"
+#include "Setting.h"
+#include <unordered_map>
 
 class FileManager : NonCopyable
 {
-	typedef std::tuple<std::string, std::string, std::string> ParsedSetting;
+	typedef std::tuple<const std::string, const std::string, const std::string> ParsedSetting;
+	typedef std::pair<const std::string, std::vector<ParsedSetting>> ParsedBranch;
 public:
-	FileManager() noexcept : m_filepath("") {};
-	FileManager(const char* filepath) noexcept : m_filepath(filepath) { this->m_inputstream.open(this->m_filepath.data()); };
-	~FileManager() noexcept { this->m_inputstream.close(); };
+	FileManager() noexcept	= default;
+	~FileManager() noexcept = default;
 
-	const std::vector<std::pair<const std::string, std::vector<ParsedSetting>>> parseFile(const char* filepath) noexcept;
-	const std::vector<std::pair<const std::string, std::vector<ParsedSetting>>> parseFile() noexcept;
-
-	const bool saveToFile(const char* filepath, const std::unordered_map<std::string, std::unordered_map<std::string, Setting>>& data) noexcept;
+	const std::vector<ParsedBranch> parseFile(const char* filepath) noexcept;
+	const bool saveToFile(const char* filepath, std::unordered_map<std::string, std::unordered_map<std::string, Setting>>& data) noexcept;
 private:
-	std::string_view m_filepath;
-	std::ifstream m_inputstream;
-
-	const std::string trim(const std::string sw) noexcept;
+	const std::string trim(const std::string s) noexcept;
 };

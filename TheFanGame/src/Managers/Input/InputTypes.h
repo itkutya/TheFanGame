@@ -1,8 +1,7 @@
 #pragma once
 
-#include <charconv>
 #include <cstdint>
-#include <array>
+#include <string>
 
 #include "SFML/Window/Event.hpp"
 #include "SFML/Window/Keyboard.hpp"
@@ -69,7 +68,7 @@ struct JoystickAxis : public Input
 	sf::Joystick::Axis m_JoystickAxis = sf::Joystick::Axis();
 };
 
-inline constexpr sf::Keyboard::Scancode StringToScanCode(const std::string_view str)
+inline constexpr sf::Keyboard::Scancode StringToScanCode(const std::string& str)
 {
 	if (str == "A")						return sf::Keyboard::Scancode::A;
 	if (str == "Apostrophe")			return sf::Keyboard::Scancode::Apostrophe;
@@ -222,7 +221,7 @@ inline constexpr sf::Keyboard::Scancode StringToScanCode(const std::string_view 
 	throw "Unimplemented";
 }
 
-inline constexpr sf::Mouse::Button StringToMouseButton(const std::string_view str)
+inline constexpr sf::Mouse::Button StringToMouseButton(const std::string& str)
 {
 	if (str == "Left")			return sf::Mouse::Button::Left;			
 	if (str == "Right")			return sf::Mouse::Button::Right;
@@ -233,16 +232,16 @@ inline constexpr sf::Mouse::Button StringToMouseButton(const std::string_view st
 	throw "Unimplemented";
 }
 
-inline constexpr sf::Mouse::Wheel StringToMouseWheel(const std::string_view str)
+inline constexpr sf::Mouse::Wheel StringToMouseWheel(const std::string& str)
 {
 	if (str == "HorizontalWheel")	return sf::Mouse::Wheel::HorizontalWheel;
 	if (str == "VerticalWheel")		return sf::Mouse::Wheel::VerticalWheel;
 	throw "Unimplemented";
 }
 
-inline const std::uint32_t StringToJoystickButton(const std::string_view str) { return std::stoul(str.data()); }
+inline const std::uint32_t StringToJoystickButton(const std::string& str) { return std::stoul(str); }
 
-inline constexpr sf::Joystick::Axis StringToJoystickAxis(const std::string_view str)
+inline constexpr sf::Joystick::Axis StringToJoystickAxis(const std::string& str)
 {
 	if (str == "X")		return sf::Joystick::Axis::X;
 	if (str == "Y")		return sf::Joystick::Axis::Y;	
@@ -255,7 +254,7 @@ inline constexpr sf::Joystick::Axis StringToJoystickAxis(const std::string_view 
 	throw "Unimplemented";
 }
 
-inline constexpr const char* ScanCodeToString(const sf::Keyboard::Scancode code)
+inline constexpr const std::string ScanCodeToString(const sf::Keyboard::Scancode code)
 {
 	switch (code)
 	{
@@ -411,7 +410,7 @@ inline constexpr const char* ScanCodeToString(const sf::Keyboard::Scancode code)
 	throw "Unimplemented";
 }
 
-inline constexpr const char* MouseButtonToString(const sf::Mouse::Button code)
+inline constexpr const std::string MouseButtonToString(const sf::Mouse::Button code)
 {
 	switch (code)
 	{
@@ -425,7 +424,7 @@ inline constexpr const char* MouseButtonToString(const sf::Mouse::Button code)
 	throw "Unimplemented";
 }
 
-inline constexpr const char* MouseWheelToString(const sf::Mouse::Wheel code)
+inline constexpr const std::string MouseWheelToString(const sf::Mouse::Wheel code)
 {
 	switch (code)
 	{
@@ -435,13 +434,12 @@ inline constexpr const char* MouseWheelToString(const sf::Mouse::Wheel code)
 	throw "Unimplemented";
 }
 
-inline const char* JoystickButtonToString(const std::uint32_t code)
+inline const std::string JoystickButtonToString(const std::uint32_t code)
 {
-	std::array<char, 1> str = {};
-	return std::to_chars(str.data(), str.data() + str.size(), code).ptr;
+	return std::to_string(code);
 }
 
-inline constexpr const char* JoystickAxisToString(const sf::Joystick::Axis code)
+inline constexpr const std::string JoystickAxisToString(const sf::Joystick::Axis code)
 {
 	switch (code)
 	{
