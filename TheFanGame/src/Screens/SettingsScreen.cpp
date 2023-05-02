@@ -14,7 +14,7 @@ void SettingsScreen::processEvent(sf::Event& event) noexcept
 		 event.type == sf::Event::JoystickMoved)									 &&
 		 this->m_KeyBindingsPopUp)
 	{
-		this->m_newInput = this->s_InputManager.getAnyInput(event);
+		this->m_newInput = std::move(this->m_app->m_InputManager.getAnyInput(event));
 	}
 }
 
@@ -111,23 +111,22 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 		break;
 		case SETTINGS_STATE::INPUT:
 		{
-			for (auto& it : this->s_InputManager.m_inputs)
+			for (auto& it : this->m_app->m_InputManager.m_inputs)
 			{
 				ImGui::Text(it.first.c_str());
 				ImGui::SameLine();
-				ImGui::PushID(it.first.c_str());
-				if (ImGui::Button(this->s_InputManager.inputToString(it.second).c_str(), ImVec2(300.f, 30.f)))
+				if (ImGui::Button(this->m_app->m_InputManager.inputToString(it.second).c_str(), ImVec2(300.f, 30.f)))
 				{
 					this->m_KeyBindingsPopUp = true;
 					this->m_newKey = it.first;
 				}
-				ImGui::PopID();
 			}
 			if (this->m_KeyBindingsPopUp)
 				ImGui::OpenPopup("Change Keybindigs");
 			if (ImGui::BeginPopupModal("Change Keybindigs", &this->m_KeyBindingsPopUp, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
 			{
-				std::string text = "Change [" + this->s_InputManager.inputToString(this->s_InputManager.m_inputs[this->m_newKey]) + "] to [" + this->s_InputManager.inputToString(this->m_newInput.get()) + "]";
+				std::string text = "Change [" + this->m_app->m_InputManager.inputToString(this->m_app->m_InputManager.m_inputs[this->m_newKey]) 
+					+ "] to [" + this->m_app->m_InputManager.inputToString(this->m_newInput.get()) + "]";
 				ImGui::Text(text.c_str(), ImVec4(1, 0, 0, 1));
 
 				if (ImGui::Button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)))
@@ -138,18 +137,22 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 				ImGui::SameLine();
 				if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)))
 				{
-					this->s_Settings["Input"][this->m_newKey].value.m_input = this->m_newInput;
-					this->s_InputManager.m_inputs[this->m_newKey] = this->s_Settings["Input"][this->m_newKey].value.m_input.get();
-					if (this->m_newInput->m_type == InputType::Keyboard)
-						this->s_Settings["Input"][this->m_newKey].type = "Keyboard";
-					else if (this->m_newInput->m_type == InputType::MouseButton)
-						this->s_Settings["Input"][this->m_newKey].type = "MouseButton";
-					else if (this->m_newInput->m_type == InputType::MouseWheel)
-						this->s_Settings["Input"][this->m_newKey].type = "MouseWheel";
-					else if (this->m_newInput->m_type == InputType::JoystickButton)
-						this->s_Settings["Input"][this->m_newKey].type = "JoystickButton";
-					else if (this->m_newInput->m_type == InputType::JoystickAxis)
-						this->s_Settings["Input"][this->m_newKey].type = "JoystickAxis";
+					auto& [type, input] = this->s_Settings["Input"][this->m_newKey];
+					input.m_input = std::move(this->m_newInput);
+					this->m_newInput = std::make_unique<Input>();
+					this->m_app->m_InputManager.m_inputs[this->m_newKey] = input.m_input.get();
+					if (input.m_input->m_type == InputType::Keyboard)
+						type = "Keyboard";
+					else if (input.m_input->m_type == InputType::MouseButton)
+						type = "MouseButton";
+					else if (input.m_input->m_type == InputType::MouseWheel)
+						type = "MouseWheel";
+					else if (input.m_input->m_type == InputType::JoystickButton)
+						type = "JoystickButton";
+					else if (input.m_input->m_type == InputType::JoystickAxis)
+						type = "JoystickAxis";
+					else
+						ImGui::InsertNotification({ ImGuiToastType_Warning, "Incorrect input type!" });
 					this->m_KeyBindingsPopUp = false;
 					ImGui::CloseCurrentPopup();
 				}

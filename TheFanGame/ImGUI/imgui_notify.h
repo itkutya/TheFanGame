@@ -144,7 +144,7 @@ public:
 		case ImGuiToastType_Warning:
 			return ICON_FA_EXCLAMATION;
 		case ImGuiToastType_Error:
-			return ICON_FA_HOLLY_BERRY;
+			return ICON_FA_CIRCLE;
 		case ImGuiToastType_Info:
 			return ICON_FA_INFO;
 		default:

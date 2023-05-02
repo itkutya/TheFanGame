@@ -14,7 +14,6 @@ class SettingsScreen : public State, public PopUpState
     SettingsManager& s_Settings = SettingsManager::getInstance();
     AudioManager& s_AudioManager = AudioManager::getInstance();
     ResourceManager& s_ResourceManager = ResourceManager::getInstance();
-    InputManager& s_InputManager = InputManager::getInstance();
     enum class SETTINGS_STATE
     {
         GRAPHICS, PROFILE, AUDIO, INPUT, GAME, MAINSCREEN
@@ -38,5 +37,5 @@ private:
 
     bool m_KeyBindingsPopUp = false;
     std::string m_newKey = "";
-    std::shared_ptr<Input> m_newInput = std::make_shared<Input>();
+    std::unique_ptr<Input> m_newInput = std::make_unique<Input>();
 };

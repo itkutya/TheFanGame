@@ -32,7 +32,7 @@ void Application::pollEvents() noexcept
 		if (event.type == sf::Event::Resized)
 			this->m_size = sf::VideoMode({ event.size.width, event.size.height });
 
-		this->s_InputManager.processEvent(event);
+		this->m_InputManager.processEvent(event);
 		this->s_StateManager.getCurrentState()->processEvent(event);
 	}
 }

@@ -17,8 +17,8 @@ struct Input
 {
 	[[noreturn]] virtual const bool	 input() const									{ throw "Unimplemented"; };
 	[[noreturn]] virtual const float input(sf::Event& event) const					{ throw "Unimplemented"; };
-	[[noreturn]] virtual const bool  input(const std::uint32_t id)	const			{ throw "Unimplemented"; };
-	[[noreturn]] virtual const float input(const std::uint32_t id, float min) const { throw "Unimplemented"; };
+	[[noreturn]] virtual const float input(const std::uint32_t id)	const			{ throw "Unimplemented"; };
+  //[[noreturn]] virtual const float input(const std::uint32_t id, float min) const { throw "Unimplemented"; };
 
 	InputType m_type = InputType::None; 
 };
@@ -54,7 +54,7 @@ struct JoystickButton : public Input
 {
 	JoystickButton(std::uint32_t button) noexcept : m_joystickButton(button) { this->m_type = InputType::JoystickButton; };
 	
-	const bool input(const std::uint32_t id) const override { return sf::Joystick::isButtonPressed(id, this->m_joystickButton); };
+	const float input(const std::uint32_t id) const override { return sf::Joystick::isButtonPressed(id, this->m_joystickButton); };
 	
 	std::uint32_t m_joystickButton = 0;
 };
@@ -63,7 +63,8 @@ struct JoystickAxis : public Input
 {
 	JoystickAxis(sf::Joystick::Axis axis) noexcept : m_JoystickAxis(axis) { this->m_type = InputType::JoystickAxis; };
 	
-	const float input(const std::uint32_t id, float min) const override { return sf::Joystick::getAxisPosition(id, this->m_JoystickAxis) > min ? sf::Joystick::getAxisPosition(id, this->m_JoystickAxis) : 0.f; };
+	const float input(const std::uint32_t id) const override { return sf::Joystick::getAxisPosition(id, this->m_JoystickAxis); };
+	//const float input(const std::uint32_t id, float min) const override { return sf::Joystick::getAxisPosition(id, this->m_JoystickAxis) > min ? sf::Joystick::getAxisPosition(id, this->m_JoystickAxis) : 0.f; };
 
 	sf::Joystick::Axis m_JoystickAxis = sf::Joystick::Axis();
 };

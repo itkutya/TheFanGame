@@ -9,7 +9,6 @@ class Menu : public State
 {
     StateManager& s_StateManager = StateManager::getInstance();
     ResourceManager& s_ResourceManager = ResourceManager::getInstance();
-    InputManager& s_InputManager = InputManager::getInstance();
 public:
     Menu(Application* app) noexcept : m_app(app) {};
 
