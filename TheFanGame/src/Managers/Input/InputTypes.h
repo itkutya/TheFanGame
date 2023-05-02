@@ -15,10 +15,21 @@ enum class InputType
 
 struct Input 
 {
-	[[noreturn]] virtual const bool	 input() const									{ throw "Unimplemented"; };
-	[[noreturn]] virtual const float input(sf::Event& event) const					{ throw "Unimplemented"; };
-	[[noreturn]] virtual const float input(const std::uint32_t id)	const			{ throw "Unimplemented"; };
-  //[[noreturn]] virtual const float input(const std::uint32_t id, float min) const { throw "Unimplemented"; };
+	union InputReturnType
+	{
+		explicit operator bool() const noexcept { return this->m_bool;  };
+
+		const bool operator>(float rhs) const  { return this->m_float > rhs ?  true : false; };
+		const bool operator<(float rhs) const  { return this->m_float < rhs ?  true : false; };
+		const bool operator==(float rhs) const { return this->m_float == rhs ? true : false; };
+		const bool operator!=(float rhs) const { return this->m_float != rhs ? true : false; };
+
+		bool  m_bool = false;
+		float m_float;
+	};
+	[[noreturn]] virtual const InputReturnType input() const									{ throw "Unimplemented"; };
+	[[noreturn]] virtual const InputReturnType input(sf::Event& event) const					{ throw "Unimplemented"; };
+	[[noreturn]] virtual const InputReturnType input(const std::uint32_t id) const				{ throw "Unimplemented"; };
 
 	InputType m_type = InputType::None; 
 };
@@ -27,7 +38,12 @@ struct Keyboard : public Input
 {
 	Keyboard(sf::Keyboard::Scancode key) noexcept : m_KeyCode(key) { this->m_type = InputType::Keyboard; };
 	
-	const bool input() const override { return sf::Keyboard::isKeyPressed(this->m_KeyCode); };
+	const InputReturnType input() const override
+	{
+		InputReturnType irt;
+		irt.m_bool = sf::Keyboard::isKeyPressed(this->m_KeyCode);
+		return irt;
+	};
 
 	sf::Keyboard::Scancode m_KeyCode = sf::Keyboard::Scancode();
 };
@@ -36,7 +52,12 @@ struct MouseButton : public Input
 {
 	MouseButton(sf::Mouse::Button button) noexcept : m_MouseButton(button) { this->m_type = InputType::MouseButton; };
 	
-	const bool input() const override { return sf::Mouse::isButtonPressed(this->m_MouseButton); };
+	const InputReturnType input() const override 
+	{
+		InputReturnType irt;
+		irt.m_bool = sf::Mouse::isButtonPressed(this->m_MouseButton);
+		return irt;
+	};
 
 	sf::Mouse::Button m_MouseButton = sf::Mouse::Button();
 };
@@ -45,8 +66,13 @@ struct MouseWheel : public Input
 {
 	MouseWheel(sf::Mouse::Wheel wheel) noexcept : m_MouseWheel(wheel) { this->m_type = InputType::MouseWheel; };
 	
-	const float input(sf::Event& event) const override { return event.mouseWheelScroll.wheel == this->m_MouseWheel ? event.mouseWheelScroll.delta : 0.f; };
-
+	const InputReturnType input(sf::Event& event) const override
+	{
+		InputReturnType irt;
+		irt.m_float = event.mouseWheelScroll.wheel == this->m_MouseWheel ? event.mouseWheelScroll.delta : 0.f;
+		return irt;
+	};
+	
 	sf::Mouse::Wheel m_MouseWheel = sf::Mouse::Wheel();
 };
 
@@ -54,7 +80,12 @@ struct JoystickButton : public Input
 {
 	JoystickButton(std::uint32_t button) noexcept : m_joystickButton(button) { this->m_type = InputType::JoystickButton; };
 	
-	const float input(const std::uint32_t id) const override { return sf::Joystick::isButtonPressed(id, this->m_joystickButton); };
+	const InputReturnType input(const std::uint32_t id) const override
+	{
+		InputReturnType irt;
+		irt.m_bool = sf::Joystick::isButtonPressed(id, this->m_joystickButton);
+		return irt;
+	};
 	
 	std::uint32_t m_joystickButton = 0;
 };
@@ -63,9 +94,13 @@ struct JoystickAxis : public Input
 {
 	JoystickAxis(sf::Joystick::Axis axis) noexcept : m_JoystickAxis(axis) { this->m_type = InputType::JoystickAxis; };
 	
-	const float input(const std::uint32_t id) const override { return sf::Joystick::getAxisPosition(id, this->m_JoystickAxis); };
-	//const float input(const std::uint32_t id, float min) const override { return sf::Joystick::getAxisPosition(id, this->m_JoystickAxis) > min ? sf::Joystick::getAxisPosition(id, this->m_JoystickAxis) : 0.f; };
-
+	const InputReturnType input(const std::uint32_t id) const override
+	{
+		InputReturnType irt;
+		irt.m_float = sf::Joystick::getAxisPosition(id, this->m_JoystickAxis);
+		return irt;
+	};
+	
 	sf::Joystick::Axis m_JoystickAxis = sf::Joystick::Axis();
 };
 
@@ -73,151 +108,151 @@ inline constexpr sf::Keyboard::Scancode StringToScanCode(const std::string& str)
 {
 	if (str == "A")						return sf::Keyboard::Scancode::A;
 	if (str == "Apostrophe")			return sf::Keyboard::Scancode::Apostrophe;
-	if (str == "Application")			return sf::Keyboard::Scancode::Application;		 
-	if (str == "B")						return sf::Keyboard::Scancode::B;					 
-	if (str == "Back")					return sf::Keyboard::Scancode::Back;				 
-	if (str == "Backslash")				return sf::Keyboard::Scancode::Backslash;			 
-	if (str == "Backspace")				return sf::Keyboard::Scancode::Backspace;			 
-	if (str == "C")						return sf::Keyboard::Scancode::C;					 
-	if (str == "CapsLock")				return sf::Keyboard::Scancode::CapsLock;			 
-	if (str == "Comma")					return sf::Keyboard::Scancode::Comma;				 
-	if (str == "Copy")					return sf::Keyboard::Scancode::Copy;				 
-	if (str == "Cut")					return sf::Keyboard::Scancode::Cut;				 
-	if (str == "D")						return sf::Keyboard::Scancode::D;		
-	if (str == "Delete")				return sf::Keyboard::Scancode::Delete;	
-	if (str == "Down")					return sf::Keyboard::Scancode::Down;			
-	if (str == "E")						return sf::Keyboard::Scancode::E;					 
-	if (str == "End")					return sf::Keyboard::Scancode::End;		
-	if (str == "Enter")					return sf::Keyboard::Scancode::Enter;	
-	if (str == "Equal")					return sf::Keyboard::Scancode::Equal;	
-	if (str == "Escape")				return sf::Keyboard::Scancode::Escape;	
-	if (str == "Execute")				return sf::Keyboard::Scancode::Execute;	
-	if (str == "F")						return sf::Keyboard::Scancode::F;		
-	if (str == "F1")					return sf::Keyboard::Scancode::F1;			
-	if (str == "F2")					return sf::Keyboard::Scancode::F2;			
-	if (str == "F3")					return sf::Keyboard::Scancode::F3;		
-	if (str == "F4")					return sf::Keyboard::Scancode::F4;	
-	if (str == "F5")					return sf::Keyboard::Scancode::F5;	
-	if (str == "F6")					return sf::Keyboard::Scancode::F6;	
-	if (str == "F7")					return sf::Keyboard::Scancode::F7;	
-	if (str == "F8")					return sf::Keyboard::Scancode::F8;	
-	if (str == "F9")					return sf::Keyboard::Scancode::F9;	
-	if (str == "F10")					return sf::Keyboard::Scancode::F10;	
-	if (str == "F11")					return sf::Keyboard::Scancode::F11;	
-	if (str == "F12")					return sf::Keyboard::Scancode::F12;		
-	if (str == "F13")					return sf::Keyboard::Scancode::F13;		
-	if (str == "F14")					return sf::Keyboard::Scancode::F14;	
-	if (str == "F15")					return sf::Keyboard::Scancode::F15;	
-	if (str == "F16")					return sf::Keyboard::Scancode::F16;		
-	if (str == "F17")					return sf::Keyboard::Scancode::F17;	
-	if (str == "F18")					return sf::Keyboard::Scancode::F18;	
-	if (str == "F19")					return sf::Keyboard::Scancode::F19;	
-	if (str == "F20")					return sf::Keyboard::Scancode::F20;	
-	if (str == "F21")					return sf::Keyboard::Scancode::F21;	
-	if (str == "F22")					return sf::Keyboard::Scancode::F22;		
-	if (str == "F23")					return sf::Keyboard::Scancode::F23;		
-	if (str == "F24")					return sf::Keyboard::Scancode::F24;		
-	if (str == "Favorites")				return sf::Keyboard::Scancode::Favorites;	
-	if (str == "Forward")				return sf::Keyboard::Scancode::Forward;		
-	if (str == "G")						return sf::Keyboard::Scancode::G;			
-	if (str == "Grave")					return sf::Keyboard::Scancode::Grave;		
-	if (str == "H")						return sf::Keyboard::Scancode::H;			
-	if (str == "Help")					return sf::Keyboard::Scancode::Help;		
-	if (str == "Home")					return sf::Keyboard::Scancode::Home;		
-	if (str == "HomePage")				return sf::Keyboard::Scancode::HomePage;	
-	if (str == "Hyphen")				return sf::Keyboard::Scancode::Hyphen;		
-	if (str == "I")						return sf::Keyboard::Scancode::I;			
-	if (str == "Insert")				return sf::Keyboard::Scancode::Insert;		
-	if (str == "J")						return sf::Keyboard::Scancode::J;			
-	if (str == "K")						return sf::Keyboard::Scancode::K;			
-	if (str == "L")						return sf::Keyboard::Scancode::L;			
-	if (str == "LAlt")					return sf::Keyboard::Scancode::LAlt;		
-	if (str == "LaunchApplication1")	return sf::Keyboard::Scancode::LaunchApplication1; 
-	if (str == "LaunchApplication2")	return sf::Keyboard::Scancode::LaunchApplication2; 
-	if (str == "LaunchMail")			return sf::Keyboard::Scancode::LaunchMail;		
+	if (str == "Application")			return sf::Keyboard::Scancode::Application;
+	if (str == "B")						return sf::Keyboard::Scancode::B;
+	if (str == "Back")					return sf::Keyboard::Scancode::Back;
+	if (str == "Backslash")				return sf::Keyboard::Scancode::Backslash;
+	if (str == "Backspace")				return sf::Keyboard::Scancode::Backspace;
+	if (str == "C")						return sf::Keyboard::Scancode::C;
+	if (str == "CapsLock")				return sf::Keyboard::Scancode::CapsLock;
+	if (str == "Comma")					return sf::Keyboard::Scancode::Comma;
+	if (str == "Copy")					return sf::Keyboard::Scancode::Copy;
+	if (str == "Cut")					return sf::Keyboard::Scancode::Cut;
+	if (str == "D")						return sf::Keyboard::Scancode::D;
+	if (str == "Delete")				return sf::Keyboard::Scancode::Delete;
+	if (str == "Down")					return sf::Keyboard::Scancode::Down;
+	if (str == "E")						return sf::Keyboard::Scancode::E;
+	if (str == "End")					return sf::Keyboard::Scancode::End;
+	if (str == "Enter")					return sf::Keyboard::Scancode::Enter;
+	if (str == "Equal")					return sf::Keyboard::Scancode::Equal;
+	if (str == "Escape")				return sf::Keyboard::Scancode::Escape;
+	if (str == "Execute")				return sf::Keyboard::Scancode::Execute;
+	if (str == "F")						return sf::Keyboard::Scancode::F;
+	if (str == "F1")					return sf::Keyboard::Scancode::F1;
+	if (str == "F2")					return sf::Keyboard::Scancode::F2;
+	if (str == "F3")					return sf::Keyboard::Scancode::F3;
+	if (str == "F4")					return sf::Keyboard::Scancode::F4;
+	if (str == "F5")					return sf::Keyboard::Scancode::F5;
+	if (str == "F6")					return sf::Keyboard::Scancode::F6;
+	if (str == "F7")					return sf::Keyboard::Scancode::F7;
+	if (str == "F8")					return sf::Keyboard::Scancode::F8;
+	if (str == "F9")					return sf::Keyboard::Scancode::F9;
+	if (str == "F10")					return sf::Keyboard::Scancode::F10;
+	if (str == "F11")					return sf::Keyboard::Scancode::F11;
+	if (str == "F12")					return sf::Keyboard::Scancode::F12;
+	if (str == "F13")					return sf::Keyboard::Scancode::F13;
+	if (str == "F14")					return sf::Keyboard::Scancode::F14;
+	if (str == "F15")					return sf::Keyboard::Scancode::F15;
+	if (str == "F16")					return sf::Keyboard::Scancode::F16;
+	if (str == "F17")					return sf::Keyboard::Scancode::F17;
+	if (str == "F18")					return sf::Keyboard::Scancode::F18;
+	if (str == "F19")					return sf::Keyboard::Scancode::F19;
+	if (str == "F20")					return sf::Keyboard::Scancode::F20;
+	if (str == "F21")					return sf::Keyboard::Scancode::F21;
+	if (str == "F22")					return sf::Keyboard::Scancode::F22;
+	if (str == "F23")					return sf::Keyboard::Scancode::F23;
+	if (str == "F24")					return sf::Keyboard::Scancode::F24;
+	if (str == "Favorites")				return sf::Keyboard::Scancode::Favorites;
+	if (str == "Forward")				return sf::Keyboard::Scancode::Forward;
+	if (str == "G")						return sf::Keyboard::Scancode::G;
+	if (str == "Grave")					return sf::Keyboard::Scancode::Grave;
+	if (str == "H")						return sf::Keyboard::Scancode::H;
+	if (str == "Help")					return sf::Keyboard::Scancode::Help;
+	if (str == "Home")					return sf::Keyboard::Scancode::Home;
+	if (str == "HomePage")				return sf::Keyboard::Scancode::HomePage;
+	if (str == "Hyphen")				return sf::Keyboard::Scancode::Hyphen;
+	if (str == "I")						return sf::Keyboard::Scancode::I;
+	if (str == "Insert")				return sf::Keyboard::Scancode::Insert;
+	if (str == "J")						return sf::Keyboard::Scancode::J;
+	if (str == "K")						return sf::Keyboard::Scancode::K;
+	if (str == "L")						return sf::Keyboard::Scancode::L;
+	if (str == "LAlt")					return sf::Keyboard::Scancode::LAlt;
+	if (str == "LaunchApplication1")	return sf::Keyboard::Scancode::LaunchApplication1;
+	if (str == "LaunchApplication2")	return sf::Keyboard::Scancode::LaunchApplication2;
+	if (str == "LaunchMail")			return sf::Keyboard::Scancode::LaunchMail;
 	if (str == "LaunchMediaSelect")		return sf::Keyboard::Scancode::LaunchMediaSelect;
-	if (str == "LBracket")				return sf::Keyboard::Scancode::LBracket;		
-	if (str == "LControl")				return sf::Keyboard::Scancode::LControl;		
-	if (str == "Left")					return sf::Keyboard::Scancode::Left;			
-	if (str == "LShift")				return sf::Keyboard::Scancode::LShift;			
-	if (str == "LSystem")				return sf::Keyboard::Scancode::LSystem;			
-	if (str == "M")						return sf::Keyboard::Scancode::M;				
-	if (str == "MediaNextTrack")		return sf::Keyboard::Scancode::MediaNextTrack;	 
-	if (str == "MediaPlayPause")		return sf::Keyboard::Scancode::MediaPlayPause;	
-	if (str == "MediaPreviousTrack")	return sf::Keyboard::Scancode::MediaPreviousTrack; 
-	if (str == "MediaStop")				return sf::Keyboard::Scancode::MediaStop;		
-	if (str == "Menu")					return sf::Keyboard::Scancode::Menu;			
-	if (str == "ModeChange")			return sf::Keyboard::Scancode::ModeChange;		
-	if (str == "N")						return sf::Keyboard::Scancode::N;				
-	if (str == "NonUsBackslash")		return sf::Keyboard::Scancode::NonUsBackslash;	
-	if (str == "Num0")					return sf::Keyboard::Scancode::Num0;			
-	if (str == "Num1")					return sf::Keyboard::Scancode::Num1;			
-	if (str == "Num2")					return sf::Keyboard::Scancode::Num2;			
-	if (str == "Num3")					return sf::Keyboard::Scancode::Num3;			
-	if (str == "Num4")					return sf::Keyboard::Scancode::Num4;		
-	if (str == "Num5")					return sf::Keyboard::Scancode::Num5;		
-	if (str == "Num6")					return sf::Keyboard::Scancode::Num6;		
-	if (str == "Num7")					return sf::Keyboard::Scancode::Num7;		
-	if (str == "Num8")					return sf::Keyboard::Scancode::Num8;		
-	if (str == "Num9")					return sf::Keyboard::Scancode::Num9;		
-	if (str == "NumLock")				return sf::Keyboard::Scancode::NumLock;		
-	if (str == "Numpad0")				return sf::Keyboard::Scancode::Numpad0;		
-	if (str == "Numpad1")				return sf::Keyboard::Scancode::Numpad1;		
-	if (str == "Numpad2")				return sf::Keyboard::Scancode::Numpad2;		
-	if (str == "Numpad3")				return sf::Keyboard::Scancode::Numpad3;		
-	if (str == "Numpad4")				return sf::Keyboard::Scancode::Numpad4;		
-	if (str == "Numpad5")				return sf::Keyboard::Scancode::Numpad5;		
-	if (str == "Numpad6")				return sf::Keyboard::Scancode::Numpad6;		
-	if (str == "Numpad7")				return sf::Keyboard::Scancode::Numpad7;		
-	if (str == "Numpad8")				return sf::Keyboard::Scancode::Numpad8;		
-	if (str == "Numpad9")				return sf::Keyboard::Scancode::Numpad9;		
-	if (str == "NumpadDecimal")			return sf::Keyboard::Scancode::NumpadDecimal;	
-	if (str == "NumpadDivide")			return sf::Keyboard::Scancode::NumpadDivide;	
-	if (str == "NumpadEnter")			return sf::Keyboard::Scancode::NumpadEnter;		
-	if (str == "NumpadEqual")			return sf::Keyboard::Scancode::NumpadEqual;	
-	if (str == "NumpadMinus")			return sf::Keyboard::Scancode::NumpadMinus;	
-	if (str == "NumpadMultiply")		return sf::Keyboard::Scancode::NumpadMultiply;	
-	if (str == "NumpadPlus")			return sf::Keyboard::Scancode::NumpadPlus;		
-	if (str == "O")						return sf::Keyboard::Scancode::O;			
-	if (str == "P")						return sf::Keyboard::Scancode::P;			
-	if (str == "PageDown")				return sf::Keyboard::Scancode::PageDown;	
-	if (str == "PageUp")				return sf::Keyboard::Scancode::PageUp;		
-	if (str == "Paste")					return sf::Keyboard::Scancode::Paste;		
-	if (str == "Pause")					return sf::Keyboard::Scancode::Pause;		
-	if (str == "Period")				return sf::Keyboard::Scancode::Period;		
-	if (str == "PrintScreen")			return sf::Keyboard::Scancode::PrintScreen;	
-	if (str == "Q")						return sf::Keyboard::Scancode::Q;				
-	if (str == "R")						return sf::Keyboard::Scancode::R;			
-	if (str == "RAlt")					return sf::Keyboard::Scancode::RAlt;		
+	if (str == "LBracket")				return sf::Keyboard::Scancode::LBracket;
+	if (str == "LControl")				return sf::Keyboard::Scancode::LControl;
+	if (str == "Left")					return sf::Keyboard::Scancode::Left;
+	if (str == "LShift")				return sf::Keyboard::Scancode::LShift;
+	if (str == "LSystem")				return sf::Keyboard::Scancode::LSystem;
+	if (str == "M")						return sf::Keyboard::Scancode::M;
+	if (str == "MediaNextTrack")		return sf::Keyboard::Scancode::MediaNextTrack;
+	if (str == "MediaPlayPause")		return sf::Keyboard::Scancode::MediaPlayPause;
+	if (str == "MediaPreviousTrack")	return sf::Keyboard::Scancode::MediaPreviousTrack;
+	if (str == "MediaStop")				return sf::Keyboard::Scancode::MediaStop;
+	if (str == "Menu")					return sf::Keyboard::Scancode::Menu;
+	if (str == "ModeChange")			return sf::Keyboard::Scancode::ModeChange;
+	if (str == "N")						return sf::Keyboard::Scancode::N;
+	if (str == "NonUsBackslash")		return sf::Keyboard::Scancode::NonUsBackslash;
+	if (str == "Num0")					return sf::Keyboard::Scancode::Num0;
+	if (str == "Num1")					return sf::Keyboard::Scancode::Num1;
+	if (str == "Num2")					return sf::Keyboard::Scancode::Num2;
+	if (str == "Num3")					return sf::Keyboard::Scancode::Num3;
+	if (str == "Num4")					return sf::Keyboard::Scancode::Num4;
+	if (str == "Num5")					return sf::Keyboard::Scancode::Num5;
+	if (str == "Num6")					return sf::Keyboard::Scancode::Num6;
+	if (str == "Num7")					return sf::Keyboard::Scancode::Num7;
+	if (str == "Num8")					return sf::Keyboard::Scancode::Num8;
+	if (str == "Num9")					return sf::Keyboard::Scancode::Num9;
+	if (str == "NumLock")				return sf::Keyboard::Scancode::NumLock;
+	if (str == "Numpad0")				return sf::Keyboard::Scancode::Numpad0;
+	if (str == "Numpad1")				return sf::Keyboard::Scancode::Numpad1;
+	if (str == "Numpad2")				return sf::Keyboard::Scancode::Numpad2;
+	if (str == "Numpad3")				return sf::Keyboard::Scancode::Numpad3;
+	if (str == "Numpad4")				return sf::Keyboard::Scancode::Numpad4;
+	if (str == "Numpad5")				return sf::Keyboard::Scancode::Numpad5;
+	if (str == "Numpad6")				return sf::Keyboard::Scancode::Numpad6;
+	if (str == "Numpad7")				return sf::Keyboard::Scancode::Numpad7;
+	if (str == "Numpad8")				return sf::Keyboard::Scancode::Numpad8;
+	if (str == "Numpad9")				return sf::Keyboard::Scancode::Numpad9;
+	if (str == "NumpadDecimal")			return sf::Keyboard::Scancode::NumpadDecimal;
+	if (str == "NumpadDivide")			return sf::Keyboard::Scancode::NumpadDivide;
+	if (str == "NumpadEnter")			return sf::Keyboard::Scancode::NumpadEnter;
+	if (str == "NumpadEqual")			return sf::Keyboard::Scancode::NumpadEqual;
+	if (str == "NumpadMinus")			return sf::Keyboard::Scancode::NumpadMinus;
+	if (str == "NumpadMultiply")		return sf::Keyboard::Scancode::NumpadMultiply;
+	if (str == "NumpadPlus")			return sf::Keyboard::Scancode::NumpadPlus;
+	if (str == "O")						return sf::Keyboard::Scancode::O;
+	if (str == "P")						return sf::Keyboard::Scancode::P;
+	if (str == "PageDown")				return sf::Keyboard::Scancode::PageDown;
+	if (str == "PageUp")				return sf::Keyboard::Scancode::PageUp;
+	if (str == "Paste")					return sf::Keyboard::Scancode::Paste;
+	if (str == "Pause")					return sf::Keyboard::Scancode::Pause;
+	if (str == "Period")				return sf::Keyboard::Scancode::Period;
+	if (str == "PrintScreen")			return sf::Keyboard::Scancode::PrintScreen;
+	if (str == "Q")						return sf::Keyboard::Scancode::Q;
+	if (str == "R")						return sf::Keyboard::Scancode::R;
+	if (str == "RAlt")					return sf::Keyboard::Scancode::RAlt;
 	if (str == "RBracket")				return sf::Keyboard::Scancode::RBracket;
-	if (str == "RControl")				return sf::Keyboard::Scancode::RControl;	
-	if (str == "Redo")					return sf::Keyboard::Scancode::Redo;		
-	if (str == "Refresh")				return sf::Keyboard::Scancode::Refresh;		
-	if (str == "Right")					return sf::Keyboard::Scancode::Right;		
-	if (str == "RShift")				return sf::Keyboard::Scancode::RShift;	
-	if (str == "RSystem")				return sf::Keyboard::Scancode::RSystem;		
-	if (str == "S")						return sf::Keyboard::Scancode::S;			
+	if (str == "RControl")				return sf::Keyboard::Scancode::RControl;
+	if (str == "Redo")					return sf::Keyboard::Scancode::Redo;
+	if (str == "Refresh")				return sf::Keyboard::Scancode::Refresh;
+	if (str == "Right")					return sf::Keyboard::Scancode::Right;
+	if (str == "RShift")				return sf::Keyboard::Scancode::RShift;
+	if (str == "RSystem")				return sf::Keyboard::Scancode::RSystem;
+	if (str == "S")						return sf::Keyboard::Scancode::S;
 	//if (str == "ScancodeCount")		return sf::Keyboard::Scancode::ScancodeCount;    
-	if (str == "ScrollLock")			return sf::Keyboard::Scancode::ScrollLock;		
-	if (str == "Search")				return sf::Keyboard::Scancode::Search;		
-	if (str == "Select")				return sf::Keyboard::Scancode::Select;		
-	if (str == "Semicolon")				return sf::Keyboard::Scancode::Semicolon;		
-	if (str == "Slash")					return sf::Keyboard::Scancode::Slash;		
-	if (str == "Space")					return sf::Keyboard::Scancode::Space;	
-	if (str == "Stop")					return sf::Keyboard::Scancode::Stop;	
-	if (str == "T")						return sf::Keyboard::Scancode::T;		
-	if (str == "Tab")					return sf::Keyboard::Scancode::Tab;		
-	if (str == "U")						return sf::Keyboard::Scancode::U;		
-	if (str == "Undo")					return sf::Keyboard::Scancode::Undo;	
+	if (str == "ScrollLock")			return sf::Keyboard::Scancode::ScrollLock;
+	if (str == "Search")				return sf::Keyboard::Scancode::Search;
+	if (str == "Select")				return sf::Keyboard::Scancode::Select;
+	if (str == "Semicolon")				return sf::Keyboard::Scancode::Semicolon;
+	if (str == "Slash")					return sf::Keyboard::Scancode::Slash;
+	if (str == "Space")					return sf::Keyboard::Scancode::Space;
+	if (str == "Stop")					return sf::Keyboard::Scancode::Stop;
+	if (str == "T")						return sf::Keyboard::Scancode::T;
+	if (str == "Tab")					return sf::Keyboard::Scancode::Tab;
+	if (str == "U")						return sf::Keyboard::Scancode::U;
+	if (str == "Undo")					return sf::Keyboard::Scancode::Undo;
 	//if (str == "Unknown")				return sf::Keyboard::Scancode::Unknown;
-	if (str == "Up")					return sf::Keyboard::Scancode::Up;		
-	if (str == "V")						return sf::Keyboard::Scancode::V;		
-	if (str == "VolumeDown")			return sf::Keyboard::Scancode::VolumeDown;	
-	if (str == "VolumeMute")			return sf::Keyboard::Scancode::VolumeMute;	
-	if (str == "VolumeUp")				return sf::Keyboard::Scancode::VolumeUp;	
-	if (str == "W")						return sf::Keyboard::Scancode::W;			
-	if (str == "X")						return sf::Keyboard::Scancode::X;		
-	if (str == "Y")						return sf::Keyboard::Scancode::Y;		
+	if (str == "Up")					return sf::Keyboard::Scancode::Up;
+	if (str == "V")						return sf::Keyboard::Scancode::V;
+	if (str == "VolumeDown")			return sf::Keyboard::Scancode::VolumeDown;
+	if (str == "VolumeMute")			return sf::Keyboard::Scancode::VolumeMute;
+	if (str == "VolumeUp")				return sf::Keyboard::Scancode::VolumeUp;
+	if (str == "W")						return sf::Keyboard::Scancode::W;
+	if (str == "X")						return sf::Keyboard::Scancode::X;
+	if (str == "Y")						return sf::Keyboard::Scancode::Y;
 	if (str == "Z")						return sf::Keyboard::Scancode::Z;
 	throw "Unimplemented";
 }

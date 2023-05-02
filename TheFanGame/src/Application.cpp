@@ -22,6 +22,7 @@ void Application::pollEvents() noexcept
 	this->s_StateManager.processStateChange(this->m_window);
 
 	sf::Event event;
+	this->m_InputManager.setEvent(event);
 	while (this->m_window.pollEvent(event))
 	{
 		ImGui::SFML::ProcessEvent(event);

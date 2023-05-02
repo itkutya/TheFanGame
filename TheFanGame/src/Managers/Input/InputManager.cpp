@@ -7,9 +7,14 @@ InputManager::InputManager() noexcept
 		this->m_inputs[i.first] = i.second.value.m_input.get();
 }
 
+void InputManager::setEvent(sf::Event& event)
+{
+	this->m_event = event;
+}
+
 void InputManager::processEvent(sf::Event& event) noexcept
 {
-	this->m_event = &event;
+	this->m_event = event;
 	if (event.type == sf::Event::JoystickConnected)
 		this->m_ConnectedJoystics.emplace_back(event.joystickConnect.joystickId);
 	if (event.type == sf::Event::JoystickDisconnected)
@@ -18,17 +23,17 @@ void InputManager::processEvent(sf::Event& event) noexcept
 				this->m_ConnectedJoystics.erase(it);
 }
 
-const float InputManager::input(const std::string& id) noexcept
+const Input::InputReturnType InputManager::input(const std::string& id) noexcept
 {
-	auto& input = this->m_inputs.at(id);
+	const auto& input = this->m_inputs.at(id);
 	if (input->m_type == InputType::Keyboard || input->m_type == InputType::MouseButton)
 		return input->input();
 	else if (input->m_type == InputType::MouseWheel)
-		return input->input(*this->m_event);
+		return input->input(this->m_event);
 	else if (input->m_type == InputType::JoystickButton || input->m_type == InputType::JoystickAxis)
 		for (const auto& id : this->m_ConnectedJoystics)
 			return input->input(id);
-	return false;
+	return { false };
 }
 
 const std::string InputManager::inputToString(Input* input) noexcept
