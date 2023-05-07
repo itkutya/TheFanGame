@@ -12,10 +12,10 @@ const bool SettingsManager::save(const char* path) noexcept
 	return fm.saveToFile(path, this->m_settings);
 }
 
-SettingsManager::SettingsManager(const char* path) noexcept
+SettingsManager::SettingsManager(const char* path)
 {
-	if (this->m_first && this->load(path))
-		this->m_first = false;
+	if (!this->load(path))
+		throw "Could not load settings!";
 }
 
 const bool SettingsManager::load(const char* path) noexcept

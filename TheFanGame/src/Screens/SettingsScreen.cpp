@@ -137,7 +137,7 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 				ImGui::SameLine();
 				if (ImGui::Button("OK##Change Keybindigs", ImVec2(100.f, 30.f)))
 				{
-					auto& [type, input] = this->s_Settings["Input"][this->m_newKey];
+					auto& [type, input] = this->s_SettingsManager["Input"][this->m_newKey];
 					input.m_input = std::move(this->m_newInput);
 					this->m_newInput = std::make_unique<Input>();
 					this->m_app->m_InputManager.m_inputs[this->m_newKey] = input.m_input.get();
@@ -205,12 +205,12 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 		break;
 		}
 
-		if (ImGui::Button("Save") && !this->s_Settings.save("Settings.ini"))
+		if (ImGui::Button("Save") && !this->s_SettingsManager.save("Settings.ini"))
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to save settings!"));
 		ImGui::SameLine();
 		if (ImGui::Button("Back & Save"))
 		{
-			if (!this->s_Settings.save("Settings.ini"))
+			if (!this->s_SettingsManager.save("Settings.ini"))
 				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to save settings!"));
 			this->close();
 		}

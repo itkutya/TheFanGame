@@ -28,11 +28,13 @@ struct Input
 		bool  m_bool = false;
 		float m_float;
 	};
+
 	[[noreturn]] virtual const InputReturnType input() const						{ throw "Unimplemented"; };
 	[[noreturn]] virtual const InputReturnType input(sf::Event& event) const		{ throw "Unimplemented"; };
 	[[noreturn]] virtual const InputReturnType input(const std::uint32_t id) const	{ throw "Unimplemented"; };
 
-	InputType m_type = InputType::None; 
+	InputType m_type = InputType::None;
+	const bool m_changeable = true;
 };
 
 struct Keyboard : public Input

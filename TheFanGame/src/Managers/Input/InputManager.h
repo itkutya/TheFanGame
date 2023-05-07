@@ -4,12 +4,12 @@
 
 class InputManager : NonCopyable
 {
-	SettingsManager& s_SettingsManager = SettingsManager::getInstance();
+	SettingsManager& s_SettingsManager = SettingsManager::getInstance("Settings.ini");
 public:
 	InputManager() noexcept;
 	~InputManager() noexcept = default;
 
-	void setEvent(sf::Event& event);
+	void setEvent(sf::Event& event) noexcept;
 	void processEvent(sf::Event& event) noexcept;
 
 	[[nodiscard]] const Input::InputReturnType input(const std::string& id) noexcept;

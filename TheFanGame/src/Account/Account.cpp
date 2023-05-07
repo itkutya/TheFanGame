@@ -35,7 +35,7 @@ const bool Account::Login(bool loaduplogin) noexcept
 											std::stof(data[ServerData::XPCAP]));
 			this->m_currency =				std::stoull(data[ServerData::Currency]);
 
-			if (this->m_rememberme && this->m_random && !this->s_Settings.save("Settings.ini"))
+			if (this->m_rememberme && this->m_random && !this->s_SettingsManager.save("Settings.ini"))
 				ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, 3000, "Failed to save settings!"));
 			ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Success, 3000, "Succesfully loged in!"));
 			return true;

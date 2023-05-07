@@ -40,7 +40,7 @@ const bool FileManager::saveToFile(const char* filepath, std::unordered_map<std:
 		{
 			file << '[' << mainbranch.first << ']' << '\n';
 			for (auto& [secondbranch, setting] : data.at(mainbranch.first))
-				file << setting.type << ' ' << secondbranch << ' ' << setting.toString() << '\n';
+				file << setting.m_type << ' ' << secondbranch << ' ' << setting.toString() << '\n';
 		}
 	}
 	file.close();

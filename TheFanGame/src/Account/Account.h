@@ -21,7 +21,7 @@ concept Hashable = requires(T a)
 
 class Account
 {
-    SettingsManager& s_Settings = SettingsManager::getInstance("Settings.ini");
+    SettingsManager& s_SettingsManager = SettingsManager::getInstance("Settings.ini");
 public:
     Account(Account const&) = delete;
     void operator=(Account const&) = delete;
@@ -32,10 +32,10 @@ public:
     const bool Login(bool loaduplogin = false) noexcept;
     const bool Register() noexcept;
 
-    std::string& m_username = this->s_Settings["Account"]["Username"];
+    std::string& m_username = this->s_SettingsManager["Account"]["Username"];
     std::string m_password;
     std::string m_email;
-    bool& m_rememberme = this->s_Settings["Account"]["RememberMe"];
+    bool& m_rememberme = this->s_SettingsManager["Account"]["RememberMe"];
     Experience m_experience;
     std::uint64_t m_currency = 0;
 private:
@@ -43,7 +43,7 @@ private:
 
     template<Hashable T> [[nodiscard]] const std::size_t CreateHashNumber(T& type) const noexcept;
 
-    std::size_t& m_random = this->s_Settings["Account"]["Random"];
+    std::size_t& m_random = this->s_SettingsManager["Account"]["Random"];
 };
 
 template<Hashable T>

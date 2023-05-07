@@ -1,19 +1,15 @@
 #pragma once
 
-#include "Managers/Setting/SettingsManager.h"
 #include "RegisterScreen.h"
 #include "MainScreen.h"
 
-class LoginScreen : public State
+class LoginScreen : public GUIState
 {
 public:
-    LoginScreen(Application* app) noexcept : m_app(app) {};
+    LoginScreen(Application* app) noexcept { this->m_app = app; };
 
     virtual void init(sf::RenderWindow& window) override;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
 private:
     Account& s_Account = Account::getInstance();
-    StateManager& s_StateManager = StateManager::getInstance();
-
-    Application* m_app;
 };

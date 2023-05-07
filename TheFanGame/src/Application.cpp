@@ -4,7 +4,7 @@ Application::Application(const std::string& title) noexcept : m_title(title)
 {
 	this->recreateWindow();
 	ImGui::SFML::Init(this->m_window);
-	this->s_StateManager.add<Menu>(this);
+	this->m_StateManager.add<Menu>(this);
 }
 
 Application::~Application() noexcept
@@ -19,7 +19,7 @@ sf::RenderWindow& Application::getWindow() noexcept
 
 void Application::pollEvents() noexcept
 {
-	this->s_StateManager.processStateChange(this->m_window);
+	this->m_StateManager.processStateChanges(this->m_window);
 
 	sf::Event event;
 	this->m_InputManager.setEvent(event);
@@ -34,7 +34,7 @@ void Application::pollEvents() noexcept
 			this->m_size = sf::VideoMode({ event.size.width, event.size.height });
 
 		this->m_InputManager.processEvent(event);
-		this->s_StateManager.getCurrentState()->processEvent(event);
+		this->m_StateManager.getCurrentState()->processEvent(event);
 	}
 }
 
@@ -58,13 +58,13 @@ void Application::update() noexcept
 			ImGui::TextColored(ImVec4(0, 0, 1, 1), "%.2f fps (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 		}ImGui::End();
 	}
-	this->s_StateManager.getCurrentState()->update(this->m_window, dt);
+	this->m_StateManager.getCurrentState()->update(this->m_window, dt);
 }
 
 void Application::draw() noexcept
 {
 	this->m_window.clear();
-	this->s_StateManager.getCurrentState()->draw(this->m_window);
+	this->m_StateManager.getCurrentState()->draw(this->m_window);
 	ImGui::SFML::Render(this->m_window);
 	this->m_window.display();
 }

@@ -7,7 +7,9 @@
 
 #include "imgui.h"
 #include "imgui_stdlib.h"
-#include "SFML/Graphics.hpp"
+#include "SFML/Graphics/RenderWindow.hpp"
+
+#include "Utility.h"
 
 class Application;
 
@@ -16,75 +18,79 @@ class State
 public:
     State() noexcept = default;
     virtual ~State() noexcept = default;
-    virtual void init(sf::RenderWindow& window) {};
-    virtual void processEvent(sf::Event& event) noexcept {};
-    virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept {};
-    virtual void draw(sf::RenderWindow& window) noexcept {};
+    virtual void init(sf::RenderWindow& window) = 0;
+    virtual void processEvent(sf::Event& event) noexcept = 0;
+    virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept = 0;
+    virtual void draw(sf::RenderWindow& window) noexcept = 0;
+
+    Application* m_app = nullptr;
 };
 
-class StateManager
+class GUIState : public State
 {
 public:
-    StateManager(StateManager const&) = delete;
-    void operator=(StateManager const&) = delete;
-    virtual ~StateManager() noexcept = default;
+    GUIState() noexcept = default;
+    virtual ~GUIState() noexcept = default;
+    virtual void init(sf::RenderWindow& window) override {};
+    virtual void processEvent(sf::Event& event) noexcept override {};
+    virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override {};
+    virtual void draw(sf::RenderWindow& window) noexcept override {};
+};
 
-    [[nodiscard]] static StateManager& getInstance();
+class StateManager : NonCopyable
+{
+    typedef std::unique_ptr<State> UState;
+    typedef std::unique_ptr<GUIState> UGUIState;
+public:
+    StateManager() noexcept = default;
+    ~StateManager() noexcept = default;
 
     template<typename T> void add(Application* app = nullptr, bool replace = false) noexcept;
     template<typename T> void addGUIState(Application* app = nullptr, bool replace = false) noexcept;
 
-    void removeLastGUIState() noexcept;
-    void popCurrent() noexcept;
+    void popCurrentGUIState() noexcept;
+    void popCurrentState() noexcept;
 
-    void processStateChange(sf::RenderWindow& window) noexcept;
+    void processStateChanges(sf::RenderWindow& window) noexcept;
 
     [[nodiscard]] const std::unique_ptr<State>& getCurrentState() const noexcept;
-    [[nodiscard]] const std::vector<std::unique_ptr<State>>& getCurrentGUIState() noexcept;
+    [[nodiscard]] const std::vector<UGUIState>& getCurrentGUIStates() noexcept;
     [[nodiscard]] const std::size_t getSize() const noexcept;
 private:
-    StateManager() noexcept = default;
-
-    std::stack<std::pair<std::unique_ptr<State>, std::vector<std::unique_ptr<State>>>> m_statestack;
+    std::stack<std::pair<UState, std::vector<UGUIState>>> m_stack;
     
-    std::unique_ptr<State> m_newstate;
-    bool m_add = false;
-    bool m_replace = false;
-    bool m_remove = false;
+    UState m_newState;
+    bool m_addState = false;
+    bool m_replaceState = false;
+    bool m_removeState = false;
 
-    std::unique_ptr<State> m_newGUIstate;
-    bool m_addGUI = false;
-    bool m_replaceGUI = false;
-    bool m_removeGUI = false;
+    UGUIState m_newGUIState;
+    bool m_addGUIState = false;
+    bool m_replaceGUIState = false;
+    bool m_removeGUIState = false;
 };
 
 template<typename T>
 inline void StateManager::add(Application* app, bool replace) noexcept
 {
-    this->m_add = true;
-    this->m_replace = replace;
-    this->m_newstate = std::make_unique<T>(app);
+    this->m_addState = true;
+    this->m_replaceState = replace;
+    this->m_newState = std::make_unique<T>(app);
 }
 
 template<typename T>
 inline void StateManager::addGUIState(Application* app, bool replace) noexcept
 {
-    this->m_addGUI = true;
-    this->m_replaceGUI = replace;
-    this->m_newGUIstate = std::make_unique<T>(app);
+    this->m_addGUIState = true;
+    this->m_replaceGUIState = replace;
+    this->m_newGUIState = std::make_unique<T>(app);
 }
 
-class PopUpState
+class PopupGUIState : public GUIState
 {
 public:
     bool m_once = true;
     bool m_open = false;
 
-    virtual inline void close() noexcept
-    {
-        ImGui::CloseCurrentPopup();
-        this->s_StateManager->removeLastGUIState();
-    };
-protected:
-    StateManager* s_StateManager = &StateManager::getInstance();
+    virtual void close() noexcept;
 };

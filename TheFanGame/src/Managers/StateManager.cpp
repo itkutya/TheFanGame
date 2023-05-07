@@ -1,73 +1,75 @@
 #include "StateManager.h"
 
-StateManager& StateManager::getInstance()
+#include "Application.h"
+
+void StateManager::popCurrentGUIState() noexcept
 {
-	static StateManager instance;
-	return instance;
+    this->m_removeGUIState = true;
 }
 
-void StateManager::removeLastGUIState() noexcept
+void StateManager::popCurrentState() noexcept
 {
-    this->m_removeGUI = true;
+    this->m_removeState = true;
 }
 
-void StateManager::popCurrent() noexcept
+void StateManager::processStateChanges(sf::RenderWindow& window) noexcept
 {
-	this->m_remove = true;
-}
-
-void StateManager::processStateChange(sf::RenderWindow& window) noexcept
-{
-    if (this->m_remove && this->m_statestack.size())
+    if (this->m_removeState && this->m_stack.size())
     {
-        this->m_remove = false;
-        this->m_statestack.pop();
+        this->m_removeState = false;
+        this->m_stack.pop();
     }
 
-    if (this->m_add)
+    if (this->m_addState)
     {
-        if (this->m_replace && this->m_statestack.size())
+        if (this->m_replaceState && this->m_stack.size())
         {
-            this->m_replace = false;
-            this->m_statestack.pop();
+            this->m_replaceState = false;
+            this->m_stack.pop();
         }
 
-        this->m_add = false;
-        auto& newState = this->m_statestack.emplace(std::make_pair(std::move(this->m_newstate), std::vector<std::unique_ptr<State>>()));
+        this->m_addState = false;
+        const auto& newState = this->m_stack.emplace(std::make_pair(std::move(this->m_newState), std::vector<StateManager::UGUIState>()));
         newState.first->init(window);
     }
 
-    if (this->m_statestack.top().second.size() && this->m_removeGUI)
+    if (this->m_removeGUIState && this->m_stack.top().second.size())
     {
-        this->m_removeGUI = false;
-        this->m_statestack.top().second.pop_back();
+        this->m_removeGUIState = false;
+        this->m_stack.top().second.pop_back();
     }
 
-    if (this->m_addGUI)
+    if (this->m_addGUIState)
     {
-        if (this->m_statestack.top().second.size() && this->m_replaceGUI)
+        if (this->m_replaceGUIState && this->m_stack.top().second.size())
         {
-            this->m_replaceGUI = false;
-            this->m_statestack.top().second.pop_back();
+            this->m_replaceGUIState = false;
+            this->m_stack.top().second.pop_back();
         }
 
-        this->m_addGUI = false;
-        auto& newState = this->m_statestack.top().second.emplace_back(std::move(this->m_newGUIstate));
+        this->m_addGUIState = false;
+        const auto& newState = this->m_stack.top().second.emplace_back(std::move(this->m_newGUIState));
         newState->init(window);
     }
 }
 
 const std::unique_ptr<State>& StateManager::getCurrentState() const noexcept
 {
-	return this->m_statestack.top().first;
+	return this->m_stack.top().first;
 }
 
-const std::vector<std::unique_ptr<State>>& StateManager::getCurrentGUIState() noexcept
+const std::vector<StateManager::UGUIState>& StateManager::getCurrentGUIStates() noexcept
 {
-    return this->m_statestack.top().second;
+    return this->m_stack.top().second;
 }
 
 const std::size_t StateManager::getSize() const noexcept
 {
-	return this->m_statestack.size();
+	return this->m_stack.size();
+}
+
+void PopupGUIState::close() noexcept
+{
+    ImGui::CloseCurrentPopup();
+    this->m_app->m_StateManager.popCurrentGUIState();
 }

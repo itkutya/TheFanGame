@@ -5,8 +5,7 @@
 
 class Application
 {
-	StateManager& s_StateManager = StateManager::getInstance();
-	SettingsManager& s_Settings_Manager = SettingsManager::getInstance();
+	SettingsManager& s_SettingsManager = SettingsManager::getInstance("Settings.ini");
 public:
 	explicit Application(const std::string& title) noexcept;
 	virtual ~Application() noexcept;
@@ -20,14 +19,15 @@ public:
 	void recreateWindow();
 
 	std::vector<sf::VideoMode> m_videomodes = sf::VideoMode::getFullscreenModes();
-	int& m_videomode = this->s_Settings_Manager["Setting"]["VideoMode"];
+	int& m_videomode = this->s_SettingsManager["Setting"]["VideoMode"];
 	sf::VideoMode m_size = this->m_videomodes[this->m_videomode];
-	bool& m_fullscreen = this->s_Settings_Manager["Setting"]["Fullscreen"];
-	int& m_fpslimit = this->s_Settings_Manager["Setting"]["FPSLimit"];
-	bool& m_fps = this->s_Settings_Manager["Setting"]["FPS"];
-	bool& m_showfps = this->s_Settings_Manager["Setting"]["ShowFPS"];
-	bool& m_vsync = this->s_Settings_Manager["Setting"]["Vsync"];
+	bool& m_fullscreen = this->s_SettingsManager["Setting"]["Fullscreen"];
+	int& m_fpslimit = this->s_SettingsManager["Setting"]["FPSLimit"];
+	bool& m_fps = this->s_SettingsManager["Setting"]["FPS"];
+	bool& m_showfps = this->s_SettingsManager["Setting"]["ShowFPS"];
+	bool& m_vsync = this->s_SettingsManager["Setting"]["Vsync"];
 	
+	StateManager m_StateManager;
 	InputManager m_InputManager;
 private:
 	sf::RenderWindow m_window;

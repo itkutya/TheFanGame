@@ -4,10 +4,10 @@ InputManager::InputManager() noexcept
 {
 	auto& input = this->s_SettingsManager["Input"];
 	for (const auto& i : input)
-		this->m_inputs[i.first] = i.second.value.m_input.get();
+		this->m_inputs[i.first] = i.second.m_value.m_input.get();
 }
 
-void InputManager::setEvent(sf::Event& event)
+void InputManager::setEvent(sf::Event& event) noexcept
 {
 	this->m_event = event;
 }
