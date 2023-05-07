@@ -17,19 +17,20 @@ struct Input
 {
 	union InputReturnType
 	{
-		explicit operator bool() const noexcept { return this->m_bool;  };
+		operator bool()  const noexcept { return this->m_bool;  };
+		operator float() const noexcept { return this->m_float; };
 
-		const bool operator>(float rhs) const  { return this->m_float > rhs ?  true : false; };
-		const bool operator<(float rhs) const  { return this->m_float < rhs ?  true : false; };
-		const bool operator==(float rhs) const { return this->m_float == rhs ? true : false; };
-		const bool operator!=(float rhs) const { return this->m_float != rhs ? true : false; };
+		const bool operator>(float rhs)  const noexcept { return this->m_float >  rhs  ? true : false; };
+		const bool operator<(float rhs)  const noexcept { return this->m_float <  rhs  ? true : false; };
+		const bool operator==(float rhs) const noexcept { return this->m_float == rhs  ? true : false; };
+		const bool operator!=(float rhs) const noexcept { return this->m_float != rhs  ? true : false; };
 
 		bool  m_bool = false;
 		float m_float;
 	};
-	[[noreturn]] virtual const InputReturnType input() const									{ throw "Unimplemented"; };
-	[[noreturn]] virtual const InputReturnType input(sf::Event& event) const					{ throw "Unimplemented"; };
-	[[noreturn]] virtual const InputReturnType input(const std::uint32_t id) const				{ throw "Unimplemented"; };
+	[[noreturn]] virtual const InputReturnType input() const						{ throw "Unimplemented"; };
+	[[noreturn]] virtual const InputReturnType input(sf::Event& event) const		{ throw "Unimplemented"; };
+	[[noreturn]] virtual const InputReturnType input(const std::uint32_t id) const	{ throw "Unimplemented"; };
 
 	InputType m_type = InputType::None; 
 };
