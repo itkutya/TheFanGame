@@ -1,8 +1,6 @@
 #pragma once
 
-#include <string>
 #include <functional>
-#include <fstream>
 
 #include "SFML/Network.hpp"
 #include "imgui.h"
@@ -19,12 +17,10 @@ concept Hashable = requires(T a)
     { std::hash<T>{}(a) } -> std::convertible_to<std::size_t>;
 };
 
-class Account
+class Account : NonCopyable
 {
     SettingsManager& s_SettingsManager = SettingsManager::getInstance("Settings.ini");
 public:
-    Account(Account const&) = delete;
-    void operator=(Account const&) = delete;
     virtual ~Account() noexcept = default;
 
     [[nodiscard]] static Account& getInstance();

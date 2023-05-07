@@ -21,8 +21,7 @@ bool AudioManager::replaceCurrentMusic(const std::string_view title) noexcept
 		return true;
 	}
 	this->m_CurrentMusic = nullptr;
-	if (!this->s_ResourceManager.remove<sf::Music>(title))
-		std::printf("Failed to deallocate Music memory!");
+	this->s_ResourceManager.remove<sf::Music>(title);
 	return false;
 }
 
@@ -38,7 +37,6 @@ bool AudioManager::addSoundEffect(const std::string_view title) noexcept
 	}
 	this->m_SoundEffects[title] = nullptr;
 	this->m_SoundEffects.erase(title);
-	if (!this->s_ResourceManager.remove<ResourceManager::AudioObject>(title))
-		std::printf("Failed to deallocate AudioObject memory!");
+	this->s_ResourceManager.remove<ResourceManager::AudioObject>(title);
 	return false;
 }

@@ -2,6 +2,6 @@
 
 ResourceManager& ResourceManager::getInstance()
 {
-    static ResourceManager instance;
-    return instance;
+	static ResourceManager instance;
+	return instance;
 }

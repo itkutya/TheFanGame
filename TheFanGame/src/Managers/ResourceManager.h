@@ -8,7 +8,9 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/Audio.hpp"
 
-class ResourceManager
+#include "Utility.h"
+
+class ResourceManager : NonCopyable
 {
 public:
     struct Object
@@ -28,18 +30,16 @@ public:
                          std::unique_ptr<AudioObject>>
     Resources;
 
-    ResourceManager(ResourceManager const&) = delete;
-    void operator=(ResourceManager const&) = delete;
-    virtual ~ResourceManager() noexcept = default;
+    ~ResourceManager() noexcept = default;
 
     [[nodiscard]] static ResourceManager& getInstance();
     
     template<class T> T* add(const std::string_view id) noexcept;
-    template<class T> [[nodiscard]] bool load(const std::string_view id, const char* path) noexcept;
-    template<class T> [[nodiscard]] bool remove(const std::string_view id) noexcept;
+    template<class T> void remove(const std::string_view id) noexcept;
     template<class T> [[nodiscard]] T* get(const std::string_view id) noexcept;
 private:
     ResourceManager() noexcept = default;
+
     std::unordered_map<std::string_view, Resources> m_resources;
 };
 
@@ -51,31 +51,9 @@ inline T* ResourceManager::add(const std::string_view id) noexcept
 }
 
 template<class T>
-inline bool ResourceManager::load(const std::string_view id, const char* path) noexcept
+inline void ResourceManager::remove(const std::string_view id) noexcept
 {
-    if constexpr (requires { T().loadFromFile(path); })
-    {
-        if (std::get<std::unique_ptr<T>>(this->m_resources.at(id))->loadFromFile(path))
-            return true;
-    }
-    else if constexpr (requires { T().openFromFile(path); })
-    {
-        if (std::get<std::unique_ptr<T>>(this->m_resources.at(id))->openFromFile(path))
-            return true;
-    }
-    return false;
-}
-
-template<class T>
-inline bool ResourceManager::remove(const std::string_view id) noexcept
-{
-    if (std::get<std::unique_ptr<T>>(this->m_resources.at(id)) != nullptr)
-    {
-        std::get<std::unique_ptr<T>>(this->m_resources.at(id)).reset();
-        this->m_resources.erase(id);
-        return true;
-    }
-    return false;
+    this->m_resources.erase(id);
 }
 
 template<class T>
