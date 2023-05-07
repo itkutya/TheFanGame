@@ -4,7 +4,7 @@ Application::Application(const std::string& title) noexcept : m_title(title)
 {
 	this->recreateWindow();
 	ImGui::SFML::Init(this->m_window);
-	this->m_StateManager.add<Menu>(this);
+	this->m_StateManager.addState<Menu>(this);
 }
 
 Application::~Application() noexcept

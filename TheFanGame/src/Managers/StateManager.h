@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 #include <stack>
+#include <type_traits>
 
 #include "imgui.h"
 #include "imgui_stdlib.h"
@@ -18,6 +19,7 @@ class State
 public:
     State() noexcept = default;
     virtual ~State() noexcept = default;
+
     virtual void init(sf::RenderWindow& window) = 0;
     virtual void processEvent(sf::Event& event) noexcept = 0;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept = 0;
@@ -26,15 +28,30 @@ public:
     Application* m_app = nullptr;
 };
 
-class GUIState : public State
+class GUIState
 {
 public:
     GUIState() noexcept = default;
     virtual ~GUIState() noexcept = default;
-    virtual void init(sf::RenderWindow& window) override {};
-    virtual void processEvent(sf::Event& event) noexcept override {};
-    virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override {};
-    virtual void draw(sf::RenderWindow& window) noexcept override {};
+
+    virtual void init(sf::RenderWindow& window) {};
+    virtual void processEvent(sf::Event& event) noexcept {};
+    virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept {};
+    virtual void draw(sf::RenderWindow& window) noexcept {};
+
+    Application* m_app = nullptr;
+};
+
+template<class T>
+concept IState = requires(T a)
+{
+    std::is_base_of<State, T>{};
+};
+
+template<class T>
+concept IGUIState = requires(T a)
+{
+    std::is_base_of<GUIState, T>{};
 };
 
 class StateManager : NonCopyable
@@ -45,8 +62,8 @@ public:
     StateManager() noexcept = default;
     ~StateManager() noexcept = default;
 
-    template<typename T> void add(Application* app = nullptr, bool replace = false) noexcept;
-    template<typename T> void addGUIState(Application* app = nullptr, bool replace = false) noexcept;
+    template<IState T>    void addState(Application* app = nullptr, bool replace = false) noexcept;
+    template<IGUIState T> void addGUIState(Application* app = nullptr, bool replace = false) noexcept;
 
     void popCurrentGUIState() noexcept;
     void popCurrentState() noexcept;
@@ -70,15 +87,15 @@ private:
     bool m_removeGUIState = false;
 };
 
-template<typename T>
-inline void StateManager::add(Application* app, bool replace) noexcept
+template<IState T>
+inline void StateManager::addState(Application* app, bool replace) noexcept
 {
     this->m_addState = true;
     this->m_replaceState = replace;
     this->m_newState = std::make_unique<T>(app);
 }
 
-template<typename T>
+template<IGUIState T>
 inline void StateManager::addGUIState(Application* app, bool replace) noexcept
 {
     this->m_addGUIState = true;

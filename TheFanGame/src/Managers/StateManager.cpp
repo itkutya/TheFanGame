@@ -39,7 +39,7 @@ void StateManager::processStateChanges(sf::RenderWindow& window) noexcept
         this->m_stack.top().second.pop_back();
     }
 
-    if (this->m_addGUIState)
+    if (this->m_addGUIState && this->m_stack.size())
     {
         if (this->m_replaceGUIState && this->m_stack.top().second.size())
         {
