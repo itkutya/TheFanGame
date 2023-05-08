@@ -17,14 +17,15 @@ concept Hashable = requires(T a)
     { std::hash<T>{}(a) } -> std::convertible_to<std::size_t>;
 };
 
-class Account : NonCopyable
+class Account : public Singleton<Account>
 {
-    SettingsManager& s_SettingsManager = SettingsManager::getInstance("Settings.ini");
+    friend class Singleton<Account>;
+
+    SettingsManager& s_SettingsManager = SettingsManager::getInstance();
+protected:
+    Account() noexcept = default;
+    ~Account() noexcept = default;
 public:
-    virtual ~Account() noexcept = default;
-
-    [[nodiscard]] static Account& getInstance();
-
     const bool Login(bool loaduplogin = false) noexcept;
     const bool Register() noexcept;
 
@@ -35,8 +36,6 @@ public:
     Experience m_experience;
     std::uint64_t m_currency = 0;
 private:
-    Account() noexcept = default;
-
     template<Hashable T> [[nodiscard]] const std::size_t CreateHashNumber(T& type) const noexcept;
 
     std::size_t& m_random = this->s_SettingsManager["Account"]["Random"];

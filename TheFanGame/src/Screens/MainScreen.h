@@ -5,9 +5,10 @@
 
 class MainScreen : public GUIState
 {
-    Account& s_Account = Account::getInstance();
     ResourceManager& s_ResourceManager = ResourceManager::getInstance();
     AudioManager& s_AudioManager = AudioManager::getInstance();
+    StateManager& s_StateManager = StateManager::getInstance();
+    Account& s_Account = Account::getInstance();
 public:
     MainScreen(Application* app) noexcept { this->m_app = app; };
 

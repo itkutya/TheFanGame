@@ -5,6 +5,7 @@
 class Menu : public State
 {
     ResourceManager& s_ResourceManager = ResourceManager::getInstance();
+    StateManager& s_StateManager = StateManager::getInstance();
 public:
     Menu(Application* app) noexcept { this->m_app = app; };
 

@@ -1,22 +1,11 @@
 ﻿#include "ShopScreen.h"
 
-void ShopScreen::init(sf::RenderWindow& window)
-{
-	this->m_open = true;
-}
-
 void ShopScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
-	if (this->m_once)
-	{
-		ImGui::OpenPopup("Shop");
-		this->m_once = false;
-	}
-
 	constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
 	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 	ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-	if (ImGui::BeginPopupModal("Shop", &this->m_open, flags))
+	if (ImGui::BeginPopupModal(this->m_name, &this->m_open, flags))
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f));

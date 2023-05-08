@@ -13,18 +13,18 @@ void Menu::init(sf::RenderWindow& window)
 		this->m_BackgroundImage->Sprite.setPosition(sf::Vector2f({ 0.f, 0.f }));
 	}
 
-	this->m_app->m_StateManager.addGUIState<LoginScreen>(this->m_app);
+	this->s_StateManager.addGUIState<LoginScreen>(this->m_app);
 }
 
 void Menu::processEvent(sf::Event& event) noexcept
 {
-	for (const auto& state : this->m_app->m_StateManager.getCurrentGUIStates())
+	for (const auto& state : this->s_StateManager.getCurrentGUIStates())
 		state->processEvent(event);
 }
 
 void Menu::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
-	for (const auto& state : this->m_app->m_StateManager.getCurrentGUIStates())
+	for (const auto& state : this->s_StateManager.getCurrentGUIStates())
 		state->update(window, dt);
 }
 
@@ -32,7 +32,7 @@ void Menu::draw(sf::RenderWindow& window) noexcept
 {
 	window.draw(this->m_BackgroundImage->Sprite);
 
-	for (const auto& state : this->m_app->m_StateManager.getCurrentGUIStates())
+	for (const auto& state : this->s_StateManager.getCurrentGUIStates())
 		state->draw(window);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 5.f);

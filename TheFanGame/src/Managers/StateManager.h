@@ -14,7 +14,7 @@
 
 class Application;
 
-class State
+class State : public NonCopyable
 {
 public:
     State() noexcept = default;
@@ -28,7 +28,7 @@ public:
     Application* m_app = nullptr;
 };
 
-class GUIState
+class GUIState : public NonCopyable
 {
 public:
     GUIState() noexcept = default;
@@ -54,14 +54,16 @@ concept IGUIState = requires(T a)
     std::is_base_of<GUIState, T>{};
 };
 
-class StateManager : NonCopyable
+class StateManager : public Singleton<StateManager>
 {
+    friend class Singleton<StateManager>;
+
     typedef std::unique_ptr<State> UState;
     typedef std::unique_ptr<GUIState> UGUIState;
-public:
+protected:
     StateManager() noexcept = default;
     ~StateManager() noexcept = default;
-
+public:
     template<IState T>    void addState(Application* app = nullptr, bool replace = false) noexcept;
     template<IGUIState T> void addGUIState(Application* app = nullptr, bool replace = false) noexcept;
 
@@ -108,6 +110,25 @@ class PopupGUIState : public GUIState
 public:
     bool m_once = true;
     bool m_open = false;
+    const char* m_name = "###";
 
-    virtual void close() noexcept;
+    virtual inline void init(sf::RenderWindow& window) override
+    {
+        this->m_open = true;
+    }
+
+    virtual inline void draw(sf::RenderWindow& window) noexcept override
+    {
+        if (this->m_once)
+        {
+            ImGui::OpenPopup(this->m_name);
+            this->m_once = false;
+        }
+    }
+
+    virtual inline void close() noexcept
+    {
+        ImGui::CloseCurrentPopup();
+        StateManager::getInstance().popCurrentGUIState();
+    }
 };

@@ -1,11 +1,5 @@
 #include "AudioManager.h"
 
-AudioManager& AudioManager::getInstance()
-{
-	static AudioManager instance;
-	return instance;
-}
-
 bool AudioManager::replaceCurrentMusic(const std::string_view title) noexcept
 {
 	if (this->m_CurrentMusic)

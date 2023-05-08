@@ -1,7 +1,5 @@
 #include "StateManager.h"
 
-#include "Application.h"
-
 void StateManager::popCurrentGUIState() noexcept
 {
     this->m_removeGUIState = true;
@@ -66,10 +64,4 @@ const std::vector<StateManager::UGUIState>& StateManager::getCurrentGUIStates() 
 const std::size_t StateManager::getSize() const noexcept
 {
 	return this->m_stack.size();
-}
-
-void PopupGUIState::close() noexcept
-{
-    ImGui::CloseCurrentPopup();
-    this->m_app->m_StateManager.popCurrentGUIState();
 }

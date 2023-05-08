@@ -1,21 +1,14 @@
 #include "SettingsManager.h"
 
-SettingsManager& SettingsManager::getInstance(const char* path)
+SettingsManager::SettingsManager()
 {
-	static SettingsManager instance(path);
-	return instance;
+	if (!this->load("Settings.ini")) throw "Could not load settings!";
 }
 
 const bool SettingsManager::save(const char* path) noexcept
 {
 	FileManager fm;
 	return fm.saveToFile(path, this->m_settings);
-}
-
-SettingsManager::SettingsManager(const char* path)
-{
-	if (!this->load(path))
-		throw "Could not load settings!";
 }
 
 const bool SettingsManager::load(const char* path) noexcept

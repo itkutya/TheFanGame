@@ -2,21 +2,20 @@
 
 #include "Managers/FileManager.h"
 
-class SettingsManager : NonCopyable
+class SettingsManager : public Singleton<SettingsManager>
 {
+	friend class Singleton<SettingsManager>;
+
 	typedef std::unordered_map<std::string, Setting> secondBranch;
 	typedef std::string mainBranch;
-public:
+protected:
+	SettingsManager();
 	~SettingsManager() noexcept = default;
-
+public:
 	[[nodiscard]] auto& operator[](const std::string id) noexcept { return this->m_settings.at(id); };
 
-	[[nodiscard]] static SettingsManager& getInstance(const char* path);
 	[[nodiscard]] const bool save(const char* path) noexcept;
-private:
-	explicit SettingsManager(const char* path);
-
 	[[nodiscard]] const bool load(const char* path) noexcept;
-
+private:
 	std::unordered_map<mainBranch, secondBranch> m_settings;
 };

@@ -5,7 +5,9 @@
 
 class Application
 {
-	SettingsManager& s_SettingsManager = SettingsManager::getInstance("Settings.ini");
+	SettingsManager& s_SettingsManager = SettingsManager::getInstance();
+	StateManager& s_StateManager = StateManager::getInstance();
+	InputManager& s_InputManager = InputManager::getInstance();
 public:
 	explicit Application(const std::string& title) noexcept;
 	virtual ~Application() noexcept;
@@ -26,9 +28,6 @@ public:
 	bool& m_fps = this->s_SettingsManager["Setting"]["FPS"];
 	bool& m_showfps = this->s_SettingsManager["Setting"]["ShowFPS"];
 	bool& m_vsync = this->s_SettingsManager["Setting"]["Vsync"];
-	
-	StateManager m_StateManager;
-	InputManager m_InputManager;
 private:
 	sf::RenderWindow m_window;
 	sf::Clock m_deltatime;

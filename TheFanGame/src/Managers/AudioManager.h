@@ -6,17 +6,16 @@
 #include "Setting/SettingsManager.h"
 #include "ResourceManager.h"
 
-class AudioManager
+class AudioManager : public Singleton<AudioManager>
 {
+    friend class Singleton<AudioManager>;
+
     ResourceManager& s_ResourceManager = ResourceManager::getInstance();
-    SettingsManager& s_SettingsManager = SettingsManager::getInstance("Settings.ini");
+    SettingsManager& s_SettingsManager = SettingsManager::getInstance();
+protected:
+    ~AudioManager() noexcept = default;
+    AudioManager() noexcept = default;
 public:
-    AudioManager(AudioManager const&) = delete;
-    void operator=(AudioManager const&) = delete;
-    virtual ~AudioManager() noexcept = default;
-
-    [[nodiscard]] static AudioManager& getInstance();
-
     [[nodiscard]] bool replaceCurrentMusic(const std::string_view title) noexcept;
     [[nodiscard]] bool addSoundEffect(const std::string_view title) noexcept;
 
@@ -26,10 +25,8 @@ public:
     std::unordered_map<std::string_view, ResourceManager::AudioObject*> m_SoundEffects;
     //TODO:
     //std::unordered_map<std::string, std::shared_ptr<ResourceManager::AudioObject>> m_3DSoundEffects;
-
     float& m_musicvolume = this->s_SettingsManager["Audio"]["MusicVolume"];
     float m_sfxvolume = 20.f;
     float m_gamevolume = 20.f;
 private:
-    AudioManager() noexcept = default;
 };

@@ -1,10 +1,5 @@
 #include "SettingsScreen.h"
 
-void SettingsScreen::init(sf::RenderWindow& window)
-{
-	this->m_open = true;
-}
-
 void SettingsScreen::processEvent(sf::Event& event) noexcept
 {
 	if ((event.type == sf::Event::KeyPressed										 || 
@@ -14,22 +9,16 @@ void SettingsScreen::processEvent(sf::Event& event) noexcept
 		 event.type == sf::Event::JoystickMoved)									 &&
 		 this->m_KeyBindingsPopUp)
 	{
-		this->m_newInput = std::move(this->m_app->m_InputManager.getAnyInput(event));
+		this->m_newInput = std::move(this->s_InputManager.getAnyInput(event));
 	}
 }
 
 void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
-	if (this->m_once)
-	{
-		ImGui::OpenPopup("Settings");
-		this->m_once = false;
-	}
-
 	static constexpr ImGuiWindowFlags s_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
 	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 	ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-	if (ImGui::BeginPopupModal("Settings", &this->m_open, s_flags))
+	if (ImGui::BeginPopupModal(this->m_name, &this->m_open, s_flags))
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f));
@@ -111,11 +100,11 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 		break;
 		case SETTINGS_STATE::INPUT:
 		{
-			for (auto& it : this->m_app->m_InputManager.m_inputs)
+			for (auto& it : this->s_InputManager.m_inputs)
 			{
 				ImGui::Text(it.first.c_str());
 				ImGui::SameLine();
-				if (ImGui::Button(this->m_app->m_InputManager.inputToString(it.second).c_str(), ImVec2(300.f, 30.f)))
+				if (ImGui::Button(this->s_InputManager.inputToString(it.second).c_str(), ImVec2(300.f, 30.f)))
 				{
 					this->m_KeyBindingsPopUp = true;
 					this->m_newKey = it.first;
@@ -125,8 +114,8 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 				ImGui::OpenPopup("Change Keybindigs");
 			if (ImGui::BeginPopupModal("Change Keybindigs", &this->m_KeyBindingsPopUp, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
 			{
-				std::string text = "Change [" + this->m_app->m_InputManager.inputToString(this->m_app->m_InputManager.m_inputs[this->m_newKey]) 
-					+ "] to [" + this->m_app->m_InputManager.inputToString(this->m_newInput.get()) + "]";
+				std::string text = "Change [" + this->s_InputManager.inputToString(this->s_InputManager.m_inputs[this->m_newKey]) 
+					+ "] to [" + this->s_InputManager.inputToString(this->m_newInput.get()) + "]";
 				ImGui::Text(text.c_str(), ImVec4(1, 0, 0, 1));
 
 				if (ImGui::Button("Cancel##Change Keybindigs", ImVec2(100.f, 30.f)))
@@ -140,7 +129,7 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 					auto& [type, input] = this->s_SettingsManager["Input"][this->m_newKey];
 					input.m_input = std::move(this->m_newInput);
 					this->m_newInput = std::make_unique<Input>();
-					this->m_app->m_InputManager.m_inputs[this->m_newKey] = input.m_input.get();
+					this->s_InputManager.m_inputs[this->m_newKey] = input.m_input.get();
 					if (input.m_input->m_type == InputType::Keyboard)
 						type = "Keyboard";
 					else if (input.m_input->m_type == InputType::MouseButton)

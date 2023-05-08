@@ -10,14 +10,17 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/Network.hpp"
 
-class CharactersManager
+#include "Utility.h"
+
+class CharactersManager : public Singleton<CharactersManager>
 {
-    class Character
+    friend class Singleton<CharactersManager>;
+
+    struct Character
     {
-    public:
         Character() noexcept = default;
         Character(std::string name, std::uint32_t atk, std::uint32_t def) noexcept : m_Name(std::move(name)), m_ATK(atk), m_DEF(def) {};
-        virtual ~Character() noexcept = default;
+        ~Character() noexcept = default;
 
         std::string m_Name = "";
         std::uint32_t m_ATK = 0;
@@ -28,15 +31,7 @@ class CharactersManager
         sf::Texture m_Icon;
         std::uint64_t m_Price = 0;
     };
-public:
-    CharactersManager(CharactersManager const&) = delete;
-    void operator=(CharactersManager const&) = delete;
-    virtual ~CharactersManager() noexcept = default;
-
-    [[nodiscard]] static CharactersManager& getInstance();
-
-    std::unordered_map<std::string, Character> m_Characters;
-private:
+protected:
     CharactersManager() noexcept
     {
         sf::Http http("http://thefangamedb.000webhostapp.com");
@@ -63,4 +58,8 @@ private:
                         std::stoul(data[CharData::DEF + i]));
         }
     };
+    ~CharactersManager() noexcept = default;
+public:
+    std::unordered_map<std::string, Character> m_Characters;
+private:
 };

@@ -1,11 +1,5 @@
 #include "Account.h"
 
-Account& Account::getInstance()
-{
-	static Account instance;
-	return instance;
-}
-
 const bool Account::Login(bool loaduplogin) noexcept
 {
 	if (!loaduplogin)

@@ -11,17 +11,19 @@
 
 class SettingsScreen : public PopupGUIState
 {
-    SettingsManager& s_SettingsManager = SettingsManager::getInstance("Settings.ini");
+    SettingsManager& s_SettingsManager = SettingsManager::getInstance();
     AudioManager& s_AudioManager = AudioManager::getInstance();
     ResourceManager& s_ResourceManager = ResourceManager::getInstance();
+    StateManager& s_StateManager = StateManager::getInstance();
+    InputManager& s_InputManager = InputManager::getInstance();
+
     enum class SETTINGS_STATE
     {
         GRAPHICS, PROFILE, AUDIO, INPUT, GAME, MAINSCREEN
     };SETTINGS_STATE m_state = SETTINGS_STATE::MAINSCREEN;
 public:
-    SettingsScreen(Application* app) noexcept { this->m_app = app; };
+    SettingsScreen(Application* app) noexcept { this->m_app = app; this->m_name = "Settings"; };
 
-    virtual void init(sf::RenderWindow& window) override;
     virtual void processEvent(sf::Event& event) noexcept override;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
 private:

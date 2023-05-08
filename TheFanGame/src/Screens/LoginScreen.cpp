@@ -3,7 +3,7 @@
 void LoginScreen::init(sf::RenderWindow& window)
 {
 	if (this->s_Account.m_rememberme && this->s_Account.Login(true))
-		this->m_app->m_StateManager.addGUIState<MainScreen>(this->m_app, true);
+		this->s_StateManager.addGUIState<MainScreen>(this->m_app, true);
 }
 
 void LoginScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
@@ -20,11 +20,11 @@ void LoginScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			ImGui::Button("Login"))
 		{
 			if (this->s_Account.Login())
-				this->m_app->m_StateManager.addGUIState<MainScreen>(this->m_app, true);
+				this->s_StateManager.addGUIState<MainScreen>(this->m_app, true);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Create Account"))
-			this->m_app->m_StateManager.addGUIState<RegisterScreen>(this->m_app);
+			this->s_StateManager.addGUIState<RegisterScreen>(this->m_app);
 		ImGui::SameLine();
 		ImGui::Checkbox("Remember me", &this->s_Account.m_rememberme);
 		

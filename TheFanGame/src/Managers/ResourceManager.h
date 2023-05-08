@@ -10,8 +10,9 @@
 
 #include "Utility.h"
 
-class ResourceManager : NonCopyable
+class ResourceManager : public Singleton<ResourceManager>
 {
+    friend class Singleton<ResourceManager>;
 public:
     struct Object
     {
@@ -29,17 +30,14 @@ public:
                          std::unique_ptr<Object>,
                          std::unique_ptr<AudioObject>>
     Resources;
-
+protected:
+    ResourceManager() noexcept = default;
     ~ResourceManager() noexcept = default;
-
-    [[nodiscard]] static ResourceManager& getInstance();
-    
+public:
     template<class T> T* add(const std::string_view id) noexcept;
     template<class T> void remove(const std::string_view id) noexcept;
     template<class T> [[nodiscard]] T* get(const std::string_view id) noexcept;
 private:
-    ResourceManager() noexcept = default;
-
     std::unordered_map<std::string_view, Resources> m_resources;
 };
 

@@ -2,13 +2,15 @@
 
 #include "Managers/Setting/SettingsManager.h"
 
-class InputManager : NonCopyable
+class InputManager : public Singleton<InputManager>
 {
-	SettingsManager& s_SettingsManager = SettingsManager::getInstance("Settings.ini");
-public:
+	friend class Singleton<InputManager>;
+
+	SettingsManager& s_SettingsManager = SettingsManager::getInstance();
+protected:
 	InputManager() noexcept;
 	~InputManager() noexcept = default;
-
+public:
 	void setEvent(sf::Event& event) noexcept;
 	void processEvent(sf::Event& event) noexcept;
 
