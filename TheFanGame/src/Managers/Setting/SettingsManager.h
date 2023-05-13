@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Utility.h"
 #include "Managers/FileManager.h"
 
 class SettingsManager : public Singleton<SettingsManager>

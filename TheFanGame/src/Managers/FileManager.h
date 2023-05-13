@@ -4,10 +4,9 @@
 #include <tuple>
 #include <unordered_map>
 
-#include "Utility.h"
 #include "Setting/Setting.h"
 
-class FileManager : NonCopyable
+class FileManager
 {
 	typedef std::tuple<const std::string, const std::string, const std::string> ParsedSetting;
 	typedef std::pair<const std::string, std::vector<ParsedSetting>> ParsedBranch;
