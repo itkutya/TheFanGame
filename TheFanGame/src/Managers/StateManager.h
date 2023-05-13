@@ -14,7 +14,17 @@
 
 class Application;
 
-class State : public NonCopyable
+class BaseState
+{
+public:
+    BaseState() noexcept = default;
+    virtual ~BaseState() noexcept = default;
+
+    Application* m_app = nullptr;
+private:
+};
+
+class State : public BaseState
 {
 public:
     State() noexcept = default;
@@ -24,11 +34,9 @@ public:
     virtual void processEvent(sf::Event& event) noexcept = 0;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept = 0;
     virtual void draw(sf::RenderWindow& window) noexcept = 0;
-
-    Application* m_app = nullptr;
 };
 
-class GUIState : public NonCopyable
+class GUIState : public BaseState
 {
 public:
     GUIState() noexcept = default;
@@ -38,8 +46,6 @@ public:
     virtual void processEvent(sf::Event& event) noexcept {};
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept {};
     virtual void draw(sf::RenderWindow& window) noexcept {};
-
-    Application* m_app = nullptr;
 };
 
 template<class T>
