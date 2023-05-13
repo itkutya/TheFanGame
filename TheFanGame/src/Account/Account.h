@@ -2,12 +2,12 @@
 
 #include <functional>
 
-#include "SFML/Network.hpp"
 #include "imgui.h"
 #include "imgui_stdlib.h"
 
 #include "Managers/Setting/SettingsManager.h"
 #include "Experience.h"
+#include "Database.h"
 
 constexpr std::uint8_t MAX_USERNAME_LENGTH = 16;
 
