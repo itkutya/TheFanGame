@@ -7,7 +7,7 @@
 
 #include "Managers/Setting/SettingsManager.h"
 #include "Experience.h"
-#include "Database.h"
+#include "Managers/Network/Database.h"
 
 constexpr std::uint8_t MAX_USERNAME_LENGTH = 16;
 

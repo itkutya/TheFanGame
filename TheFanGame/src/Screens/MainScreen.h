@@ -2,6 +2,7 @@
 
 #include "SettingsScreen.h"
 #include "ShopScreen.h"
+#include "Gameplay/Tutorial.h"
 
 class MainScreen : public GUIState
 {

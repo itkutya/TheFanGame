@@ -20,3 +20,13 @@ public:
 private:
 	std::unordered_map<mainBranch, secondBranch> m_settings;
 };
+
+struct AudioSettings
+{
+private:
+	SettingsManager& s_SettingsManager = SettingsManager::getInstance();
+public:
+	AudioSettings(bool loop = false) noexcept : m_loop(loop) {};
+	bool m_loop = false;
+	float& m_volume = this->s_SettingsManager["Audio"]["SoundEffectVolume"];
+};

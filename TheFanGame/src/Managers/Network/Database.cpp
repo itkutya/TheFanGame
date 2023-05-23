@@ -1,5 +1,6 @@
 #include "Database.h"
 
+//Use curl to avoid crashing when no connection...
 Database::Database(const char* link, const char* php, sf::Http::Request::Method method, const sf::Time timeout, std::string post) noexcept
 {
 	this->m_http.setHost(link);
@@ -10,7 +11,7 @@ Database::Database(const char* link, const char* php, sf::Http::Request::Method 
 	this->m_respone = this->m_http.sendRequest(this->m_request, timeout);
 
 	if (this->getStatus() != sf::Http::Response::Status::Ok)
-		std::printf("Error while sending request to the database!\n Error:%s", this->m_respone.getBody().c_str());
+		std::printf("Error while sending request to the database!\n Error:%s\n", this->m_respone.getBody().c_str());
 	else
 		this->parseData();
 }

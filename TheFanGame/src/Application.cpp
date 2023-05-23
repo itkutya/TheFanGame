@@ -58,6 +58,7 @@ void Application::update() noexcept
 			ImGui::TextColored(ImVec4(0, 0, 1, 1), "%.2f fps (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 		}ImGui::End();
 	}
+	this->s_AudioManager.m_BackGroundMusic.update();
 	this->s_StateManager.getCurrentState()->update(this->m_window, dt);
 }
 

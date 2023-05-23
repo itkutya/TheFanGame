@@ -9,7 +9,7 @@
 #include "SFML/Network.hpp"
 
 #include "Utility.h"
-#include "Database.h"
+#include "Managers/Network/Database.h"
 
 class CharactersManager : public Singleton<CharactersManager>
 {

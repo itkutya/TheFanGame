@@ -37,6 +37,7 @@ public:
     template<class T> T* add(const std::string_view id) noexcept;
     template<class T> void remove(const std::string_view id) noexcept;
     template<class T> [[nodiscard]] T* get(const std::string_view id) noexcept;
+    template<class T> [[nodiscard]] std::unique_ptr<T>& getUniquePtr(const std::string_view id) noexcept;
 private:
     std::unordered_map<std::string_view, Resources> m_resources;
 };
@@ -58,4 +59,10 @@ template<class T>
 inline T* ResourceManager::get(const std::string_view id) noexcept
 {
     return std::get<std::unique_ptr<T>>(this->m_resources.at(id)).get();
+}
+
+template<class T>
+inline std::unique_ptr<T>& ResourceManager::getUniquePtr(const std::string_view id) noexcept
+{
+    return std::get<std::unique_ptr<T>>(this->m_resources.at(id));
 }

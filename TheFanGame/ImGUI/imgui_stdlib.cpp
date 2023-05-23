@@ -84,6 +84,14 @@ bool ImGui::InputTextWithHint(const char* label, const char* hint, std::string* 
     return InputTextWithHint(label, hint, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
 }
 
+IMGUI_API bool ImGui::ButtonWithToolTip(const char* label, const ImVec2 size, const char* tooltip) noexcept
+{
+    const bool temp = ImGui::Button(label, size);
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip(tooltip);
+    return temp;
+}
+
 IMGUI_API bool ImGui::CenteredButton(const char* label, float alignment)
 {
     ImGuiStyle& style = GetStyle();

@@ -82,20 +82,21 @@ void SettingsScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexce
 			ImGui::Text("Currently playing: ");
 			ImGui::SameLine();
 			ImGui::SetNextItemWidth(500.f);
-			if (ImGui::BeginCombo("###MusicSelector", this->s_AudioManager.m_CurrentMusicTitle.c_str(), ImGuiComboFlags_HeightSmall))
+			if (ImGui::BeginCombo("###MusicSelector", this->s_AudioManager.m_BackGroundMusic.m_CurrentTitle.c_str(), ImGuiComboFlags_HeightSmall))
 			{
-				for (auto& music : this->s_AudioManager.m_MusicTitles)
+				for (const auto& music : this->s_AudioManager.m_BackGroundMusic.m_MusicTitles)
 				{
-					if (ImGui::Selectable(music.data()) && this->s_AudioManager.m_CurrentMusicTitle.c_str() != music.data())
-						if (!this->s_AudioManager.replaceCurrentMusic(music))
+					if (ImGui::Selectable(music) && this->s_AudioManager.m_BackGroundMusic.m_CurrentTitle.c_str() != music)
+						if (!this->s_AudioManager.m_BackGroundMusic.change(music))
 							ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
 				}
 				ImGui::EndCombo();
 			}
-			if (ImGui::SliderFloat("Music volume: ", &this->s_AudioManager.m_musicvolume, 0.f, 100.f))
-				this->s_AudioManager.m_CurrentMusic->setVolume(this->s_AudioManager.m_musicvolume);
-			ImGui::SliderFloat("Game volume: ", &this->s_AudioManager.m_gamevolume, 0.f, 100.f);
-			ImGui::SliderFloat("SFX volume: ", &this->s_AudioManager.m_sfxvolume, 0.f, 100.f);
+			if (ImGui::SliderFloat("Global volume: ", &this->s_AudioManager.m_GlobalVolume, 0.f, 100.f))
+				sf::Listener::setGlobalVolume(this->s_AudioManager.m_GlobalVolume);
+			if (ImGui::SliderFloat("Music volume: ", &this->s_AudioManager.m_BackGroundMusic.m_volume, 0.f, 100.f))
+				this->s_AudioManager.m_BackGroundMusic.m_Music->setVolume(this->s_AudioManager.m_BackGroundMusic.m_volume);
+			ImGui::SliderFloat("SFX volume: ", &this->s_AudioManager.m_SoundEffectVolume, 0.f, 100.f);
 		}
 		break;
 		case SETTINGS_STATE::INPUT:

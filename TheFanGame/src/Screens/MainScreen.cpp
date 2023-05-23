@@ -15,9 +15,6 @@ void MainScreen::init(sf::RenderWindow& window)
 		this->m_FrontImage->Sprite.setTexture(this->m_FrontImage->Texture);
 		this->m_FrontImage->Sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 600, 600 }));
 	}
-
-	if (!this->s_AudioManager.replaceCurrentMusic(this->s_AudioManager.m_CurrentMusicTitle.c_str()))
-		ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
 }
 
 void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
@@ -41,27 +38,27 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 				ImGui::TableNextColumn();
 				ImGui::Text("Account: %s\nXP: %.2f/%.2f\nLevel: %i\nCoverCoin: %u$",
 					(this->s_Account.m_username).c_str(),
-					 this->s_Account.m_experience.getCurrentXP(),
-					 this->s_Account.m_experience.getCurrentXPCap(),
-					 this->s_Account.m_experience.getLevel(),
-					 this->s_Account.m_currency);
+					this->s_Account.m_experience.getCurrentXP(),
+					this->s_Account.m_experience.getCurrentXPCap(),
+					this->s_Account.m_experience.getLevel(),
+					this->s_Account.m_currency);
 				ImGui::Dummy(ImVec2(ImGui::GetContentRegionMax().x, 0.f));
 				ImGui::ProgressBar(this->s_Account.m_experience.getProgress());
 				ImGui::EndTable();
 			}
 			ImGui::TableNextColumn();
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-			if (this->s_AudioManager.m_CurrentMusic->getStatus() == sf::SoundSource::Playing)
+			if (this->s_AudioManager.m_BackGroundMusic.m_Music->getStatus() == sf::SoundSource::Playing)
 			{
 				ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
 				if (ImGui::Button("\xef\x81\x8c", sf::Vector2f(35.f, 35.f)))
-					this->s_AudioManager.m_CurrentMusic->pause();
+					this->s_AudioManager.m_BackGroundMusic.m_Music->pause();
 			}
 			else
 			{
 				ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.65f, 0.5f));
 				if (ImGui::Button("\xef\x81\x8b", sf::Vector2f(35.f, 35.f)))
-					this->s_AudioManager.m_CurrentMusic->play();
+					this->s_AudioManager.m_BackGroundMusic.m_Music->play();
 			}
 			ImGui::PopStyleColor();
 			ImGui::PopStyleVar();
@@ -69,12 +66,12 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 			ImGui::Text("Currently playing: ");
 			ImGui::SameLine();
 			ImGui::PushItemWidth(300.f);
-			if (ImGui::BeginCombo("###MusicSelector", this->s_AudioManager.m_CurrentMusicTitle.c_str(), ImGuiComboFlags_HeightSmall))
+			if (ImGui::BeginCombo("###MusicSelector", this->s_AudioManager.m_BackGroundMusic.m_CurrentTitle.c_str(), ImGuiComboFlags_HeightSmall))
 			{
-				for (auto& music : this->s_AudioManager.m_MusicTitles)
+				for (const auto& music : this->s_AudioManager.m_BackGroundMusic.m_MusicTitles)
 				{
-					if (ImGui::Selectable(music.data()) && this->s_AudioManager.m_CurrentMusicTitle.c_str() != music.data())
-						if (!this->s_AudioManager.replaceCurrentMusic(music))
+					if (ImGui::Selectable(music) && this->s_AudioManager.m_BackGroundMusic.m_CurrentTitle.c_str() != music)
+						if (!this->s_AudioManager.m_BackGroundMusic.change(music))
 							ImGui::InsertNotification({ ImGuiToastType_Warning, "Failed to load the music file!" });
 				}
 				ImGui::EndCombo();
@@ -98,34 +95,27 @@ void MainScreen::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 					ImGui::SetTooltip("Start playing the game RIGHT NOW!");
 				if (ImGui::BeginPopupModal("PlaySelected", &this->m_PlaySelected, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
 				{
+					if (ImGui::ButtonWithToolTip("Tutorial", ImVec2(200.f, 50.f), "Select this if you want to learn how to play the game."))
+					{
+						this->m_PlaySelected = false;
+						this->s_StateManager.popCurrentGUIState();
+						this->s_StateManager.addState<Tutorial>(this->m_app, true);
+					}
+					if (ImGui::Button("Story", ImVec2(200.f, 50.f)))
+					{
+						this->m_PlaySelected = false;
+					}
+					if (ImGui::Button("LAN COOP", ImVec2(200.f, 50.f)))
+					{
+						this->m_PlaySelected = false;
+					}
 					if (ImGui::Button("Singleplayer", ImVec2(200.f, 50.f)))
 					{
 						this->m_PlaySelected = false;
-						//this->m_MainMusic->stop();
-						//this->m_State = state::Singleplayer;
-						//stateSystem::add<game>(window);
 					}
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("Starts the game state.");
-
 					if (ImGui::Button("Multiplayer", ImVec2(200.f, 50.f)))
 					{
-						/*
-						if (this->mpPanel.network.join())
-						{
-							using namespace std::chrono_literals;
-							if (this->mpPanel.network.receive(this->mpPanel.ServerNum).wait_for(3s) == std::future_status::ready)
-							{
-								for (std::size_t i = 0; i < this->mpPanel.ServerNum; ++i)
-									this->mpPanel.servers.push_back({ sf::IpAddress(0), 0 });
-								guistateSystem::add<multiplayerPanel>();
-							}
-							else
-								ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, "Cannot connect to main server!"));
-						}
-						else
-							ImGui::InsertNotification(ImGuiToast(ImGuiToastType_Error, "Cannot connect to main server!"));
-						*/
+						this->m_PlaySelected = false;
 					}
 					ImGui::EndPopup();
 				}

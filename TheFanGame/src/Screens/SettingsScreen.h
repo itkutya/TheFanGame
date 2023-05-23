@@ -2,9 +2,9 @@
 
 #include "Managers/Setting/SettingsManager.h"
 #include "Managers/Input/InputManager.h"
+#include "Managers/Audio/AudioManager.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/StateManager.h"
-#include "Managers/AudioManager.h"
 #include "Account/Account.h"
 
 #include "Application.h"

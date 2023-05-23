@@ -8,6 +8,7 @@ class Application
 	SettingsManager& s_SettingsManager = SettingsManager::getInstance();
 	StateManager& s_StateManager = StateManager::getInstance();
 	InputManager& s_InputManager = InputManager::getInstance();
+	AudioManager& s_AudioManager = AudioManager::getInstance();
 public:
 	explicit Application(const std::string& title) noexcept;
 	virtual ~Application() noexcept;

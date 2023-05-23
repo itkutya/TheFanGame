@@ -1,0 +1,17 @@
+Open word
+Dungeon crawler
+FPS
+Chest Opening ingame
+No innventory -> instead smth else
+Unique Abilities
+Open spaces with no rooftop as well not just dungeon
+Multiple LVL
+More floors
+Safe spaces in dungeons
+Game modes:
+	Tutorial
+	Story Mode
+	Singleplayer Mode
+	LAN COOP Mode
+	Multiplayer Mode
+etc...

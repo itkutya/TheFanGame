@@ -170,13 +170,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Database.cpp" />
+    <ClCompile Include="src\World\Skybox.cpp" />
+    <ClCompile Include="src\World\Floor.cpp" />
+    <ClCompile Include="src\World\Dungeon.cpp" />
+    <ClCompile Include="src\Gameplay\Game.cpp" />
+    <ClCompile Include="src\Managers\Audio\Sound.cpp" />
+    <ClCompile Include="src\Managers\Audio\Music.cpp" />
+    <ClCompile Include="src\Managers\Network\Database.cpp" />
     <ClCompile Include="src\Managers\FileManager.cpp" />
     <ClCompile Include="src\Managers\CharactersManager.cpp" />
     <ClCompile Include="src\Screens\ShopScreen.cpp" />
     <ClCompile Include="src\Managers\Input\InputManager.cpp" />
     <ClCompile Include="src\Managers\Setting\SettingsManager.cpp" />
-    <ClCompile Include="src\Managers\AudioManager.cpp" />
+    <ClCompile Include="src\Managers\Audio\AudioManager.cpp" />
     <ClCompile Include="src\Screens\SettingsScreen.cpp" />
     <ClCompile Include="src\Screens\MainScreen.cpp" />
     <ClCompile Include="src\Screens\RegisterScreen.cpp" />
@@ -196,9 +202,17 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Managers\StateManager.cpp" />
     <ClCompile Include="src\Utility.cpp" />
+    <ClCompile Include="src\Gameplay\Tutorial.cpp" />
+    <ClCompile Include="src\World\Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Database.h" />
+    <ClInclude Include="src\World\Skybox.h" />
+    <ClInclude Include="src\World\Floor.h" />
+    <ClInclude Include="src\World\Dungeon.h" />
+    <ClInclude Include="src\Gameplay\Game.h" />
+    <ClInclude Include="src\Managers\Audio\Sound.h" />
+    <ClInclude Include="src\Managers\Audio\Music.h" />
+    <ClInclude Include="src\Managers\Network\Database.h" />
     <ClInclude Include="src\Managers\Setting\Setting.h" />
     <ClInclude Include="src\Managers\FileManager.h" />
     <ClInclude Include="ImGUI\IconsFontAwesome6.h" />
@@ -207,7 +221,7 @@
     <ClInclude Include="src\Managers\Input\InputTypes.h" />
     <ClInclude Include="src\Managers\Input\InputManager.h" />
     <ClInclude Include="src\Managers\Setting\SettingsManager.h" />
-    <ClInclude Include="src\Managers\AudioManager.h" />
+    <ClInclude Include="src\Managers\Audio\AudioManager.h" />
     <ClInclude Include="src\Screens\SettingsScreen.h" />
     <ClInclude Include="src\Screens\MainScreen.h" />
     <ClInclude Include="src\Screens\RegisterScreen.h" />
@@ -230,12 +244,17 @@
     <ClInclude Include="ImGUI\imstb_truetype.h" />
     <ClInclude Include="src\Managers\StateManager.h" />
     <ClInclude Include="src\Utility.h" />
+    <ClInclude Include="src\Gameplay\Tutorial.h" />
+    <ClInclude Include="src\World\Tile.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\wolftextures.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Settings.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Ideas.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

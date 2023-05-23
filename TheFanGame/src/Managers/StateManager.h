@@ -14,17 +14,7 @@
 
 class Application;
 
-class BaseState
-{
-public:
-    BaseState() noexcept = default;
-    virtual ~BaseState() noexcept = default;
-
-    Application* m_app = nullptr;
-private:
-};
-
-class State : public BaseState
+class State
 {
 public:
     State() noexcept = default;
@@ -34,18 +24,20 @@ public:
     virtual void processEvent(sf::Event& event) noexcept = 0;
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept = 0;
     virtual void draw(sf::RenderWindow& window) noexcept = 0;
+
+    Application* m_app = nullptr;
 };
 
-class GUIState : public BaseState
+class GUIState : public State
 {
 public:
     GUIState() noexcept = default;
     virtual ~GUIState() noexcept = default;
 
-    virtual void init(sf::RenderWindow& window) {};
-    virtual void processEvent(sf::Event& event) noexcept {};
-    virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept {};
-    virtual void draw(sf::RenderWindow& window) noexcept {};
+    virtual void init(sf::RenderWindow& window) override {};
+    virtual void processEvent(sf::Event& event) noexcept override {};
+    virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override {};
+    virtual void draw(sf::RenderWindow& window) noexcept override {};
 };
 
 template<class T>
@@ -118,12 +110,12 @@ public:
     bool m_open = false;
     const char* m_name = "###";
 
-    virtual inline void init(sf::RenderWindow& window) override
+    virtual inline void init(sf::RenderWindow& window) final
     {
         this->m_open = true;
     }
 
-    virtual inline void draw(sf::RenderWindow& window) noexcept override
+    virtual inline void draw(sf::RenderWindow& window) noexcept final
     {
         if (this->m_once)
         {
