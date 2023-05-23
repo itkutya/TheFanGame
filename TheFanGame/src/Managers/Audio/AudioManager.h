@@ -11,7 +11,7 @@ class AudioManager : public Singleton<AudioManager>
     SettingsManager& s_SettingsManager = SettingsManager::getInstance();
 protected:
     AudioManager() noexcept;
-    ~AudioManager() noexcept = default;
+    ~AudioManager() noexcept;
 public:
     void addSoundEffect(const char* title, AudioSettings as = { false }) noexcept;
 

@@ -9,6 +9,7 @@ constexpr std::uint16_t TILE_TEXTURE_HEIGHT = 16;
 
 struct TileType
 {
+public:
 	enum TextureType
 	{
 		None, Grassy, Bricky

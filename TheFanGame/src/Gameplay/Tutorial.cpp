@@ -2,7 +2,10 @@
 
 void Tutorial::init(sf::RenderWindow& window)
 {
-	Floor f(12, 12);
+	this->m_dungeon = Dungeon(3);
+	this->m_dungeon.m_floors[0] = Floor(5, 5);
+	this->m_dungeon.m_floors[1] = Floor(12, 12);
+	this->m_dungeon.m_floors[2] = Floor(24, 24);
 }
 
 void Tutorial::processEvent(sf::Event& event) noexcept

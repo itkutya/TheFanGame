@@ -13,6 +13,8 @@ public:
 private:
 	bool hasBoss = false;
 	bool isSafePoint = false;
+	bool m_hasStart = false;
+	bool m_hasExit = false;
 	//...
 	std::vector<Tile> m_layout;
 };
