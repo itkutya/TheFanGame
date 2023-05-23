@@ -6,6 +6,7 @@
 
 class Floor
 {
+	typedef std::tuple<Ground, Wall, Ceiling> Tile;
 public:
 	Floor(const int x = 0, const int y = 0) noexcept;
 	~Floor() noexcept = default;

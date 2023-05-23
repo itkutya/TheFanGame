@@ -28,6 +28,14 @@ struct Ground : public TileType
 	{
 		this->construct("Ground", type);
 	};
+
+	Ground operator=(const Ground& other) noexcept
+	{
+		this->m_occupied = other.m_occupied;
+		this->m_TextureType = other.m_TextureType;
+		this->m_texture = other.m_texture;
+		return *this;
+	};
 };
 
 struct Wall : public TileType
@@ -52,9 +60,12 @@ struct Ceiling : public TileType
 	{
 		this->construct("Ceiling", type);
 	};
-};
 
-struct Tile
-{
-	std::tuple<Ground, Wall, Ceiling> m_Tile;
+	Ceiling operator=(const Ceiling& other) noexcept
+	{
+		this->m_occupied = other.m_occupied;
+		this->m_TextureType = other.m_TextureType;
+		this->m_texture = other.m_texture;
+		return *this;
+	};
 };

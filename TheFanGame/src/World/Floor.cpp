@@ -7,7 +7,7 @@ Floor::Floor(const int x, const int y) noexcept
 
 	for (auto tile = this->m_layout.begin(); tile != this->m_layout.end(); ++tile)
 	{
-		auto& [ground, wall, ceiling] = tile->m_Tile;
+		auto& [ground, wall, ceiling] = *tile;
 		std::size_t i = std::distance(this->m_layout.begin(), tile);
 		if (i == 0 || i < x || i % x == 0 || i % x == std::size_t(x - 1) || (i > std::size_t(x * y) - x))
 			wall = Wall(TileType::TextureType::Bricky);
@@ -17,7 +17,7 @@ Floor::Floor(const int x, const int y) noexcept
 	std::vector<int> temp(x * y);
 	for (std::size_t i = 0; i < this->m_layout.size(); ++i)
 	{
-		auto& [ground, wall, ceiling] = this->m_layout[i].m_Tile;
+		auto& [ground, wall, ceiling] = this->m_layout[i];
 		if (wall.m_occupied)
 			temp[i] = 1;
 		std::printf("%i", temp[i]);
