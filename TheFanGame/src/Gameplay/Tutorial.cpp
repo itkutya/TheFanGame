@@ -22,8 +22,5 @@ void Tutorial::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 
 void Tutorial::draw(sf::RenderWindow& window) noexcept
 {
-	sf::RenderStates state;
-	state.texture = &this->m_dungeon->m_texture;
-	state.transform = this->m_dungeon->getTransform();
-	window.draw(*this->m_dungeon, state);
+	window.draw(*this->m_dungeon);
 }

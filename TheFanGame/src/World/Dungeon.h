@@ -2,10 +2,9 @@
 
 #include <initializer_list>
 
-#include "Gameplay/Entity.h"
 #include "Floor.h"
 
-class Dungeon : public Entity
+class Dungeon : public sf::Drawable
 {
 public:
 	Dungeon(const std::initializer_list<Floor> floors) noexcept;
