@@ -170,6 +170,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Gameplay\Entity.cpp" />
+    <ClCompile Include="src\Gameplay\Player.cpp" />
     <ClCompile Include="src\World\Skybox.cpp" />
     <ClCompile Include="src\World\Floor.cpp" />
     <ClCompile Include="src\World\Dungeon.cpp" />
@@ -206,6 +208,8 @@
     <ClCompile Include="src\World\Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Gameplay\Entity.h" />
+    <ClInclude Include="src\Gameplay\Player.h" />
     <ClInclude Include="src\World\Skybox.h" />
     <ClInclude Include="src\World\Floor.h" />
     <ClInclude Include="src\World\Dungeon.h" />

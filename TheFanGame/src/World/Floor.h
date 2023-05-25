@@ -8,13 +8,21 @@ class Floor
 {
 	typedef std::tuple<Ground, Wall, Ceiling> Tile;
 public:
-	Floor(const int x = 0, const int y = 0) noexcept;
+	enum class FloorType
+	{
+		None, Randomized, NotRandomized
+	};
+
+	Floor(const std::uint32_t x, const std::uint32_t y, const FloorType type = FloorType::None) noexcept;
 	~Floor() noexcept = default;
-private:
+
 	bool hasBoss = false;
 	bool isSafePoint = false;
 	bool m_hasStart = false;
 	bool m_hasExit = false;
+	sf::Vector2u m_size;
+	FloorType m_floorType;
 	//...
 	std::vector<Tile> m_layout;
+private:
 };

@@ -2,10 +2,7 @@
 
 void Tutorial::init(sf::RenderWindow& window)
 {
-	this->m_dungeon = Dungeon(3);
-	this->m_dungeon.m_floors[0] = Floor(5, 5);
-	this->m_dungeon.m_floors[1] = Floor(12, 12);
-	this->m_dungeon.m_floors[2] = Floor(24, 24);
+	this->m_dungeon = std::make_unique<Dungeon>(std::initializer_list<Floor>{ Floor(5, 5), Floor(12, 12), Floor(24, 24) });
 }
 
 void Tutorial::processEvent(sf::Event& event) noexcept
@@ -14,8 +11,19 @@ void Tutorial::processEvent(sf::Event& event) noexcept
 
 void Tutorial::update(sf::RenderWindow& window, const sf::Time& dt) noexcept
 {
+	if (ImGui::Button("<-") && this->m_dungeon->m_currentFloor > 0)
+		--this->m_dungeon->m_currentFloor;
+	ImGui::SameLine();
+	ImGui::Text("Current floor number: %i", this->m_dungeon->m_currentFloor);
+	ImGui::SameLine();
+	if (ImGui::Button("->") && this->m_dungeon->m_currentFloor < this->m_dungeon->m_floors.size() - 1)
+		++this->m_dungeon->m_currentFloor;
 }
 
 void Tutorial::draw(sf::RenderWindow& window) noexcept
 {
+	sf::RenderStates state;
+	state.texture = &this->m_dungeon->m_texture;
+	state.transform = this->m_dungeon->getTransform();
+	window.draw(*this->m_dungeon, state);
 }

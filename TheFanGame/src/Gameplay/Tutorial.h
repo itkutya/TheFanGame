@@ -12,5 +12,5 @@ public:
     virtual void update(sf::RenderWindow& window, const sf::Time& dt) noexcept override;
     virtual void draw(sf::RenderWindow& window) noexcept override;
 private:
-    Dungeon m_dungeon;
+    std::unique_ptr<Dungeon> m_dungeon;
 };
